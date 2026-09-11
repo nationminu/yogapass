@@ -3,11 +3,11 @@ doc_id: PM-PLAN
 title: 프로젝트 계획서
 phase: P1
 owner: pmo
-version: 0.3
-status: in-review
+version: 1.0
+status: approved
 reviewers: [planner, developer]
 inputs: [pm/requests/CR-000_initial-request.md]
-updated: 2026-09-11
+updated: 2026-09-12
 ---
 
 # 프로젝트 계획서 — 강남 요가패스 홈페이지

@@ -1,0 +1,32 @@
+# 의존성 · 빌드 산출물
+node_modules/
+dist/
+build/
+out/
+.astro/
+.next/
+.nuxt/
+.cache/
+.vercel/
+.netlify/
+
+# 비밀 정보 (예시 파일만 커밋)
+.env
+.env.*
+!.env.example
+
+# 고객 인도 패키지 (git archive 결과물)
+.delivery/
+
+# 대용량 테스트 증거 (요약·스크린샷은 커밋)
+qa/evidence/**/*.webm
+qa/evidence/**/*.mp4
+qa/evidence/**/trace*.zip
+
+# OS · 에디터
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.log

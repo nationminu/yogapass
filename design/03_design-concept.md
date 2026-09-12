@@ -3,7 +3,7 @@ doc_id: DSN-CONCEPT
 title: 디자인 컨셉 (시안 3안)
 phase: P3
 owner: designer
-version: 0.1
+version: 0.2
 status: in-review
 reviewers: [planner, developer]
 inputs: [planning/02_requirements.md, planning/02_information-architecture.md, planning/02_storyboard.md, planning/02_storyboard-admin.md, pm/01_project-plan.md, pm/requests/CR-000_initial-request.md, interviews/2026-09-12_booking-rules.md, shared/reviews/CR-001_impact_designer.md]
@@ -234,11 +234,15 @@ updated: 2026-09-12
 
 ## 4. PM 선택 결과
 
-- 선택 시안:
-- 수정·조합 요청:
-- A-보정-1 / A-보정-2 수용 여부:
-- 결정 일자:
-- 결정 기록: `shared/decisions/ADR-{nnn}_design-concept.md`
+- 선택 시안: **시안 A — 정돈된 신뢰**
+- 수정·조합 요청: 없음
+- A-보정-1 / A-보정-2 수용 여부: **둘 다 적용** (섹션 간격 88 → 96px · 히어로 상하 패딩 88 → 104px / **1차 소개형 화면 한정** radius 8 → 12px + 강점 카드 아이콘 원형)
+- 함께 확정된 사항: 관리자 디자인 수준 **안 B**(동일 토큰·기능 위주) · 관리자 모바일 **M-2**(읽기 전용) · 로고는 **임시 로고 사용**(고객 원본 미확보) · **사진 0장 전제**
+- 결정 일자: **2026-09-12**
+- 결정 기록: `shared/decisions/ADR-{nnn}_design-concept.md` (pmo 발행 예정)
+
+> 이 결정에 따라 §5의 확인 사항은 **Q-D1·Q-D2·Q-D5·Q-D6이 해소**됐다. **Q-D3(로고 원본·브랜드 컬러, 기한 09-17)과 Q-D4(사진 조달)는 미해소**이며 각 기준값대로 진행한다.
+> 후속 산출물: `design/03_design-system.md` v0.1 · `design/03_page-design.md` v0.1 · `design/mockups/scr-001·002·003·008.html` (2026-09-12).
 
 ---
 
@@ -260,3 +264,4 @@ updated: 2026-09-12
 | 버전 | 일자 | 작성자 | 내용 | 관련 리뷰/CR |
 |---|---|---|---|---|
 | 0.1 | 2026-09-12 | designer | 최초 작성 — 3안(A 정돈된 신뢰 / B 고요한 호흡 / C 또렷한 안내) 정의, 시안별 대비 측정값 산출, 기능 화면 확장성 축을 포함한 비교표, 권고안(A + 보정 2건), PM 확인 사항 6건. 목업 3종·임시 로고 2종·SOURCES.md 동시 작성 | CR-001 영향도 의견(designer) §6.3 반영 |
+| 0.2 | 2026-09-12 | designer | **§4 PM 선택 결과 기입** — 시안 A 확정, 보정 1·2 둘 다 적용, 관리자 안 B · 모바일 M-2 · 임시 로고 · 사진 0장 전제 확정. 확인 사항 Q-D1·D2·D5·D6 해소 / Q-D3·D4 미해소 표시. 후속 산출물 경로 연결 | PM 결정 2026-09-12 |

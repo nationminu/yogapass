@@ -684,7 +684,7 @@ summary:focus-visible,
 
 포커스 전에는 화면 밖(`position:absolute; left:-9999px`)에 두고, `:focus`에서 **좌상단 16px 지점에 `primary md` 버튼**으로 나타난다. 라벨 "본문 바로가기", 대상 `#main`. `z-index`는 `--z-toast`(헤더 위에 떠야 한다).
 
-> **구현 확정 (developer R1 #7)**: 대상 요소는 **`<main id="main" tabindex="-1">`** 으로 만든다. Safari 등 일부 브라우저는 `tabindex="-1"`이 없으면 skip link를 눌러도 포커스가 실제로 이동하지 않는다. 목업에는 `.skip` CSS만 있고 마크업이 빠져 있었으므로 v0.2에서 각 목업 파일의 대표 프레임에 마크업을 넣었다(다른 프레임은 같은 구조 반복이라 생략 — 구현 정본은 이 절이다).
+> **구현 확정 (developer R1 #7)**: 대상 요소는 **`<main id="main" tabindex="-1">`** 으로 만든다. Safari 등 일부 브라우저는 `tabindex="-1"`이 없으면 skip link를 눌러도 포커스가 실제로 이동하지 않는다. 목업에는 `.skip` CSS만 있고 마크업이 빠져 있었으므로 v0.2에서 **`mockups/scr-003.html`·`mockups/scr-001.html`의 대표 프레임과 신규 `mockups/scr-006.html`에 마크업을 넣었다.** `scr-002.html`·`scr-008.html`은 `.skip` 스타일 자체가 없어 v0.2 반영 범위에서 제외했다(같은 구조 반복 — **구현 정본은 이 절이며 전 화면에 적용한다**).
 
 ### CMP-009 Container / Section
 

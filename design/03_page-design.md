@@ -310,7 +310,7 @@ updated: 2026-09-12
 ## 5. SCR-006 개인정보 처리방침
 
 - 화면정의: `planning/02_storyboard.md` SCR-006 (목차 13항목)
-- 목업: **`design/mockups/scr-006.html` (v0.2 신규 — planner R1 #5)**. 1280px(2단 sticky TOC) · 360px(`<details>` 목차 + 표 → 카드 전환) 2프레임
+- 목업: **`design/mockups/scr-006.html` (v0.2 신규 — planner R1 #5)**. ① 1280px(좌 240px sticky TOC + 우 720px 본문 2단) ② 360px 2프레임(`<details>` 목차 접힘/펼침 + 표 → 카드 전환 + 고정 바 S1 보조 규칙)
 
 ### 5.1 레이아웃
 

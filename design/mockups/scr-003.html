@@ -175,6 +175,11 @@ body{background:#EEF1F5;color:#16263A;font-family:Pretendard,"Pretendard Variabl
 .yp .bodypad{height:calc(var(--fixed-bar-h) + 16px)}
 .yp .nobar{padding:16px;background:var(--color-neutral-bg);border-top:1px dashed var(--color-border-strong);
   font-size:13px;color:var(--color-neutral);text-align:center}
+/* 목업 전용 상태 라벨(사이트 디자인 아님) */
+.yp .state{font-size:12.5px;line-height:1.5;color:var(--color-neutral);background:var(--color-neutral-bg);
+  border:1px dashed var(--color-border-strong);border-radius:6px;padding:6px 10px;max-width:360px}
+.yp .state b{color:var(--color-ink)}
+.yp .skip{position:absolute;left:-9999px}
 </style>
 </head>
 <body>
@@ -192,13 +197,14 @@ body{background:#EEF1F5;color:#16263A;font-family:Pretendard,"Pretendard Variabl
   <span>지도 좌 / 정보 우 2단(gap 40px) · 지도 대체 영역 400px · 문의 폼 본문 폭 640px 중앙 정렬 · 고정 바 미노출(1280px 구간 규칙)</span></div>
 <div class="mk-scroll"><div class="mk-frame">
 <div class="yp vp-1280">
+  <a class="skip" href="#main">본문 바로가기</a>
   <header class="hdr"><div class="wrap">
     <a class="logo" href="#"><svg viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"><path d="M7.5 33.5a16.5 16.5 0 0 1 33 0"/><path d="M6 40.5h36"/></g><circle cx="24" cy="12" r="5.5" fill="currentColor"/></svg><span><b>YOGAPASS</b><small>강남 요가 스튜디오</small></span></a>
     <nav class="gnb" aria-label="주 메뉴"><a href="#">홈</a><a href="#">강사 소개</a><a href="#" aria-current="page">오시는 길</a><a href="#">문의하기</a></nav>
-    <div class="hdr-right"><a class="hdr-tel" href="#"><span class="tbd">[TBD: 대표 전화]</span></a><a class="btn btn-p" href="#">문의하기</a></div>
+    <div class="hdr-right"><span class="state">헤더 주 CTA <b>H3 미노출</b> — 자기 참조(G-6 ①) + 대표 전화 [TBD](G-6 ②)</span></div>
   </div></header>
 
-  <main>
+  <main id="main" tabindex="-1">
     <div class="wrap"><div class="pagehead">
       <h1>오시는 길</h1>
       <p class="lead">강남 요가패스를 찾아오시는 방법을 안내합니다.</p>
@@ -206,7 +212,7 @@ body{background:#EEF1F5;color:#16263A;font-family:Pretendard,"Pretendard Variabl
     </div></div>
 
     <section class="sec" id="map"><div class="wrap">
-      <h2>지도</h2>
+      <h2 tabindex="-1">지도·오시는 길</h2>
       <div class="two">
         <div>
           <div class="map">
@@ -259,7 +265,7 @@ body{background:#EEF1F5;color:#16263A;font-family:Pretendard,"Pretendard Variabl
   <footer class="ftr"><div class="wrap">
     <div><span class="logo" style="color:#fff;max-width:none"><svg viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"><path d="M7.5 33.5a16.5 16.5 0 0 1 33 0"/><path d="M6 40.5h36"/></g><circle cx="24" cy="12" r="5.5" fill="currentColor"/></svg><span><b>YOGAPASS</b></span></span>
       <p class="ft-muted">상호·주소·전화·운영시간 <span class="tbd">[TBD]</span></p></div>
-    <div><h4>메뉴</h4><a href="#">홈</a><a href="#">요가 강사 소개</a><a href="#">오시는 길</a><a href="#">문의하기</a></div>
+    <div><h4>메뉴</h4><a href="#">홈</a><a href="#">강사 소개</a><a href="#">오시는 길</a><a href="#">문의하기</a></div>
     <div><h4>안내</h4><a href="#" class="strong">개인정보 처리방침</a></div>
     <div><h4>소셜</h4><p class="ft-muted" style="font-size:13px">계정 미확인(T-H) → 섹션 미노출</p></div>
   </div></footer>

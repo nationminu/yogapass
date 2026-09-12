@@ -3,10 +3,10 @@ doc_id: DSN-SYSTEM
 title: 디자인 시스템
 phase: P3
 owner: designer
-version: 0.1
+version: 0.2
 status: in-review
 reviewers: [planner, developer]
-inputs: [design/03_design-concept.md, planning/02_requirements.md, planning/02_information-architecture.md, planning/02_storyboard.md, pm/01_project-plan.md]
+inputs: [design/03_design-concept.md, planning/02_requirements.md, planning/02_information-architecture.md, planning/02_storyboard.md, pm/01_project-plan.md, shared/reviews/P3_design-docs_planner_r1.md, shared/reviews/P3_design-docs_developer_r1.md]
 updated: 2026-09-12
 ---
 
@@ -109,9 +109,20 @@ updated: 2026-09-12
 **폰트**: **Pretendard / Pretendard Variable** 단일 (SIL Open Font License 1.1 · https://github.com/orioncactus/pretendard). 라이선스 근거는 `design/assets/SOURCES.md` §2.
 
 - **로딩 방식**: P4에서 **self-host**(로컬 번들). 외부 CDN·Google Fonts를 쓰지 않는다(초기 로드 외부 도메인 요청 0건 — REQ-F-032·REQ-N-004 성능 목표와 같은 원칙).
-- `font-display: swap` + **한글 subset(Korean + Latin) 우선 로드**, Variable 단일 파일 사용 시 weight 400/500/700만 사용한다.
 - **폴백 스택**: `-apple-system, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif` (OS 동봉 폰트 — 저장소에 포함하지 않는다)
 - **숫자**: 전역 `font-variant-numeric: tabular-nums` (시간·잔여·날짜·전화번호 정렬 — 2차 캘린더·표에서 필수)
+
+**폰트 파일 구성 — 확정 (v0.2 · developer R1 #5 처리)**
+
+| # | 항목 | 확정값 | 근거 |
+|---|---|---|---|
+| ① | 파일 형태 | **static 2종(400 · 700)** × **`unicode-range` 분할 subset woff2**(Pretendard 배포본의 dynamic subset 세트). **Variable 단일 파일을 쓰지 않는다** | Variable 단일 파일은 한글 전체를 포함해 1MB를 넘고, **weight를 덜 쓴다고 파일이 작아지지 않는다**(v0.1의 "Variable 단일 파일 사용 시 weight 400/500/700만 사용한다"는 전제를 **정정**한다). `unicode-range` 분할은 첫 화면에 실제로 쓰인 글자 chunk만 내려받아 모바일 LCP 위험을 없앤다 |
+| ② | 1차 사용 weight | **400 · 700 두 종뿐. `--fw-medium: 500`은 1차에서 사용하지 않는다** (토큰 이름은 2차용으로 남긴다) | 500을 쓰면 static 파일이 1세트 더 늘어난다. 500을 쓰던 곳은 **CMP-004 GNB 항목**과 **CMP-005 패널 항목** 둘뿐이며, 둘 다 기본 **400 / 현재 항목 700**으로 내린다. 굵기 대비가 500↔700에서 400↔700으로 커져 현재 메뉴 표시가 오히려 뚜렷해진다 |
+| ③ | 로딩 | `font-display: swap`. **preload는 Latin + 한글 기본 chunk(400)만 2개**로 제한한다(분할 subset 전량 preload 금지 — 오히려 느려진다) | LCP 요소가 h1(700)이지만 첫 화면 문자 수가 적어 swap 노출 시간이 짧다 |
+| ④ | 폴백 메트릭 보정 | **필수.** 폴백용 `@font-face`(`local("Malgun Gothic")` / `local("Apple SD Gothic Neo")`)에 **`size-adjust` · `ascent-override` · `descent-override`를 지정**해 교체 시 CLS를 0으로 만든다 | `swap` + 메트릭 미보정은 글꼴 교체 시점에 줄 높이가 바뀌어 CLS가 생긴다 |
+| ⑤ | ④의 수치 | **P4 기술 설계에서 실측해 확정**하고 designer가 1회 확인한다. **수용 기준은 designer가 지금 확정한다 — 폴백 렌더와 Pretendard 렌더에서 `h1 2줄 + 서브카피 3줄` 블록의 높이 차이가 ±2px 이내, 측정 CLS 0.01 이하** | 오버라이드 값은 두 폰트의 실제 메트릭에서 나오는 값이라 문서에서 지어낼 수 없다. **판정 기준을 P3에서 닫아 두면 P5 판정이 열리지 않는다** |
+
+> ②로 인해 §1.2 타이포 표의 weight 열에는 **400과 700만** 나타난다. 1차 구현에서 `font-weight: 500`을 쓰면 디자인 QA 지적 대상이다.
 
 | 토큰 | 역할 | `≥1280px` | `768~1279px` | `<768px` | weight | line-height | letter-spacing |
 |---|---|---|---|---|---|---|---|
@@ -241,7 +252,11 @@ updated: 2026-09-12
 | `--z-modal` | 50 | 모달·다이얼로그 (backdrop 49) | `--shadow-modal` |
 | `--z-toast` | 60 | 토스트·스낵바 | 모달 위에서도 보여야 한다 |
 
-> 기획 문서(§10·화면정의서 §2차 예고)의 나열 순서와 2번째·1번째가 바뀌었다. **나열 순서는 열거였고 쌓임 순서가 아니었다**고 보아 시각 논리를 따랐다. planner·developer가 다르게 보면 리뷰로 지적해 주기 바란다.
+> 기획 문서(§10·화면정의서 §2차 예고)의 나열 순서와 2번째·1번째가 바뀌었다. **나열 순서는 열거였고 쌓임 순서가 아니었다**고 보아 시각 논리를 따랐다. → **planner·developer R1에서 둘 다 승인**(planner R1 §3.1 A · developer R1 #10). D-2는 해소로 닫는다.
+>
+> **구현 조건 2가지 (developer R1 #10 · 숫자만으로는 보장되지 않는다)**
+> ① z-index는 **같은 쌓임 맥락 안에서만** 비교된다. **표 컨테이너와 그 조상에 `transform`·`filter`·`opacity<1`·`will-change`·`contain: paint`·`isolation: isolate`를 쓰지 않는다**(새 쌓임 맥락이 생기면 10 < 20 비교가 무의미해져 표 헤더가 사이트 헤더를 덮는다).
+> ② sticky 표 헤더의 `top`은 **`var(--header-h)`** 로 잡는다(`0`으로 두면 z-index와 무관하게 사이트 헤더 뒤에 가려 읽을 수 없다).
 
 ### 1.5 Breakpoint (4구간)
 
@@ -302,9 +317,12 @@ updated: 2026-09-12
   --color-disabled-border: #C4CDD8;
 
   /* ---- typography ---- */
-  --font-family: "Pretendard Variable", Pretendard, -apple-system,
+  --font-family: Pretendard, "Pretendard Fallback", -apple-system,
                  "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
-  --fw-regular: 400;  --fw-medium: 500;  --fw-bold: 700;
+  /* static 400/700 + unicode-range 분할 subset (§1.2 폰트 파일 구성).
+     "Pretendard Fallback" = 메트릭 오버라이드를 건 폴백 @font-face 이름. */
+  --fw-regular: 400;  --fw-bold: 700;
+  --fw-medium: 500;            /* 2차 예약 — 1차에서 사용하지 않는다 */
 
   --fs-h1: 27px;   --lh-h1: 1.3;
   --fs-h2: 22px;   --lh-h2: 1.3;
@@ -317,7 +335,9 @@ updated: 2026-09-12
   --fs-label: 15px;
   --fs-eyebrow: 12.5px;
   --fs-input: 16px;            /* iOS 자동 확대 방지 — 어떤 구간에서도 16px 유지 */
-  --lh-body: 1.7;  --ls-heading: -0.015em;
+  --lh-body: 1.7;  --lh-caption: 1.6;  --lh-label: 1.4;
+  --ls-heading: -0.015em;      /* h1·h2 */
+  --ls-h3: -0.01em;  --ls-h4: 0;  --ls-eyebrow: 0.1em;
 
   /* ---- spacing ---- */
   --space-1: 4px;   --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
@@ -410,9 +430,15 @@ updated: 2026-09-12
   }
 }
 
-/* ---- G-11: 세로가 매우 짧을 때(1280px 400% 확대 ≈ 320px 상당) ---- */
-@media (max-height: 420px) {
-  :root { --body-pad-bottom: 0px; }
+/* ---- G-11: 400% 확대 상황(1280px 400% 확대 ≈ 가로 320px · 세로 400px 상당) ----
+   ⚠ max-height 단독으로 쓰지 않는다. 360×640 단말을 가로로 돌리면 640×360이 되어
+   조건에 걸리고, 고정 바가 정적 배치로 내려가 화면에서 사라진다(G-1 취지와 충돌).
+   and (max-width: 400px)로 400% 확대 상황만 잡는다. (planner R1 #2) */
+@media (max-height: 420px) and (max-width: 400px) {
+  :root {
+    --body-pad-bottom: 0px;
+    --anchor-offset: var(--space-4);   /* 헤더가 떠 있지 않으므로 오프셋 불필요 (developer R1 #4) */
+  }
   /* 헤더 sticky 해제 · 고정 바 정적 배치 — §4.4 참조 */
 }
 
@@ -432,20 +458,34 @@ body { font-family: var(--font-family); font-size: var(--fs-body); line-height: 
        color: var(--color-ink); background: var(--color-surface);
        font-variant-numeric: tabular-nums;
        padding-bottom: var(--body-pad-bottom); }
-:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+:target { scroll-margin-top: var(--anchor-offset); }
+
+/* ---- 포커스 표시 : 스타일시트 맨 뒤에 둔다 (developer R1 #1) ----
+   · border-radius를 선언하지 않는다 — outline이 아니라 요소 자체의 모서리를 바꾸므로
+     포커스 순간 pill 칩(999px)·카드(12px)가 6px로 변형된다.
+     브라우저 outline은 이미 요소의 border-radius를 따라 그려진다.
+   · :where()는 특이성 0이라 뒤에 오는 .btn류 규칙이 outline을 덮을 수 있어
+     선택자를 풀어 쓴다(각 (0,1,1) — .btn (0,1,0)보다 강하다). */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
   outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: var(--focus-ring-offset);
-  border-radius: var(--radius-sm);
 }
-[data-surface="dark"] :where(a, button):focus-visible {
+[data-surface="dark"] a:focus-visible,
+[data-surface="dark"] button:focus-visible {
   outline-color: var(--focus-ring-color-on-dark);
 }
-:target { scroll-margin-top: var(--anchor-offset); }
 ```
 
-> **개발 주의 2가지**
+> **개발 주의 3가지** (v0.2에서 ②를 확장하고 ③을 신설했다 — developer R1 #2·#3)
 > ① `--fixed-bar-h`를 `≥1280px`에서 `0px`로 덮었기 때문에 `--body-pad-bottom` 계산이 자동으로 0이 된다. **고정 바 실제 높이가 바뀌면 이 변수 하나만 고치면 전 화면이 따라온다.**
-> ② 텍스트 200% 확대로 고정 바 라벨이 2줄이 되면 바 높이가 60px를 넘는다. 이때는 **JS로 `ResizeObserver`를 걸어 `--fixed-bar-h`를 실측값으로 갱신**한다(G-9 WebKit 폴백 스크립트에 함께 넣는다). 이 보정이 없으면 폼 제출 버튼과의 16px 간격(G-4)이 깨진다.
+> ② **`ResizeObserver` 실측 갱신 대상은 고정 바와 헤더 둘 다다.** 텍스트 200% 확대로 고정 바 라벨이 2줄이 되면 바 높이가 60px를 넘고, 같은 조건에서 GNB가 2줄이 되거나 로고 폭 폴백 ③이 걸리면 **헤더도 64/68/72px을 넘는다**. 헤더는 `min-height`로 선언돼 실제 높이가 자동으로 늘어나는데 `--header-h`는 고정값이므로, 갱신하지 않으면 `--anchor-offset`(= `--header-h + 16px`)과 `scroll-padding-top`이 실제 높이를 따라가지 못해 **앵커 진입 시 대상 제목이 sticky 헤더 뒤로 숨는다**(G-10 미충족 — SCR-003 이동 칩, SCR-006 목차 13항목이 직접 영향). → **`--fixed-bar-h`와 `--header-h`를 같은 스크립트 하나에서 실측값으로 갱신**한다(G-9 WebKit 폴백 스크립트에 함께 넣는다). `--header-h`만 갱신하면 `--anchor-offset`은 `calc()`라 자동으로 따라온다.
+> ③ `documentElement.style.setProperty()`는 **인라인 스타일**이라 `@media (min-width: 1280px)`의 `--fixed-bar-h: 0px`와 `@media (max-height: 420px) and (max-width: 400px)` 블록을 **이긴다**. 따라서 **바를 렌더하지 않는 구간(`≥1280px`, 400% 확대 조건)에서는 `removeProperty('--fixed-bar-h')`로 인라인 속성을 되돌린다.** 되돌리지 않으면 데스크톱으로 넓혔을 때 바는 사라졌는데 본문 하단에 76px 빈 공간이 남는다. (헤더는 전 구간에서 렌더되므로 `--header-h`는 되돌릴 필요가 없다.)
 
 ---
 
@@ -461,7 +501,7 @@ body { font-family: var(--font-family); font-size: var(--fs-body); line-height: 
 | **active(눌림)** | 배경 `--color-primary-active`, `transform: translateY(1px)` | — |
 | **disabled** | `--color-disabled-*` + `cursor: not-allowed` | `disabled` 또는 `aria-disabled="true"`. **포커스 순서에서 제거되는 버튼은 대체 안내를 함께 둔다** |
 | **오류(error)** | 테두리 2px `--color-error` + 오류 아이콘 + 14px 오류 문구 | `aria-invalid="true"` + `aria-describedby`로 오류 문구 연결, `role="alert"` |
-| **로딩(loading)** | 라벨을 진행 문구로 교체("보내는 중…") + 24px 스피너. **버튼 폭을 바꾸지 않는다**(CLS 0) | `aria-busy="true"`, `aria-live="polite"` |
+| **로딩(loading)** | 라벨을 진행 문구로 교체("보내는 중…") + 24px 스피너. **버튼 폭을 바꾸지 않는다**(CLS 0).<br>**모션 축소 환경(`prefers-reduced-motion: reduce`)에서는 스피너 회전이 멈추므로 라벨 교체가 주 진행 표시다** — 스피너를 유일한 진행 표시로 만들지 않는다 (developer R1 #12) | `aria-busy="true"`, `aria-live="polite"` |
 | **빈 상태(empty)** | 아이콘 + 안내 문장 + 다음 행동 버튼 | **"준비 중" 표현 금지**(§5.0 M-5). "공개되면 안내드립니다" 계열 사용 |
 
 ### 2.1 컴포넌트 목록 (1차)
@@ -511,9 +551,9 @@ body { font-family: var(--font-family); font-size: var(--fs-body); line-height: 
 | 기본 | `primary` 배경 `#0B4F9E` / 글자 `#FFFFFF` (**7.99:1**)<br>`secondary` 배경 `#FFFFFF` / 테두리 `#7E8FA3`(**3.31:1**) / 글자 `#0B4F9E`(**7.99:1**)<br>`text` 글자 `#0B4F9E` + 밑줄(hover 시 두께 2px) |
 | hover | `primary` → `#08407F` / `secondary` → 배경 `#F0F5FB`, 테두리 `#0B4F9E` / `text` → `#08407F` |
 | focus-visible | `outline 3px #0B4F9E`, offset 2px. 푸터(네이비) 안에서는 흰색 링 |
-| active | 배경 `#06336A`, `translateY(1px)` |
+| active | 배경 `#06336A`, `translateY(min(1px, var(--motion-distance)))` — reduce에서 이동 0 |
 | disabled | 배경 `#EEF1F5` / 글자 `#5A6B7D`(4.83:1) / 테두리 `#C4CDD8` / `cursor: not-allowed` |
-| 로딩 | 라벨 교체 + 18px 스피너(회전 800ms linear). `aria-busy="true"`. **폭 고정** |
+| 로딩 | 라벨 교체 + 18px 스피너(회전 800ms linear). `aria-busy="true"`. **폭 고정**.<br>**reduce 환경에서는 스피너가 정지하므로 라벨 교체("보내는 중…")가 주 표시다** |
 | 접근성 | 모든 크기가 44px 이상. 인접 버튼 간 간격 **8px 이상**. 아이콘 단독은 `aria-label` 필수. 아이콘 + 텍스트 병기 시 아이콘은 `aria-hidden="true"` |
 | 사용 화면 | SCR-001·002·003·006·008·009 |
 
@@ -522,7 +562,7 @@ body { font-family: var(--font-family); font-size: var(--fs-body); line-height: 
 | 항목 | 내용 |
 |---|---|
 | 인라인 링크 | `#0B4F9E` + **항상 밑줄**(색만으로 구분하지 않는다). hover 시 `#08407F` + 밑줄 두께 2px |
-| 단독 링크 | 밑줄 없음 + 우측 화살표 아이콘 16px. hover 시 화살표가 `--motion-distance` 범위(4px) 이동 |
+| 단독 링크 | 밑줄 없음 + 우측 화살표 아이콘 16px. hover 시 화살표가 `translateX(min(4px, var(--motion-distance)))` 이동 — reduce에서 자동으로 0이 된다 |
 | 새 창 링크 | 라벨 뒤 외부 링크 아이콘 14px + **접근 이름에 "(새 창 열림)" 포함**(REQ-F-005). `target="_blank" rel="noopener noreferrer"` |
 | `tel:` 링크 | 전화 아이콘 + 번호. **번호가 `[TBD]`면 링크 자체를 렌더하지 않는다**(REQ-N-023 — `[TBD]` 문자열을 화면에 노출하지 않는다) |
 | 터치 | 인라인 링크가 본문 중간에 있어 44px을 만들 수 없는 경우, **줄 높이 1.7 확보 + 링크 전후 여백**으로 오조작을 줄인다(WCAG 2.5.5 "인라인 예외") |
@@ -535,7 +575,35 @@ body { font-family: var(--font-family); font-size: var(--fs-body); line-height: 
 |---|---|---|---|
 | `<768px` | **64px** | 로고(높이 32px, 폭 ≤140px) + `우측` 전화 아이콘 버튼 44×44 + 햄버거 44×44. 두 버튼 간격 8px | 패널 안에 회원 메뉴 섹션 추가 |
 | `768~1279px` | **68px** | 로고 + 인라인 GNB 4개(**항목 좌우 패딩 12px 고정** — `--gnb-item-pad-x`) + 전화 아이콘 44×44. **헤더 주 CTA 없음**(G-8) | GNB 5개 + 유틸 슬롯(비로그인 "로그인" 텍스트 버튼 56px / 로그인 사람 아이콘 44px + 드롭다운) |
-| `≥1280px` | **72px** | 로고 + 인라인 GNB 4개 + 전화번호 텍스트(15px, `#16263A`) + **주 CTA `primary md`("문의하기")** | 주 CTA가 상담 예약/레슨 예약으로 분기 + 회원 유틸 텍스트 |
+| `≥1280px` | **72px** | 로고 + 인라인 GNB 4개 + 전화번호 텍스트(15px, `#16263A`) + **주 CTA `primary md`("문의하기")** — **자기 참조 화면에서는 아래 H1~H3 상태를 따른다** | 주 CTA가 상담 예약/레슨 예약으로 분기 + 회원 유틸 텍스트 |
+
+**`≥1280px` 헤더 주 CTA 상태 3종 ★ (v0.2 신설 — planner R1 #1 Must)**
+
+`≥1280px`는 **고정 바 미노출 구간**이라 헤더 주 CTA가 그 화면의 **유일한 상시 주 CTA**다. 따라서 자기 참조 처리를 정의하지 않으면 `/location`에서 `/location#contact`로 가는 강조 버튼이 남아 IA §2.1 마지막 줄·요구사항 §3.0 G-6 ①과 충돌한다.
+
+> **채택 원칙: 헤더 주 CTA는 하단 고정 바(CMP-007)와 동일한 판단 축을 쓴다.** 규칙을 두 벌 만들지 않고 G-6 ①·②를 그대로 한 번 더 적용한다. 판정은 **현재 URL과 목적지 URL 비교**(G-7)이며 화면 목록을 하드코딩하지 않는다.
+
+| # | 상태 | 시각 | 조건 | 대응하는 고정 바 상태 |
+|---|---|---|---|---|
+| **H1** | **기본** | `primary md` "문의하기" → `/location#contact` | 목적지 URL ≠ 현재 화면 URL | S1 |
+| **H2** | **전화 문의로 대체** | `primary md` "전화 문의"(`phone` 아이콘 + 라벨) → `tel:` 대표 전화 | **자기 참조**(G-6 ①) + 대표 전화 **확정** | S2 |
+| **H3** | **미노출** | 버튼을 렌더하지 않는다. 헤더 우측에는 GNB와 (확정된 경우) 전화번호 텍스트만 남는다 | **자기 참조 + 대표 전화 `[TBD]`**(G-6 ②) — **현재 SCR-003이 이 상태다** | S3 |
+
+**선택 근거 (다른 안을 버린 이유)**
+
+| 검토안 | 판정 | 이유 |
+|---|---|---|
+| ⓐ 버튼을 비활성(disabled)으로 둔다 | **기각** | 비활성 강조 버튼은 "지금 누를 수 없는 주 CTA"로 읽혀 전환 화면에서 오히려 방해가 된다. 스크린리더에도 의미 없는 요소가 남는다 |
+| ⓑ 페이지 내 앵커 이동("문의 폼으로")으로 의미를 바꾼다 | **기각** | 같은 역할을 **페이지 헤더의 이동 칩(CMP-023 "문의하기")**이 이미 하고 있어 같은 화면에 같은 목적지 버튼이 2개가 된다(G-8이 막으려던 상황과 같다) |
+| ⓒ **자기 참조면 "전화 문의"로 대체, 전화 미확정이면 미노출** | **채택** | 고정 바 S2/S3와 **판단 축·조건·데이터 의존이 완전히 동일**해 구현이 분기 하나를 공유한다. 대표 전화가 확정되면 H2가 자동으로 살아나 `≥1280px`에서도 대체 연락 수단이 상시 노출된다 |
+
+**H3에서 `≥1280px` 주 CTA가 사라지는 것에 대한 보완** — 이 상태는 **전환 목적지 화면(SCR-003) 자신**에서만 발생하며, 같은 화면 안에 ⓐ 페이지 헤더 이동 칩 "문의하기" ⓑ 문의 폼 `#contact` 본체 ⓒ 폼 하단 대체 연락 안내가 있어 전환 경로가 끊기지 않는다. 다른 화면(SCR-001·002·006·008·009)은 전부 H1이다.
+
+**`aria-current` 처리 (명확화)**
+
+- **헤더 주 CTA 버튼에는 어떤 상태에서도 `aria-current`를 부여하지 않는다.** H1·H2는 목적지가 현재 화면이 아니고, H3은 요소 자체가 없다.
+- 현재 화면 표시는 **GNB 항목의 `aria-current="page"` 1개로만** 한다(`/location`에서는 "오시는 길").
+- **GNB "문의하기"(`/location#contact`)는 `/location`에서 페이지 내 앵커 이동으로 계속 동작**하며 `aria-current`를 받지 않는다(경로는 같지만 프래그먼트가 다른 위치 이동이고, 이동 링크로 **강조**하지 않는다는 규칙의 대상은 강조 버튼이다).
 
 - **로고 폭 상한 140px**(`--logo-max-w`). 고객 로고가 가로형 워드마크로 와서 140px을 넘으면 **IA §2.1 폴백 순서**를 적용한다: ① `768~1279px`에서 심볼 전용(44px)으로 전환 → ② GNB 항목 패딩 8px → ③ 메뉴 1개를 유틸 드롭다운으로 이동. **③까지 가면 designer가 티켓으로 알린다.**
 - **현재 메뉴 표시**: `aria-current="page"` + 글자 700 + **하단 2px `#0B4F9E` 인셋 라인**(색 + 굵기 + 라인 3중 표시 — 색만으로 구분하지 않는다).
@@ -545,7 +613,7 @@ body { font-family: var(--font-family); font-size: var(--fs-body); line-height: 
 
 | 상태 | 규칙 |
 |---|---|
-| 기본 | 15px/500, `#16263A`, padding `10px 12px`, radius 6px, **min-height 44px** |
+| 기본 | 15px/**400**, `#16263A`, padding `10px 12px`, radius 6px, **min-height 44px** (v0.2: 500 → 400 — §1.2 폰트 파일 구성 ②) |
 | hover | 배경 `#F0F5FB` |
 | focus-visible | 포커스 링 3px |
 | current | `#0B4F9E` / 700 / `box-shadow: inset 0 -2px 0 #0B4F9E` + `aria-current="page"` |
@@ -555,10 +623,11 @@ body { font-family: var(--font-family); font-size: var(--fs-body); line-height: 
 | 항목 | 내용 |
 |---|---|
 | 형태 | 헤더 아래에서 내려오는 **전폭 패널**(드로어 아님). 배경 `#FFFFFF`, 하단 1px 라인 |
-| 항목 | **min-height 52px**, 좌우 패딩 16px, 16px/500, 항목 간 1px `--color-border` |
-| 열림/닫힘 | `--motion-base` `--ease-out`, `opacity` + `translateY(-8px)`. 버튼 `aria-expanded` 갱신 |
+| 항목 | **min-height 52px**, 좌우 패딩 16px, 16px/**400**, 항목 간 1px `--color-border` (v0.2: 500 → 400 — §1.2 ②). 현재 항목만 700 |
+| 열림/닫힘 | `--motion-base` `--ease-out`, `opacity` + `translateY(calc(-1 * var(--motion-distance)))` — reduce에서 이동 0 |
 | 포커스 | 열면 첫 항목으로 포커스 이동, `Esc`로 닫고 햄버거 버튼으로 포커스 복귀. **패널이 열린 동안 배경 스크롤 잠금** |
-| JS 비활성 | `<details>/<summary>` 기반으로 만들어 **JS 없이도 펼쳐진다**(REQ-N-028). JS는 `aria-expanded`·포커스 관리만 보강 |
+| **마크업 정본** | **`<details>/<summary>` 기반이 정본이다** (developer R1 #8 확인 요청 → 확정). `<summary>`는 브라우저가 펼침 상태를 접근성 트리에 **자체 노출**하므로 **`aria-expanded`를 수동으로 붙이지 않는다**(수동 값이 어긋나면 스크린리더에 모순된 상태가 읽힌다) |
+| JS 비활성 | `<details>` 기반이라 **JS 없이도 펼쳐진다**(REQ-N-028). **JS의 역할은 ① 열 때 첫 항목 포커스 이동 ② `Esc` 닫기 + 트리거 복귀 ③ 배경 스크롤 잠금 세 가지로 한정**한다. 상태 속성 갱신은 JS가 하지 않는다 |
 | 하단 | 전화 링크 + 개인정보 처리방침 링크 (푸터까지 가지 않아도 도달 가능) |
 
 ### CMP-006 Footer
@@ -596,13 +665,26 @@ body { font-family: var(--font-family); font-size: var(--fs-body); line-height: 
 | S2 | **전폭 1버튼** | `primary sm` "전화 문의" 100% | 자기 참조 화면(G-6 ①) — 1차에서는 **SCR-003** |
 | S3 | **미노출** | 바를 렌더하지 않고 `--body-pad-bottom: 0` | 자기 참조 + 대표 전화 `[TBD]`(G-6 ②) — **현재 SCR-003이 이 상태다** |
 | S4 | **가상 키보드 활성** | 바를 계속 표시. WebKit은 `visualViewport` 보정으로 위치 유지 | G-9 |
-| S5 | **정적 배치** | `position: static`으로 전환, 문서 끝에 배치, 본문 하단 여백 해제, 헤더 sticky 해제 | `@media (max-height: 420px)` (G-11 — §4.4) |
+| S5 | **정적 배치** | `position: static`으로 전환, 문서 끝에 배치, 본문 하단 여백 해제, 헤더 sticky 해제, 앵커 오프셋 해제 | `@media (max-height: 420px) and (max-width: 400px)` (G-11 — §4.4. v0.2에서 `max-width` 조건 추가) |
+
+**S1 보조 규칙 — 대표 전화 미확정 (v0.2 신설 · 전 화면 공통 · planner R1 #3)**
+
+> **S1에서 대표 전화가 확정되지 않았으면 좌측 "전화 문의" 버튼을 렌더하지 않고, 우측 "문의하기" 버튼이 전폭(100%)이 된다.** 바 자체는 유지한다 — **G-6 ②의 미노출 단서는 자기 참조 화면(S3)에만 적용**되므로, 자기 참조가 아닌 화면은 주 CTA가 살아 있어 바를 없앨 이유가 없다.
+> 같은 조건에서 **헤더 전화 아이콘 버튼(`<768px`·`768~1279px`)·헤더 전화번호 텍스트(`≥1280px`)·푸터 전화 행·모바일 패널 전화 링크도 함께 렌더하지 않는다**(CMP-002 `tel:` 규칙 · REQ-N-023: `[TBD]` 문자열을 화면에 출력하지 않는다).
+> **이 규칙은 여기 한 곳에만 둔다.** 페이지 디자인의 화면별 절(SCR-001·002·006·008·009)은 "S1 유지 + 이 규칙 적용"으로만 적고 조건을 복제하지 않는다.
+
+| 조건 | 좌측 "전화 문의" | 우측 "문의하기" | 바 노출 |
+|---|---|---|---|
+| 대표 전화 확정 | 40% 노출 | 60% | 노출 |
+| 대표 전화 `[TBD]` | **미렌더** | **100% 전폭** | 노출 |
 
 **대비 검증**: 좌 `secondary` 테두리 `#7E8FA3` = 3.31:1(≥3:1 ✓), 글자 `#0B4F9E` = 7.99:1 ✓ / 우 `primary` 흰 글자 = 7.99:1 ✓ / 상단 경계선은 장식이며 바와 본문의 구분은 배경 흰색 + 1px 라인 + 그림자 아닌 실선으로 전달한다.
 
 ### CMP-008 Skip Link
 
 포커스 전에는 화면 밖(`position:absolute; left:-9999px`)에 두고, `:focus`에서 **좌상단 16px 지점에 `primary md` 버튼**으로 나타난다. 라벨 "본문 바로가기", 대상 `#main`. `z-index`는 `--z-toast`(헤더 위에 떠야 한다).
+
+> **구현 확정 (developer R1 #7)**: 대상 요소는 **`<main id="main" tabindex="-1">`** 으로 만든다. Safari 등 일부 브라우저는 `tabindex="-1"`이 없으면 skip link를 눌러도 포커스가 실제로 이동하지 않는다. 목업에는 `.skip` CSS만 있고 마크업이 빠져 있었으므로 v0.2에서 각 목업 파일의 대표 프레임에 마크업을 넣었다(다른 프레임은 같은 구조 반복이라 생략 — 구현 정본은 이 절이다).
 
 ### CMP-009 Container / Section
 
@@ -688,7 +770,7 @@ body { font-family: var(--font-family); font-size: var(--fs-body); line-height: 
 
 ### CMP-021 Toast
 
-화면 하단 중앙, **고정 바 위 12px**(`bottom: calc(var(--fixed-bar-h) + var(--safe-b) + 12px)`), `z-index: var(--z-toast)`. 배경 `#16263A`, 글자 `#FFFFFF`(15.30:1), radius 8px, 패딩 `12px 16px`, 14~15px. 3초 후 자동 사라짐, `role="status"`. 등장은 `opacity` + `translateY(8px)` `--motion-base`.
+화면 하단 중앙, **고정 바 위 12px**(`bottom: calc(var(--fixed-bar-h) + var(--safe-b) + 12px)`), `z-index: var(--z-toast)`. 배경 `#16263A`, 글자 `#FFFFFF`(15.30:1), radius 8px, 패딩 `12px 16px`, 14~15px. 3초 후 자동 사라짐, `role="status"`. 등장은 `opacity` + `translateY(var(--motion-distance))` `--motion-base` — reduce에서 이동 0.
 
 ### CMP-022 Map Placeholder (클릭 투 로드)
 
@@ -778,7 +860,7 @@ h1 + 리드(`--font-lead`, `#5A6B7D`) + (선택) 앵커 칩. 상하 패딩 = `<7
 | `--admin-topbar-h` | 56px | CMP-053 |
 | `--table-row-h` | 44px | CMP-042 (터치 하한과 동일) |
 | `--cell-min-h` | 56px | CMP-040 |
-| `--week-col-min-w` | 127px (`≥1280`) / 120px (`1024~1279`) | CMP-057 |
+| `--week-col-min-w` | 127px (`≥1280`) / 120px (`1024~1279`) | CMP-057. **2차 착수 시 재확인**(developer R1 #11): 1024px 실측 = `1024 − 사이드바 64 − 컨테이너 패딩 32×2 − 시간축 64 = 832`, `÷ 7 = 118.86px`로 120px 하한에 **1.1px 모자라 가로 스크롤이 생긴다.** 하한을 118px로 내리거나 이 화면의 컨테이너 패딩을 24px로 좁혀 해소한다. **1차 토큰에는 영향이 없어 지금 고치지 않는다** |
 
 > **새로 추가되는 것은 위 5종 계열뿐이며 §1의 컬러·타이포·간격·radius·shadow·motion·z-index·breakpoint 토큰은 값이 바뀌지 않는다.** 이것이 TR-10의 "변경된 토큰 0건" 목표다.
 
@@ -850,14 +932,17 @@ h1 + 리드(`--font-lead`, `#5A6B7D`) + (선택) 앵커 칩. 상하 패딩 = `<7
 
 | 대상 | 규칙 | 조건 |
 |---|---|---|
-| 하단 고정 바 | `position: static`으로 전환해 **문서 마지막에 정적 배치**, `--body-pad-bottom: 0` | `@media (max-height: 420px)` |
-| sticky 헤더 | `position: static`으로 전환 | `@media (max-height: 420px)` |
+| 하단 고정 바 | `position: static`으로 전환해 **문서 마지막에 정적 배치**, `--body-pad-bottom: 0` | `@media (max-height: 420px) and (max-width: 400px)` |
+| sticky 헤더 | `position: static`으로 전환 | `@media (max-height: 420px) and (max-width: 400px)` |
+| **앵커 오프셋** | `--anchor-offset: var(--space-4)`(16px)로 낮춘다. 헤더가 떠 있지 않은데 80~88px 오프셋을 유지하면 **세로 420px 뷰포트의 약 20%가 빈 여백**이 되어 G-11의 목적(콘텐츠 손실 방지)과 반대로 움직인다 (developer R1 #4) | `@media (max-height: 420px) and (max-width: 400px)` |
 | 전 레이아웃 | 1열 전환, **가로 스크롤 0** | `@media (max-width: 400px)` |
 | 칩·버튼 그룹 | `flex-wrap: wrap`으로 줄바꿈(가로 스크롤 금지) | 항상 |
 | **캘린더(2차)** | 7열 `role="grid"`를 **주 단위 리스트(`<ul>`)로 전환**한다. 각 주가 제목(`{n}월 {d}일 ~ {d}일`), 각 날짜가 리스트 항목(min-height 44px, 날짜 + 상태 라벨 + 잔여). **데이터·접근 이름·링크 목적지는 그리드와 동일**하고 표현만 바뀐다 | `@media (max-width: 359.98px), (max-height: 420px)` |
 | 데이터 표(2차) | CMP-042의 모바일 카드 변형을 그대로 쓴다 | `@media (max-width: 1023.98px)` |
 
 **근거**: 세로 420px에서 헤더 64px + 고정 바 60px = 124px이 뷰포트의 29.5%를 차지해 본문 가용 높이가 300px 아래로 떨어진다. 콘텐츠 손실(WCAG 1.4.10) 판정을 피하려면 이 지점에서 고정 요소를 풀어야 한다.
+
+> **조건식에 `and (max-width: 400px)`를 병기하는 이유 (v0.2 · planner R1 #2)**: `max-height: 420px` 단독이면 **가로 모드 휴대폰(360×640 → 640×360)** 에서도 발동해 **1차의 유일한 상시 전환 수단인 고정 바가 화면에서 사라진다**(G-1 "스크롤 위치·상태로 숨기지 않는다"의 취지와 충돌). 판정 뷰포트(360/768/1280 세로)에는 걸리지 않아 P5에서 잡히지 않는 종류의 문제다. 1280px 400% 확대는 **가로 320px · 세로 약 400px**이라 `max-width: 400px`에 그대로 걸리고, 가로 모드 휴대폰(가로 640px 이상)은 제외된다. §1.6 CSS 블록과 이 표를 함께 고쳤다.
 
 ### 4.5 키보드 · 스크린리더
 
@@ -892,10 +977,13 @@ h1 + 리드(`--font-lead`, `#5A6B7D`) + (선택) 앵커 칩. 상하 패딩 = `<7
 | G-3 본문 하단 여백 | `calc(60px + env(safe-area-inset-bottom) + 16px)` = **76px + safe-area** | `--body-pad-bottom` |
 | G-4 제출 버튼 간격 | 폼 마지막 요소 하단 마진 **16px** + G-3 여백 | `--space-4` |
 | G-5 고정 바 구성 | 버튼 `sm`(44px) × 2, 간격 8px, 좌 40% / 우 60%, 좌우 패딩 12px | CMP-007 |
-| G-8 헤더 CTA | `≥1280px`에서만 `primary md` | CMP-003 |
+| G-8 헤더 CTA | `≥1280px`에서만 `primary md`. **자기 참조 처리는 CMP-003 H1~H3**(고정 바 S1~S3와 동일한 판단 축 — v0.2 신설) | CMP-003 |
+| G-6 ① 헤더 적용 | 자기 참조 → 헤더 주 CTA를 **"전화 문의"(`tel:`)로 대체**(H2) | CMP-003 |
+| G-6 ② 헤더 적용 | 자기 참조 + 대표 전화 `[TBD]` → 헤더 주 CTA **미노출**(H3) | CMP-003 |
+| G-6 ② 비적용 화면 | 자기 참조가 아닌 화면에서 대표 전화가 `[TBD]`면 **바는 유지하고 좌측 전화 버튼만 미렌더**(S1 보조 규칙) | CMP-007 |
 | G-9 `scroll-padding-bottom` | `--scroll-pad-bottom` = `--body-pad-bottom` | `html` 선언 |
 | G-10 헤더 높이 · 앵커 오프셋 | 64 / 68 / 72px, 앵커 오프셋 = `헤더 높이 + 16px` | `--header-h` · `--anchor-offset` |
-| G-11 400% 확대 | `@media (max-height: 420px)` → 헤더·고정 바 정적 배치 | §4.4 |
+| G-11 400% 확대 | `@media (max-height: 420px) and (max-width: 400px)` → 헤더·고정 바 정적 배치 + 앵커 오프셋 16px (v0.2: 가로 모드 휴대폰 오발동 방지) | §4.4 |
 | G-12 회원 헤더(2차) | 공개 헤더 + 회원 메뉴. 구간별 구성은 **IA §2.1 표를 따른다**(값 복제 안 함) | CMP-003 |
 | G-13 관리자 셸(2차) | 사이드바 240 / 64px, 상단바 56px | CMP-053 |
 | IA §2.1 GNB 전제 | 항목 좌우 패딩 **12px 고정**, 로고 폭 상한 **140px** | `--gnb-item-pad-x` · `--logo-max-w` |
@@ -941,8 +1029,13 @@ h1 + 리드(`--font-lead`, `#5A6B7D`) + (선택) 앵커 칩. 상하 패딩 = `<7
 |---|---|---|
 | `logo-yogapass-mark.svg` (48×48) | **임시(Placeholder)** | `currentColor` 기반. 헤더·푸터·파비콘 공용 |
 | `logo-yogapass-horizontal.svg` (236×48) | **임시(Placeholder)** | 헤더 로고. 워드마크가 `<text>`라 **확정본은 아웃라인(path) 변환 필요** |
-| 파비콘 세트 (`favicon.ico` 32/48, `icon-192.png`, `icon-512.png`, `apple-touch-icon.png` 180) | **미제작** | 임시 로고 기반으로 P4 착수 전 제작 |
-| OG 이미지 (1200×630) | **미제작** | 로고 + 헤드라인 + 틴트 배경, **사진 없이 성립**하게 제작 |
+| 파비콘 세트 (`favicon.ico` 32/48, `icon-192.png`, `icon-512.png`, `apple-touch-icon.png` 180) | **미제작 — 납기 확정** | **G3 승인 직후 2작업일 이내에 임시 로고(심볼 SVG) 기반으로 제작해 `design/assets/`에 넣고 developer에게 티켓으로 알린다** |
+| OG 이미지 (1200×630) | **미제작 — 납기 확정** | 동일 납기. 로고 + 헤드라인 + 틴트 배경, **사진 없이 성립**하게 제작 |
+
+> **파비콘·OG 처리 방침 확정 (developer R1 #9 — 제안대로 승인)**
+> ① designer가 **G3 승인 직후 2작업일 이내**에 임시 로고 기반으로 4종 + 1종을 제작해 전달한다(고객 로고 수령 시 CR로 재제작 — D-1과 같은 경로).
+> ② 그때까지 제작이 늦어지면 **placeholder 파일을 만들지 않고 `<link rel="icon">`·`og:image` 태그 자체를 뺀 채 빌드**하고, 수령 시 교체한다. 깨진 아이콘·빈 이미지가 남는 것보다 낫고 Lighthouse 권장사항 감점 폭도 작다.
+> ③ OG 이미지에는 `og:image:alt`를 함께 넣는다(§4.3 "의미 있음" 분류).
 | 고객 로고 원본 | **[TBD: 고객 제공 필요]** | 계획서 V-2 · 기한 09-17. AI/SVG 또는 고해상도 PNG + 브랜드 컬러 HEX + 최소 사용 크기·보호 여백 |
 | 스튜디오 사진 · 강사 사진 | **[TBD: 고객 제공 필요]** | 조달 방침 미회신(Q11). **사진 0장 전제로 1차 디자인이 성립**하며, 수령 시 레이아웃 변경 없이 교체 가능 |
 
@@ -960,6 +1053,9 @@ h1 + 리드(`--font-lead`, `#5A6B7D`) + (선택) 앵커 칩. 상하 패딩 = `<7
 8. 애니메이션은 `opacity`·`transform`만, 이동 거리 8px 이하.
 9. **`[TBD]` 값은 화면에 문자열로 출력하지 않는다** — 해당 행·링크 자체를 렌더하지 않는다(REQ-N-023).
 10. 신규 색·radius·간격이 필요하면 **토큰을 추가하지 말고 designer에게 티켓**(`to-design`)을 보낸다.
+11. **포커스 표시 규칙 블록은 스타일시트의 맨 뒤에 둔다.** 컴포넌트 클래스 규칙보다 뒤에 와야 `outline` 선언이 덮이지 않는다(§1.6 주석 참조).
+12. **행간·자간은 §1.6의 변수를 쓴다** — `--lh-h1~h4` · `--lh-body` · `--lh-caption` · `--lh-label` · `--ls-heading`(h1·h2) · `--ls-h3` · `--ls-h4` · `--ls-eyebrow`. §1.2 표의 값 중 변수로 존재하지 않는 것은 없다(v0.2에서 5개 추가 — developer R1 #6).
+13. **1차에서 `font-weight: 500`(`--fw-medium`)을 사용하지 않는다** — 폰트 파일이 1세트 늘어난다(§1.2 폰트 파일 구성 ②).
 
 ---
 
@@ -968,11 +1064,12 @@ h1 + 리드(`--font-lead`, `#5A6B7D`) + (선택) 앵커 칩. 상하 패딩 = `<7
 | # | 항목 | 영향 | designer 기준(무회신 시) |
 |---|---|---|---|
 | D-1 | **고객 로고 원본·브랜드 컬러**(V-2, 기한 09-17) | `--color-primary` 계열 4개 + 전 화면 대비 재검증 0.5작업일 | `#0B4F9E` 확정값 유지, 수령분은 CR |
-| D-2 | **z-index 쌓임 순서** — sticky 표 헤더를 사이트 헤더보다 아래로 둔 판단(§1.4) | 2차 관리자 표 화면 | 이 문서 값대로 진행. 이견은 리뷰로 |
+| ~~D-2~~ | ~~z-index 쌓임 순서~~ | — | **해소(2026-09-12)** — planner R1 §3.1 A · developer R1 #10 **둘 다 승인**. 구현 조건 2가지를 §1.4에 추가했다 |
 | D-3 | **레슨 유형 배지 색**(§3.3) | 2차 CMP-043 | ⓐ 중립 1색 + 텍스트 구분. 2차 착수 시 PM 결정 |
 | D-4 | **캘린더 셀 `잔여 {n}`의 `{n}` 정의**(잔여 자리 합계 vs 슬롯 수 — designer R2 #N1) | 2차 셀 폭 46.28px 초과 여부 | 2자리(최대 "잔여 12")를 전제로 **셀 높이 64px + 라벨 2줄** 흡수안 적용 |
 | D-5 | 사진 조달 방침(Q11) | 히어로·카드 이미지 자리 | **사진 0장 전제**로 1차 완주. 수령 시 레이아웃 변경 없이 교체 |
-| D-6 | 임시 로고를 1차 오픈에 사용해도 되는가(Q-D5) | 파비콘·OG 제작 시점 | 임시 로고로 제작하고 수령 시 재제작 |
+| D-6 | 임시 로고를 1차 오픈에 사용해도 되는가(Q-D5) | 파비콘·OG 제작 시점 | 임시 로고로 제작하고 수령 시 재제작. **제작 납기·미제작 시 처리는 §6.3에서 확정**(v0.2) |
+| D-7 | **폴백 `@font-face` 메트릭 오버라이드 수치**(`size-adjust`·`ascent-override`·`descent-override`) | 글꼴 교체 시 CLS | **P4 기술 설계에서 실측 → designer 1회 확인.** 수용 기준은 §1.2 ⑤에서 P3가 확정했다(블록 높이 차 ±2px 이내 · CLS 0.01 이하) |
 
 ---
 
@@ -980,6 +1077,5 @@ h1 + 리드(`--font-lead`, `#5A6B7D`) + (선택) 앵커 칩. 상하 패딩 = `<7
 
 | 버전 | 일자 | 작성자 | 내용 | 관련 리뷰/CR |
 |---|---|---|---|---|
+| 0.2 | 2026-09-12 | designer | **R1 교차 검토 반영(planner 수정 요청 · developer 조건부 승인).** ① **Must** — CMP-003에 `≥1280px` **헤더 주 CTA 상태 3종(H1·H2·H3)** 신설: 고정 바와 동일한 판단 축(G-6 ①·②)을 적용해 자기 참조 시 "전화 문의" 대체 / 대표 전화 `[TBD]`면 미노출, 선택 근거·`aria-current` 처리 명문화 ② CMP-007에 **S1 보조 규칙(대표 전화 미확정 → 좌측 버튼 미렌더·우측 전폭)** 을 전 화면 공통으로 1회만 정의 ③ G-11 조건식 `and (max-width: 400px)` 병기(§1.6·§4.4) + 해당 구간 `--anchor-offset` 해제 ④ `:focus-visible`의 `border-radius` 삭제 + 선택자 풀어쓰기 + 스타일시트 말미 배치 규칙 ⑤ `ResizeObserver` 갱신 대상에 **헤더** 추가 + 비노출 구간 `removeProperty` ⑥ **폰트 파일 구성 확정**(static 400/700 + `unicode-range` 분할 subset · 500 미사용 · 폴백 메트릭 보정 필수 + 수용 기준) 및 "Variable은 weight를 덜 써도 작아지지 않는다" 전제 정정 ⑦ 행간·자간 변수 5개 추가 ⑧ CMP-005 `<details>` 정본 확정(`aria-expanded` 수동 금지, JS 역할 3가지 한정) ⑨ CMP-008 `<main id="main" tabindex="-1">` 확정 ⑩ **파비콘 4종·OG 1종 납기·미제작 시 처리 확정** ⑪ z-index 구현 조건 2줄 · D-2 해소 ⑫ CMP-004/005 weight 500 → 400 ⑬ 이동값 `--motion-distance` 참조 통일 · reduce 스피너 주석 ⑭ `--week-col-min-w` 2차 재확인 메모 ⑮ D-7 신설 | `shared/reviews/P3_design-docs_planner_r1.md` #1~#3·#8 · `shared/reviews/P3_design-docs_developer_r1.md` #1~#13 |
 | 0.1 | 2026-09-12 | designer | 최초 작성 — 시안 A + 보정 1·2 기준 토큰 전량(컬러 32·타이포 10단·간격 15+3·radius 5·shadow 4·motion 7·z-index 6단·breakpoint 4구간), 개발 전달용 CSS 변수 블록, 1차 컴포넌트 30종 + 2차 확장 예고 27종, 대비 측정 27조합, 장식 이미지 판정 목록, 400% 확대·G-11 규칙, 아이콘 세트 Lucide 확정 | ADR(컨셉 선택 2026-09-12), 요구사항 §3.0·§10 TR-10, designer R1 #1·R2 #N1·#N2 |
-</content>
-</invoke>

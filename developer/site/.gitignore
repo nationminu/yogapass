@@ -1,0 +1,7 @@
+# developer/site 전용 (프로젝트 루트 .gitignore 와 중복되지 않는 항목만 둔다)
+__pycache__/
+*.py[cod]
+.ruff_cache/
+staticfiles/
+media/
+backups/

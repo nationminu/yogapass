@@ -1,0 +1,57 @@
+/* 전 화면 공통 뷰포트 보정 (페이지 디자인 §2.5 · 디자인 시스템 §1.6 개발 주의 ②③)
+   ① --fixed-bar-h · --header-h 를 ResizeObserver 로 실측 갱신한다.
+      (텍스트 200% 확대로 고정 바 라벨·GNB 가 2줄이 되면 G-4 간격과 G-10 앵커 오프셋이 함께 깨진다)
+   ② 바를 렌더하지 않는 구간(≥1280px, 400% 확대 조건)에서는 removeProperty 로 인라인 값을 되돌린다.
+      인라인 스타일은 미디어 쿼리를 이기기 때문이다.
+   ③ WebKit 가상 키보드 폴백(G-9): visualViewport 변화 시 고정 바 위치를 보정한다. */
+(function () {
+  "use strict";
+  var root = document.documentElement;
+  var bar = document.querySelector(".barwrap");
+  var header = document.querySelector(".hdr");
+  var noBarQuery = window.matchMedia(
+    "(min-width: 1280px), (max-height: 420px) and (max-width: 400px)"
+  );
+
+  function syncBar() {
+    if (!bar) return;
+    if (noBarQuery.matches) {
+      root.style.removeProperty("--fixed-bar-h");
+      return;
+    }
+    var height = Math.round(bar.getBoundingClientRect().height);
+    if (height > 0) root.style.setProperty("--fixed-bar-h", height + "px");
+  }
+
+  function syncHeader() {
+    if (!header) return;
+    var height = Math.round(header.getBoundingClientRect().height);
+    if (height > 0) root.style.setProperty("--header-h", height + "px");
+  }
+
+  function syncAll() { syncBar(); syncHeader(); }
+
+  if (window.ResizeObserver) {
+    var observer = new ResizeObserver(syncAll);
+    if (bar) observer.observe(bar);
+    if (header) observer.observe(header);
+  }
+  if (noBarQuery.addEventListener) noBarQuery.addEventListener("change", syncAll);
+  window.addEventListener("resize", syncAll);
+  syncAll();
+
+  /* G-9 WebKit 폴백 — 가상 키보드가 뜨면 고정 바가 화면 밖으로 밀린다.
+     관측 신호: <html data-vk-fallback="on"> (검증 도구 ⑥ 가 이 속성을 본다) */
+  var vv = window.visualViewport;
+  if (!vv || !bar) return;
+  var isWebKit = /AppleWebKit/.test(navigator.userAgent) && !/Chrome|Chromium|Edg/.test(navigator.userAgent);
+  if (!isWebKit) return;
+  root.setAttribute("data-vk-fallback", "on");
+  function follow() {
+    if (noBarQuery.matches) { bar.style.transform = ""; return; }
+    var offset = window.innerHeight - vv.height - vv.offsetTop;
+    bar.style.transform = offset > 0 ? "translateY(-" + offset + "px)" : "";
+  }
+  vv.addEventListener("resize", follow);
+  vv.addEventListener("scroll", follow);
+})();

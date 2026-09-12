@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" role="img" aria-labelledby="ypmt">
+  <title id="ypmt">요가패스 임시 심볼</title>
+  <!--
+    YOGAPASS 임시 심볼 (designer 자체 제작, 2026-09-12)
+    - 구성: 아치(호흡·균형) + 기준선(매트) + 원(사람)
+    - 색: currentColor 사용 → 부모 CSS color 값을 따른다
+    - 최소 사용 크기 24x24px, 보호 여백 = 심볼 높이의 25%
+    - [TBD: 고객 로고 원본(V-2, 09-17 예정) 수령 시 교체한다]
+  -->
+  <g fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round">
+    <path d="M7.5 33.5a16.5 16.5 0 0 1 33 0"/>
+    <path d="M6 40.5h36"/>
+  </g>
+  <circle cx="24" cy="12" r="5.5" fill="currentColor"/>
+</svg>

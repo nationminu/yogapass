@@ -14,6 +14,29 @@
 
 ---
 
+## 2026-09-13 · P4 · 반영 + 구현 (기술 설계 v0.3 · 구현 1단계)
+- 요청: 오케스트레이터가 두 가지를 함께 지시했다. ① R2 리뷰 2건(devops 조건부 승인 Should 3·Could 2 / qa 조건부 승인 Should 5·Could 2, **신규 Must 0건**)의 Should 반영 → 설계 v0.3 ② **구현 1단계 착수**(§11.1 작업 1~3: 스캐폴딩·compose·공통 레이아웃, 가능하면 SCR-001 뼈대). 두 팀 모두 R3를 요구하지 않아 반영 직후 구현에 들어갔다.
+- 수행:
+  - **R2 지적 12건(Should 8 · Could 4)을 전건 반영했다(미반영 0건).** 반영 위치는 §17.4 처리 대장에, 리뷰 문서 2건의 "처리 결과" 열에도 같은 내용을 기입했다.
+    - devops #1: 배포 절차에서 **스케줄러 정지를 2.5 → 0.5단계로 앞당기고**, 라벨 백업(`pre-deploy`·`pre-restore`)은 `required=True` 로 **락 충돌 시 `skipped` 가 아니라 실패**로 끝나 배포·복구를 중단하게 했다. 구현(`apps/core/jobs.py`)에도 같은 규칙을 넣었다 — 문서만 고치면 나중에 또 어긋난다.
+    - devops #2: 일일 요약의 백업 판정을 **"24시간 내 성공 기록 없음 = 점검 필요"** 로 뒤집고(`has_recent_success()`), `skipped` 를 별도 집계하게 했다. `scheduler` 단일 실패점은 설계로 없애지 않고 **"요약 메일이 오지 않는 날 = 이상 신호"** 를 P8 가이드 1번 항목으로 받는 방식에 동의했다.
+    - devops #3: **`/healthz` 는 항상 앱에 직접 호출**(nginx 비경유·`SITE_BASE_URL` 미사용)을 §3.3·§3.4·§3.5.1·§12.2 네 곳에 못박았다. compose 헬스체크도 `127.0.0.1:8000/healthz` 직접 호출로 작성했다. 이 한 줄이 없으면 10-17 스테이징 배포에서 401 → 자동 롤백 오발동이 확실히 났다.
+    - devops #4·#5(Could): 로컬 `local.conf` 에 `auth_basic` 주석 블록 + 검증 전용 더미 `htpasswd.dummy` 를 넣어 **REQ-N-040 을 로컬에서 선검증**할 수 있게 했고(스테이징 단독 판정 5건 → 4건), `${BACKUP_DIR}` 바인드를 **`scheduler` 에만** 두었다.
+    - qa #1·#2: `.env.example` 에 **`COMPOSE_PROFILES`** 를 두어 플래그 없는 `docker compose up` 으로 프록시까지 뜨게 했고(문면-실행 간극 0), `mail` 을 **`compose.prod.yaml` 의 프로필**로 분리해 운영에는 뜨지 않게 했다. 둘 다 실행으로 확인했다(프록시 자동 기동 / 운영 미리보기 `ps` 에 `mail` 0건).
+    - qa #3·#4·#5: 폼 **차단 지속 시간과 `Retry-After` 계산식**을 확정하고, 판정용 로그를 **`key=value` 로 고정**(honeypot ↔ 토큰 재사용 구분 증거)했으며 조회 수단을 명시했다. 선행 조건 #3·#4의 **10-16 재확인 체크포인트**를 넣었다.
+    - qa #6·#7(Could): `qa/qa_settings.py`·`developer/site/qa/webkit_checklist.md` 경로 표기를 정정했다.
+  - **구현 1단계**를 `developer/site/` 안에서만 수행했다. Django 5.2.9 + PostgreSQL 17 + docker compose(app·db·mail·scheduler·proxy). 설정 분리(base/local/staging/production/test), `config/env.py`(외부 의존성 없이 환경 변수 해석), 기본값 거부 접근 제어·후행 슬래시 301·보안 헤더 미들웨어, `/healthz`, 단일 시각 진입점(`clock.now()`), 식별자 규칙(`refs.py`), 정기 작업 실행기(어드바이저리 락 + `core_jobrunlog`), 메일 아웃박스 + `send_outbox`, 커스텀 사용자 모델(첫 마이그레이션에 포함), 콘텐츠 모델 3종 + `seed_content`.
+  - 공통 레이아웃은 **디자인 시스템 v1.1 §1.6 블록을 그대로 복사**해 `tokens.css` 로 두고(값 수정 0건), 그 위에 base·layout·nav·components CSS 를 얹었다. 헤더 H1~H3 / 고정 바 S1~S3 는 **판정 함수 하나(`core/cta.py`)** 로 공유해 규칙을 두 벌 만들지 않았다. 폰트는 Pretendard **unicode-range 92청크 × 400/700(184파일, 2.7MB)** 를 self-host 하고 OFL 을 동봉했으며 preload 는 설계대로 2개만 걸었다.
+  - **실행으로 확인했다(28건, 개발 보고서 §4)**: 로컬 5개 서비스 healthy, 앱·프록시 200, 404 실제 상태 코드, 301 정규화, robots·sitemap, 보안 헤더, nginx gzip, 스케줄러 1분 주기 실행 기록, **아웃박스 → SMTP → Mailpit 수신**, 테스트 9건 통과, ruff 통과, 운영 이미지 빌드(collectstatic 207/299 · `qa/`·`tests/`·`.env` 미포함 · 비밀 문자열 0건), 운영 미리보기(gunicorn·해시 파일명·brotli·immutable·DB 포트 비게시·`mail` 0건), `check --deploy` 경고 2건(의도된 HSTS 옵션뿐).
+  - **확인하지 않은 것을 완료로 적지 않았다**: Lighthouse 측정·실제 뷰포트 렌더·Safari 실기기·백업/배포/롤백은 전부 "미확인"으로 §4 말미에 따로 묶었다.
+- 산출물: `developer/04_tech-design.md` v0.3, `developer/04_dev-report.md` v0.1(draft), `developer/site/` 전체(소스·compose·Dockerfile·deploy·static·templates·tests·README), `shared/reviews/P4a_tech-design_devops_r2.md`·`P4a_tech-design_qa_r2.md` 처리 결과 열
+- 티켓·리뷰: 발행 티켓 없음 (설계 §16 Q-10 티켓은 오케스트레이터 경유로 별도 발행 예정)
+- 이슈·다음 할 일:
+  - **메인 화면 문구·강사·수업 유형·주소·전화가 전부 `[TBD]`** 라 SCR-001 은 현재 4섹션만 렌더된다. 지어내지 않았고, 값이 오면 `content/*.yml` + `seed_content` 1회로 반영된다. 디자인 검토(P4-④) 시 이 차이를 먼저 알려야 한다.
+  - 다음 순서는 작업 4 마감 → 5(강사) → 6(오시는 길) → **7(문의 폼, §9.6 응답 6종이 P5 기대값)** → 8(메일 본문) → 9(처리방침·오류) → 10·11(SEO·성능 마감) → 12(운영 compose·백업·배포) → 13(검증 지원 도구).
+  - 폰트 폴백 메트릭 실측(작업 11)과 `requirements.lock`(작업 12)은 잊지 않도록 개발 보고서 §6에 이슈로 등록했다.
+  - `backup` 프로필은 `run_backup` 구현 전까지 기본값에서 빼 두었다(작업 12에서 `COMPOSE_PROFILES=proxy,backup` 으로 전환).
+
 ## 2026-09-12 · P4 · 반영 (기술 설계서 R1 리뷰 반영 → v0.2)
 - 요청: 오케스트레이터가 **기술 설계서 교차 검토 R1 반영**을 지시했다(v0.1 → v0.2). 입력은 리뷰 2건(devops Must 2·Should 9·Could 4 / qa Must 3·Should 10·Could 3, 둘 다 "수정 요청")이고, 두 리뷰 모두 §16 질의 Q-1~Q-8에 답을 달아 두어 **그 답변까지 설계에 반영**하는 것이 과제였다. PM 방침은 "최대한 빨리 — 이번 반영으로 Must를 모두 닫아 R2를 짧게 끝내라". **코드 작성·명령 실행 금지, 설계 문서만.**
 - 수행:

@@ -1,0 +1,40 @@
+# 운영·스테이징 override — gunicorn + 이미지 태그 + 포트 비게시
+# 구분은 -p(프로젝트명)와 .env 파일로만 한다:
+#   운영     -p yogapass      .env
+#   스테이징 -p yogapass-stg  .env.staging (DJANGO_SETTINGS_MODULE=config.settings.staging)
+services:
+  app:
+    build:
+      context: .
+      target: prod
+    image: yogapass-app:${APP_VERSION}
+    command: ["gunicorn", "-c", "deploy/gunicorn.conf.py", "config.wsgi:application"]
+    ports:
+      # 기존(호스트) nginx 가 proxy_pass 로 붙는다. 외부에 직접 노출하지 않는다.
+      - "127.0.0.1:${APP_PORT}:8000"
+    # I-2-a 회신이 "운영 nginx = 컨테이너" 로 오면 위 ports 를 지우고 아래를 켠다(0.25작업일).
+    # networks: [internal, edge]
+
+  scheduler:
+    image: yogapass-app:${APP_VERSION}
+    volumes:
+      # 백업 디렉토리는 scheduler 에만 붙인다 — app(외부 노출) 에는 붙이지 않는다 (devops R2 #5)
+      - ${BACKUP_HOST_DIR}:/backups
+
+  mail:
+    # 스테이징 전용. 운영에서는 COMPOSE_PROFILES 에 mail 을 넣지 않는다 (qa R2 #2)
+    #   스테이징 .env.staging : COMPOSE_PROFILES=mail
+    #   운영     .env         : COMPOSE_PROFILES=(비움)
+    # 판정 지점: 운영 `docker compose ps` 에 mail 0건 / 스테이징 1건
+    profiles: ["mail"]
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks: [internal]
+
+# networks:
+#   edge:
+#     external: true
+#     name: ${EDGE_NETWORK:-web}

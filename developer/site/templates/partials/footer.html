@@ -1,0 +1,34 @@
+{% load static icons %}
+{# CMP-006 Footer — 값이 미확정인 행은 **렌더하지 않는다**(REQ-N-023) #}
+<footer class="ftr" data-surface="dark">
+  <div class="wrap ftr-grid">
+    <div class="ftr-brand">
+      {% inline_svg "img/logo-horizontal.svg" "logo-svg" %}
+      {% if site.address %}<p class="ft-muted">{{ site_name }} · {{ site.address }}</p>{% endif %}
+      {% if has_phone %}<p class="ft-muted"><a href="{% tel_href site_phone %}">{{ site_phone }}</a></p>{% endif %}
+      {% if site.hours %}<p class="ft-muted">{{ site.hours }}</p>{% endif %}
+    </div>
+
+    <div>
+      <h2 class="ftr-h">메뉴</h2>
+      {% for item in nav_items %}<a href="{{ item.url }}">{{ item.label }}</a>{% endfor %}
+    </div>
+
+    <div>
+      <h2 class="ftr-h">안내</h2>
+      <a class="strong" href="/privacy">개인정보 처리방침</a>
+      {% if site.business_info %}<p class="ft-muted ft-small">{{ site.business_info }}</p>{% endif %}
+    </div>
+
+    {% if site.sns %}
+      <div>
+        <h2 class="ftr-h">소셜</h2>
+        {% for link in site.sns %}
+          <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">{{ link.label }} (새 창 열림)</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <p class="ft-muted ft-small ftr-copy">© {% now "Y" %} {{ site_name }}</p>
+  </div>
+</footer>

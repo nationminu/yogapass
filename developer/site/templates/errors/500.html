@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{# SCR-009 공용 오류 화면 — 전용 화면이며 폼 화면이 아니다. noindex. #}
+{% block content %}
+  <section class="sec">
+    <div class="wrap" style="text-align:center">
+      <h1>일시적인 오류가 발생했습니다</h1>
+      <p class="muted" style="margin-top:var(--space-4)">
+        잠시 후 다시 시도해 주세요. 문제가 계속되면 문의해 주세요.
+      </p>
+      <div class="cta-row" style="justify-content:center">
+        <a class="btn btn-lg btn-p" href="/">홈으로 가기</a>
+      </div>
+    </div>
+  </section>
+{% endblock %}

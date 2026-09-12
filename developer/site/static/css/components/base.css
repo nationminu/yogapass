@@ -1,0 +1,135 @@
+/* CMP-001 Button · CMP-002 Link · CMP-010 Card · CMP-011 Icon Frame ·
+   CMP-012 Eyebrow · CMP-013 Callout · CMP-014 Definition List · CMP-025 CTA Band ·
+   CMP-027 Initial Avatar · CMP-030 Divider */
+
+/* ---- CMP-001 Button ---- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  min-height: 48px; padding: 0 var(--space-5);
+  border: 1px solid transparent; border-radius: var(--radius-md);
+  font-size: var(--fs-label); font-weight: var(--fw-bold); line-height: 1.2;
+  text-decoration: none; cursor: pointer; white-space: nowrap;
+  transition: background-color var(--motion-fast) var(--ease-standard),
+              border-color var(--motion-fast) var(--ease-standard),
+              color var(--motion-fast) var(--ease-standard);
+}
+.btn-lg { min-height: 52px; padding: 0 var(--space-6); }
+.btn-sm { min-height: 44px; padding: 0 14px; font-size: 15px; }
+.btn-icon { min-width: 44px; min-height: 44px; padding: 0; background: var(--color-surface);
+            border-color: var(--color-border-strong); color: var(--color-primary); }
+.btn-p { background: var(--color-primary); color: #fff; }
+.btn-s { background: var(--color-surface); color: var(--color-primary); border-color: var(--color-border-strong); }
+.btn svg { width: 20px; height: 20px; flex: none; }
+@media (hover: hover) {
+  .btn-p:hover { background: var(--color-primary-hover); }
+  .btn-s:hover { background: var(--color-primary-subtle); border-color: var(--color-primary); }
+}
+.btn-p:active, .btn-s:active { transform: translateY(min(1px, var(--motion-distance))); }
+.btn-p:active { background: var(--color-primary-active); color: #fff; }
+.btn[aria-disabled="true"], .btn:disabled {
+  background: var(--color-disabled-bg); color: var(--color-disabled-fg);
+  border-color: var(--color-disabled-border); cursor: not-allowed;
+}
+
+/* ---- CMP-002 Link ---- */
+.link { color: var(--color-primary); text-decoration: underline; }
+.link:hover { color: var(--color-primary-hover); text-decoration-thickness: 2px; }
+.link-solo {
+  display: inline-flex; align-items: center; gap: 6px; min-height: var(--touch-min);
+  color: var(--color-primary); font-weight: var(--fw-bold); text-decoration: none;
+}
+.link-solo svg { width: 18px; height: 18px; transition: transform var(--motion-fast) var(--ease-standard); }
+@media (hover: hover) { .link-solo:hover svg { transform: translateX(min(4px, var(--motion-distance))); } }
+
+/* ---- CMP-009 grid ---- */
+.grid { display: grid; gap: var(--grid-gutter); }
+@media (min-width: 768px) {
+  .g-2 { grid-template-columns: repeat(2, 1fr); }
+  .g-3 { grid-template-columns: repeat(2, 1fr); }
+  .g-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1280px) {
+  .g-3 { grid-template-columns: repeat(3, 1fr); }
+  .g-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ---- CMP-010 Card ---- */
+.card {
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg); padding: var(--space-6);
+  transition: border-color var(--motion-fast) var(--ease-standard);
+}
+@media (min-width: 1280px) { .card { padding: var(--space-7); } }
+@media (hover: hover) { .card:hover { border-color: var(--color-border-strong); } }
+.card h3 { margin-bottom: var(--space-2); }
+.card p { font-size: var(--fs-body-sm); color: var(--color-muted); }
+.card--lesson { min-height: 148px; }
+.card--instructor { padding: 0; overflow: hidden; }
+.card--instructor .card-body { padding: var(--space-5); }
+
+/* ---- CMP-011 Icon Frame (원형 56px) ---- */
+.icon-frame {
+  width: 56px; height: 56px; border-radius: var(--radius-pill);
+  background: var(--color-primary-subtle); border: 1px solid var(--color-border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-primary); margin-bottom: var(--space-4);
+}
+.icon-frame svg { width: 24px; height: 24px; }
+
+/* ---- CMP-012 Eyebrow ---- */
+.eyebrow {
+  display: inline-flex; align-items: center; align-self: start;
+  background: var(--color-surface); border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-pill); padding: 6px 14px;
+  font-size: var(--fs-eyebrow); font-weight: var(--fw-bold);
+  letter-spacing: var(--ls-eyebrow); color: var(--color-primary);
+  margin-bottom: var(--space-5);
+}
+
+/* ---- CMP-013 Callout ---- */
+.callout {
+  display: flex; gap: var(--space-3); padding: var(--space-4) 18px;
+  border-radius: var(--radius-md); border-left: 3px solid var(--color-primary);
+  background: var(--color-info-bg); font-size: var(--fs-body-sm);
+}
+.callout svg { width: 18px; height: 18px; flex: none; color: var(--color-primary); margin-top: 2px; }
+
+/* ---- CMP-014 Definition List ---- */
+.info-dl { margin: 0; border-top: 1px solid var(--color-border); }
+.info-dl > div {
+  display: flex; flex-direction: column; gap: var(--space-1);
+  padding: 14px 0; border-bottom: 1px solid var(--color-border);
+}
+.info-dl dt { font-size: var(--fs-caption); font-weight: var(--fw-bold); color: var(--color-muted); flex: none; }
+.info-dl dd { margin: 0; font-size: var(--fs-body); }
+@media (min-width: 768px) {
+  .info-dl > div { flex-direction: row; gap: var(--space-4); align-items: baseline; }
+  .info-dl dt { width: 96px; }
+}
+
+/* ---- CMP-025 CTA Band ---- */
+.band {
+  background: var(--color-primary-subtle);
+  border-top: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border);
+  padding-block: var(--space-10); text-align: center;
+}
+@media (min-width: 768px)  { .band { padding-block: var(--space-12); } }
+@media (min-width: 1280px) { .band { padding-block: var(--space-14); } }
+.band p { margin-top: 10px; color: var(--color-muted); }
+.band .cta-row { justify-content: center; margin-top: var(--space-6); }
+
+/* ---- CMP-027 Initial Avatar ---- */
+.avatar {
+  aspect-ratio: 1 / 1; background: var(--color-primary-subtle);
+  border-bottom: 1px solid var(--color-border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-primary); font-weight: var(--fw-bold); font-size: 56px;
+}
+
+/* ---- CMP-030 Divider ---- */
+.divider { border: 0; border-top: 1px solid var(--color-border); margin: var(--space-7) 0; }
+
+/* ---- 공통 CTA 행 ---- */
+.cta-row { display: flex; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-5); }
+.cta-row .btn { width: 100%; }
+@media (min-width: 768px) { .cta-row .btn { width: auto; } }

@@ -1,0 +1,17 @@
+{% load icons %}
+{# CMP-007 Bottom Fixed Bar — 노출 구간 <1280px 는 CSS 가 제어한다.
+   S3(자기 참조 + 대표 전화 미확정)에서는 요소 자체를 렌더하지 않는다. #}
+{% if cta.show_bar %}
+<div class="barwrap">
+  <div class="bar{% if not cta.bar_two_up %} bar-full{% endif %}">
+    {% if cta.bar == "S1" %}
+      {% if has_phone %}
+        <a class="btn btn-sm btn-s bar-tel" href="{% tel_href site_phone %}">{% icon "phone" %}전화 문의</a>
+      {% endif %}
+      <a class="btn btn-sm btn-p" href="{{ cta.contact_url }}">{% icon "message-square" %}문의하기</a>
+    {% elif cta.bar == "S2" %}
+      <a class="btn btn-sm btn-p" href="{% tel_href site_phone %}">{% icon "phone" %}전화 문의</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}

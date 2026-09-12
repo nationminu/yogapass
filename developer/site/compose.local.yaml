@@ -1,0 +1,82 @@
+# 로컬 override — runserver + 소스 바인드 마운트 + Mailpit
+# 선택 프로필(기술 설계 §3.2.1): proxy(nginx) · backup(run_backup 실행자)
+#   .env 의 COMPOSE_PROFILES 로 켠다 (기본값 예시는 .env.example 참고 — qa R2 #1)
+services:
+  app:
+    build:
+      context: .
+      target: dev
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.local
+    volumes:
+      - .:/app
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      mail:
+        condition: service_started
+
+  db:
+    ports:
+      - "127.0.0.1:5432:5432"   # 로컬 조회용 (운영·스테이징은 포트를 게시하지 않는다)
+
+  scheduler:
+    build:
+      context: .
+      target: dev
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.local
+    volumes:
+      - .:/app
+
+  mail:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8025:8025"   # Mailpit UI
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks: [internal]
+
+  proxy:
+    profiles: ["proxy"]
+    image: nginx:alpine
+    depends_on:
+      app:
+        condition: service_started
+    ports:
+      - "127.0.0.1:8080:80"
+    volumes:
+      - ./deploy/nginx/local.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./deploy/nginx/maintenance.html:/usr/share/nginx/html/maintenance.html:ro
+      - ./deploy/nginx/htpasswd.dummy:/etc/nginx/htpasswd.dummy:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "nginx -t && wget -q -O /dev/null http://127.0.0.1/healthz || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks: [internal]
+
+  backup:
+    # ⚠ 작업 12(manage.py run_backup 구현) 완료 후부터 동작한다.
+    profiles: ["backup"]
+    build:
+      context: .
+      target: dev
+    command: ["python", "manage.py", "run_backup"]
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.local
+    env_file: ["${ENV_FILE:-.env}"]
+    volumes:
+      - .:/app
+      - ${BACKUP_HOST_DIR:-./backups}:/backups
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+    networks: [internal]

@@ -1,0 +1,49 @@
+# 사이트 표시 값 (단일 원본) — 기술 설계 §5.1.1
+# 사용법: 값을 고친 뒤 반드시 `manage.py seed_content` 를 1회 실행해야 화면에 반영된다.
+# 규칙: 확인되지 않은 값은 value 를 비우고 is_published: false 로 둔다.
+#       미확정 항목은 화면에서 해당 요소·행 자체를 렌더하지 않는다(REQ-N-023).
+settings:
+  name:
+    value: "요가패스"
+    is_published: true
+    note: "[TBD: T-G] 정식 상호 확정 후 교체"
+  tagline:
+    value: "강남 요가 스튜디오"
+    is_published: true
+    note: "[TBD: T-G] 고객 확인 대상"
+  phone:
+    value: null
+    is_published: false
+    note: "[TBD: T-E] 대표 전화 — 미확정이면 전화 요소를 전부 미렌더(디자인 시스템 CMP-007 S1 보조 규칙)"
+  address:
+    value: null
+    is_published: false
+    note: "[TBD: T-E] 도로명 주소"
+  transit:
+    value: null
+    is_published: false
+    note: "[TBD: T-E] 지하철역·출구·도보 시간"
+  hours:
+    value: null
+    is_published: false
+    note: "[TBD: T-E] 운영시간·휴무일"
+  business_info:
+    value: null
+    is_published: false
+    note: "[TBD: T-G] 사업자 등록번호·대표자 등 푸터 표기 항목"
+  sns:
+    value: null
+    is_published: false
+    note: "[TBD: T-H] 계정 미확인 시 푸터 SNS 섹션 미노출"
+  hero_headline:
+    value: null
+    is_published: false
+    note: "[TBD: T-G] 히어로 헤드라인 문구 확정 전 — 확정 전에는 기본 문구를 쓰지 않는다"
+  hero_lead:
+    value: null
+    is_published: false
+    note: "[TBD: T-G] 히어로 서브카피"
+  features:
+    value: null
+    is_published: false
+    note: "[TBD: T-G] 강점 3~4 항목(제목·설명·아이콘). 확정 전에는 섹션을 렌더하지 않는다"

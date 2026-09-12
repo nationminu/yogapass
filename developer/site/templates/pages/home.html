@@ -1,0 +1,138 @@
+{% extends "base.html" %}{% load static icons %}
+{# SCR-001 메인 (페이지 디자인 §2)
+   · 섹션 2·3·4 는 데이터가 없으면 **섹션 태그 자체를 렌더하지 않는다**(빈 카드·자리표시자 금지).
+   · 값이 미확정인 행은 렌더하지 않는다(REQ-N-023). #}
+{% block page_css %}<link rel="stylesheet" href="{% static 'css/pages/home.css' %}">{% endblock %}
+
+{% block content %}
+  {% include "partials/jsonld_localbusiness.html" %}
+
+  {# 1. Hero #}
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        {% if site_tagline %}<span class="eyebrow">{{ site_tagline }}</span>{% endif %}
+        <h1>{% if site.hero_headline %}{{ site.hero_headline }}{% else %}{{ site_name }}{% endif %}</h1>
+        {% if site.hero_lead %}<p class="lead">{{ site.hero_lead }}</p>{% endif %}
+        <div class="cta-row">
+          <a class="btn btn-lg btn-p" href="{{ cta.contact_url }}">문의하기</a>
+          {% if has_phone %}
+            <a class="btn btn-lg btn-s" href="{% tel_href site_phone %}">{% icon "phone" %}전화로 문의하기</a>
+          {% endif %}
+        </div>
+        {% if site.hours %}<p class="hours">운영시간 {{ site.hours }}</p>{% endif %}
+      </div>
+      <div class="art" aria-hidden="true">{% inline_svg "img/logo-mark.svg" %}</div>
+    </div>
+  </section>
+
+  {# 2. 강점 3~4 (조건부) #}
+  {% if features %}
+    <section class="sec">
+      <div class="wrap">
+        <div class="sec-h"><h2>요가패스를 선택하는 이유</h2></div>
+        <div class="grid g-3">
+          {% for feature in features|slice:":4" %}
+            <div class="card">
+              <div class="icon-frame">{% icon feature.icon|default:"info" %}</div>
+              <h3>{{ feature.title }}</h3>
+              {% if feature.body %}<p>{{ feature.body }}</p>{% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  {% endif %}
+
+  {# 3. 수업 유형 (조건부) #}
+  {% if lesson_types %}
+    <section class="sec">
+      <div class="wrap">
+        <div class="sec-h"><h2>수업 안내</h2></div>
+        <div class="grid g-3">
+          {% for lesson in lesson_types %}
+            <div class="card card--lesson">
+              {% if lesson.tag %}<span class="eyebrow">{{ lesson.tag }}</span>{% endif %}
+              <h3>{{ lesson.name }}</h3>
+              <p>{{ lesson.description }}</p>
+            </div>
+          {% endfor %}
+        </div>
+        <div class="callout" style="margin-top: var(--space-6)">
+          {% icon "info" %}
+          <span>월 시간표는 공개되면 안내드립니다. 자세한 일정은 문의해 주세요.</span>
+        </div>
+      </div>
+    </section>
+  {% endif %}
+
+  {# 4. 강사 미리보기 (조건부) #}
+  {% if instructors %}
+    <section class="sec">
+      <div class="wrap">
+        <div class="sec-h"><h2>함께하는 강사</h2></div>
+        <div class="grid g-3">
+          {% for instructor in instructors %}
+            <div class="card card--instructor">
+              <div class="avatar" aria-hidden="true">{{ instructor.initial }}</div>
+              <div class="card-body">
+                <h3>{{ instructor.name }}</h3>
+                {% if instructor.headline %}<p>{{ instructor.headline }}</p>{% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <p style="margin-top: var(--space-4)">
+          <a class="link-solo" href="/instructors">강사 전체 보기{% icon "arrow-right" %}</a>
+        </p>
+      </div>
+    </section>
+  {% endif %}
+
+  {# 5. 위치 요약 — 지도를 임베드하지도, 지도 이미지를 쓰지도 않는다(REQ-F-030 ⓑ) #}
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec-h"><h2>오시는 길</h2></div>
+      <div class="location-grid">
+        <div class="art" aria-hidden="true">{% icon "map-pin" %}</div>
+        <div>
+          {% if site.address or site.transit or site.hours %}
+            <dl class="info-dl">
+              {% if site.address %}<div><dt>주소</dt><dd>{{ site.address }}</dd></div>{% endif %}
+              {% if site.transit %}<div><dt>교통</dt><dd>{{ site.transit }}</dd></div>{% endif %}
+              {% if site.hours %}<div><dt>운영시간</dt><dd>{{ site.hours }}</dd></div>{% endif %}
+            </dl>
+          {% endif %}
+          <p style="margin-top: var(--space-3)">
+            <a class="link-solo" href="/location">지도·길찾기 보기{% icon "arrow-right" %}</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {# 6. 문의 안내 #}
+  <section class="sec">
+    <div class="wrap inquiry-note">
+      <div>
+        <h2>궁금한 점이 있으신가요?</h2>
+        <p class="muted" style="margin-top:10px">문의 사항을 남겨주시면 확인 후 연락드립니다.</p>
+      </div>
+      <a class="btn btn-lg btn-s" href="{{ cta.contact_url }}">문의 남기기</a>
+    </div>
+  </section>
+
+  {# 7. 하단 전환 블록 (CMP-025) #}
+  <section class="band">
+    <div class="wrap">
+      <h2>궁금한 점을 남겨주세요</h2>
+      <p>남겨주신 연락처로 확인 후 연락드립니다.</p>
+      <div class="cta-row">
+        <a class="btn btn-lg btn-p" href="{{ cta.contact_url }}">문의하기</a>
+        {% if has_phone %}
+          <a class="btn btn-lg btn-s" href="{% tel_href site_phone %}">{% icon "phone" %}전화 문의</a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+{% endblock %}

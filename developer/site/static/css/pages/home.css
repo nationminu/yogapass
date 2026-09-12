@@ -1,0 +1,41 @@
+/* SCR-001 메인 (페이지 디자인 §2) */
+
+.hero { background: var(--color-primary-subtle); border-bottom: 1px solid var(--color-border); }
+.hero .wrap {
+  display: grid; gap: var(--space-7); align-content: center;
+  padding-block: var(--space-11);
+  min-height: 320px;                       /* 100dvh 를 쓰지 않는다(iOS 주소창 CLS) */
+}
+.hero h1 { font-size: var(--fs-h1); line-height: var(--lh-h1); }
+.hero .lead { margin-top: var(--space-3); font-size: var(--fs-lead); color: var(--color-muted); max-width: 30em; }
+.hero .hours { margin-top: var(--space-5); font-size: var(--fs-caption); color: var(--color-muted); }
+@media (min-width: 768px)  { .hero .wrap { padding-block: var(--space-13); min-height: 420px; } }
+@media (min-width: 1280px) {
+  .hero .wrap {
+    padding-block: var(--space-15); min-height: 520px;
+    grid-template-columns: 1fr 480px; gap: 56px; align-items: center;
+  }
+}
+
+/* 히어로 그래픽 패널 — 장식(aria-hidden). 사진 수령 전 CSS 라인 격자 */
+.art {
+  position: relative; aspect-ratio: 16 / 9;
+  border: 1px solid var(--color-border-strong); border-radius: var(--radius-lg);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-primary);
+  background:
+    repeating-linear-gradient(0deg, rgba(11,79,158,.10) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, rgba(11,79,158,.10) 0 1px, transparent 1px 40px),
+    var(--color-surface);
+}
+.art svg { width: 34%; height: auto; opacity: .9; }
+
+/* 위치 요약 2단 */
+.location-grid { display: grid; gap: var(--space-6); }
+@media (min-width: 1280px) { .location-grid { grid-template-columns: 520px 1fr; gap: var(--space-9); align-items: start; } }
+
+/* 문의 안내 */
+.inquiry-note { display: flex; flex-direction: column; gap: var(--space-4); }
+@media (min-width: 1280px) {
+  .inquiry-note { flex-direction: row; justify-content: space-between; align-items: center; gap: var(--space-7); }
+}

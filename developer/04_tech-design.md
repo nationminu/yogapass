@@ -3,11 +3,11 @@ doc_id: DEV-TECH
 title: 기술 설계서 — 1차(2026-11-06 오픈 범위) + 2차 스키마 선설계
 phase: P4
 owner: developer
-version: 0.2
+version: 0.3
 status: in-review
 reviewers: [devops, qa]
-inputs: [planning/02_requirements.md, planning/02_information-architecture.md, planning/02_storyboard.md, design/03_design-system.md, design/03_page-design.md, design/mockups/, interviews/2026-09-12_infra-constraints.md, interviews/2026-09-12_booking-rules.md, pm/01_project-plan.md, pm/gates/G3a_design.md, shared/reviews/CR-001_impact_developer_r2.md, shared/reviews/P3_design-docs_developer_r1.md, shared/reviews/P4a_tech-design_devops_r1.md, shared/reviews/P4a_tech-design_qa_r1.md]
-updated: 2026-09-12
+inputs: [planning/02_requirements.md, planning/02_information-architecture.md, planning/02_storyboard.md, design/03_design-system.md, design/03_page-design.md, design/mockups/, interviews/2026-09-12_infra-constraints.md, interviews/2026-09-12_booking-rules.md, pm/01_project-plan.md, pm/gates/G3a_design.md, shared/reviews/CR-001_impact_developer_r2.md, shared/reviews/P3_design-docs_developer_r1.md, shared/reviews/P4a_tech-design_devops_r1.md, shared/reviews/P4a_tech-design_qa_r1.md, shared/reviews/P4a_tech-design_devops_r2.md, shared/reviews/P4a_tech-design_qa_r2.md]
+updated: 2026-09-13
 ---
 
 # 기술 설계서 — 강남 요가패스
@@ -15,7 +15,7 @@ updated: 2026-09-12
 > **읽는 법**
 > 1. 이 문서는 **1차(2026-11-06 오픈: 소개 6화면 + 문의 폼 + full compose)를 구현하기 위한 확정 설계**이고, 동시에 **2차(회원·레슨 예약·상담·관리자 39화면)에서 1차 결정을 되돌리지 않기 위한 선설계**다. 두 목적이 섞이지 않도록 각 절에 **`[1차 구현]` / `[2차 설계만]`** 을 표시했다.
 > 2. **§2(스택)·§3(compose)·§5(데이터 모델)·§12(배포·백업)가 이 문서의 본체**다. 나머지는 그 결정의 전개다.
-> 3. 이 문서가 **검토를 통과하기 전에는 구현에 착수하지 않는다**(CLAUDE.md §2 P4 체크포인트). 현재 `developer/site/`는 비어 있고, 이번 작업에서 코드 작성·의존성 설치·명령 실행은 하지 않았다.
+> 3. **R2에서 devops·qa 모두 조건부 승인(신규 Must 0건)** 했고 두 팀 다 R3를 요구하지 않았으므로, v0.3 반영과 함께 **구현 1단계(§11.1 작업 1~3)에 착수했다.** 구현 결과와 실행 증거는 `developer/04_dev-report.md`(P4-③ 초안)에 있다. 이 문서의 설계와 구현이 어긋나면 **구현이 아니라 이 문서를 먼저 고친다.**
 > 4. 확정 권한이 없는 값은 `[TBD]`로 두고 **무엇이 막히는지**를 함께 적었다(§14).
 
 > **v0.2 반영 요약 (R1 리뷰 2건 — devops Must 2·Should 9·Could 4 / qa Must 3·Should 10·Could 3)**
@@ -30,6 +30,25 @@ updated: 2026-09-12
 > | Should 19건 | 전건 반영(미반영 0건) — 상세는 §17 처리 대장 | §17 |
 >
 > **구현 착수 조건**: 이 v0.2가 R2에서 승인되면 §11.1 순서대로 착수한다. 반영 과정에서 늘어난 공수는 **+0.8~1.05작업일**(§11.1 #12 +0.5~0.75 · #13 +0.3)이며, 산정은 **약 15작업일 → 약 16작업일**이 된다. **§11.2의 결론(ⓐ 기준 오픈일 11-06 사용)은 바뀌지 않고, 차이가 5일에서 약 6일로 커진다 — PM 결정 사항이다**(§14.4 PM-1).
+
+> **v0.3 반영 요약 (R2 리뷰 2건 — devops Should 3·Could 2 / qa Should 5·Could 2 · **신규 Must 0건**)**
+>
+> | 반영 | 바뀐 것 | 위치 |
+> |---|---|---|
+> | devops #1 | **배포 직전 백업이 조용히 건너뛰어지는 경로를 닫았다** — 스케줄러 정지를 **0.5단계**로 앞당기고, **라벨 백업(`pre-deploy`·`pre-restore`)은 락 충돌 시 `skipped`를 성공으로 보지 않고 배포를 중단**한다 | §12.2 · §12.5.1 · §12.5.3 |
+> | devops #2 | **백업 "미실행"도 통지에 걸리게** 판정을 뒤집었다 — 일일 요약 ⓒ를 **"최근 24시간 내 성공 기록이 없으면 `[점검필요]`"** 로, `skipped`는 ⓓ에 별도 집계. `deploy.sh` 0단계 사전 점검에도 같은 규칙 | §3.3 · §12.2 |
+> | devops #3 | **`/healthz` 호출은 항상 앱에 직접**(`http://app:8000/healthz`), **nginx 비경유·`SITE_BASE_URL` 미사용** — 스테이징 `auth_basic` 예외 0건과 충돌하지 않는다(자동 롤백 오발동 차단) | §3.3 ⓐ · §3.4 · §3.5.1 ① · §12.2 5단계 |
+> | devops #4 (Could) | 로컬 `local.conf`에 **`auth_basic` 블록(주석)과 검증 전용 더미 `htpasswd.dummy`** 를 넣어 REQ-N-040(무인증 401)을 **로컬에서 선검증** 가능하게 했다 | §3.2.1 · §12.3 #8 · §13 #12 |
+> | devops #5 (Could) | `${BACKUP_DIR}` 바인드를 **`scheduler`에만** 두고 배포 직전 백업도 `run --rm scheduler` 로 실행 — `app`(외부 노출) 노출면 축소, 비용 0 | §3.5 · §12.2 1단계 |
+> | qa #1 | **`.env.example`에 `COMPOSE_PROFILES`** 를 두어 **플래그 없는 `docker compose up`** 으로 프록시까지 뜬다 → REQ-N-034 수용 기준의 문면-실행 간극 0 | §3.2.1 · §3.5 · §8 |
+> | qa #2 | **`mail`을 `compose.prod.yaml`에 프로필 `mail`로 정의**하고 스테이징 `.env.staging`에서만 켠다 → 판정 지점 확정(**운영 `ps` 에 `mail` 0건 / 스테이징 1건**) | §3.2 · §3.5 |
+> | qa #3 | **폼 빈도 제한의 차단 지속 시간**과 **`Retry-After` 계산식**을 확정 → "429 → 대기 → 200 복귀" TC 작성 가능 | §5.3 · §9.6 ④ |
+> | qa #4 | **판정용 로그 라인을 `key=value` 형식으로 고정**하고 **조회 수단**(로컬 `docker compose logs app` / 스테이징 devops 대행)을 명시 → ③honeypot ↔ ⑤토큰 재사용 구분 가능 | §9.6 · §10.2 |
+> | qa #5 | **선행 조건 #3·#4를 10-16 종료 시점에 재확인**하고 결과를 즉시 pmo·qa에 통지하는 체크포인트 신설 | §12.6.2 |
+> | qa #6·#7 (Could) | `qa/qa_settings.py` 경로 표기 정정 · `developer/site/qa/webkit_checklist.md` 로 경로 명시 | §10.1 ④ · §10.5 ③ |
+> | 구현 반영 | 구현 1단계에서 확정된 사실을 표에 반영: **PyYAML 6.0.3 의존성 추가**(시드 파일 파서), 패치 버전 고정값, `deploy/nginx/htpasswd.dummy`·`config/env.py` 파일 추가 | §2.7 · §4 |
+>
+> **미반영 0건.** Should 8건·Could 4건 전건 반영. 처리 대장은 §17.4.
 
 ---
 
@@ -182,17 +201,19 @@ infra §4와 CR-001 R2 §2의 권고를 **그대로 채택**한다. 결정 근�
 | 구성 요소 | 버전 | 이미지·패키지 |
 |---|---|---|
 | Python | 3.13 | `python:3.13-slim` (앱 이미지 베이스) |
-| Django | **5.2 LTS** (5.2.x 최신 패치) | pip |
-| psycopg | 3.x (binary) | pip |
-| Gunicorn | 23.x 이상 | pip |
-| WhiteNoise | 6.x (`[brotli]`) | pip |
+| Django | **5.2 LTS** — 구현 고정값 **5.2.9** | pip |
+| psycopg | 3.x (binary) — 구현 고정값 **3.3.5** | pip |
+| Gunicorn | 23.x 이상 — 구현 고정값 **26.2.0** | pip |
+| WhiteNoise | 6.x (`[brotli]`) — 구현 고정값 **6.12.0** | pip |
 | Pillow | 11.x **(2차 강사 사진 리사이즈용, 1차 미설치)** | pip |
 | PostgreSQL | **17** | `postgres:17-alpine` |
 | Mailpit (로컬·스테이징만) | 최신 안정 | `axllent/mailpit` |
 | supercronic (스케줄러) | 최신 안정 | 앱 이미지에 바이너리 포함 |
 | **`postgresql-client` (17)** | 17.x | **앱 이미지에 포함** — `manage.py run_backup`이 `pg_dump`·`pg_restore --list`를 호출한다(§12.5). 클라이언트 도구만 설치하며 서버는 설치하지 않는다(이미지 증가 ~15MB) |
 | nginx (**로컬 프로필 전용**) | 최신 안정 | `nginx:alpine` — `compose.local.yaml`의 `--profile proxy`에서만 기동. **운영·스테이징은 기존 nginx 재사용이므로 우리 compose에 없다**(§3.2) |
-| ruff (개발만) | 최신 | pip (dev) |
+| **PyYAML** (v0.3 추가) | **6.0.3** | pip — `content/*.yml` 시드 파서(§5.1.1). 운영 의존성이 5개 → **6개**가 된다. JSON 으로 바꾸면 뺄 수 있으나 설계 §4가 확정한 파일 형식(사람이 고치는 단일 원본)이 YAML 이라 채택했다 |
+| supercronic (구현 고정값) | **v0.2.49** (sha1 검증 후 앱 이미지에 포함) | GitHub release |
+| ruff (개발만) | 최신 — 구현 고정값 **0.16.7** | pip (dev) |
 
 > 의존성은 `requirements.txt`에 **정확한 버전 + 해시**로 고정하고, 업그레이드는 별도 작업 단위로 한다. 정확한 패치 버전은 구현 착수 시점에 확정해 `site/README.md`와 개발 보고서에 기록한다.
 
@@ -246,7 +267,7 @@ infra §4와 CR-001 R2 §2의 권고를 **그대로 채택**한다. 결정 근�
 |---|---|---|---|---|
 | `app` | ○ (`runserver`, 소스 바인드 마운트, 자동 리로드) | ○ (`gunicorn`, 이미지 내 소스) | 같은 Dockerfile의 `dev`/`prod` 타깃 | 운영은 비루트 사용자로 실행 |
 | `db` | ○ (포트 `127.0.0.1:5432` 게시 — 로컬 조회용) | ○ (**포트 게시 없음**, 내부 네트워크만) | `postgres:17-alpine` | 명명 볼륨 |
-| `mail` | ○ (Mailpit, SMTP 1025 / UI `localhost:8025`) | **스테이징 필수** / 운영 미배치 | `axllent/mailpit` | qa R1 #6 — "선택적"을 **필수**로 확정. 스테이징에 실제 SMTP 계정이 연결되면 그때 `EMAIL_HOST`를 교체하고 Mailpit을 내린다 |
+| `mail` | ○ (Mailpit, SMTP 1025 / UI `localhost:8025`) | **스테이징 필수** / 운영 미배치 | `axllent/mailpit` | qa R1 #6 — "선택적"을 **필수**로 확정. **갈라내는 수단(v0.3, qa R2 #2): `compose.prod.yaml`에 프로필 `mail`로 정의하고 스테이징 `.env.staging`의 `COMPOSE_PROFILES=mail`로만 켠다. 운영 `.env`에는 넣지 않는다 → 판정 지점 = 운영 `docker compose ps`에 `mail` 0건 / 스테이징 1건.** 스테이징에 실제 SMTP 계정이 연결되면 그때 `EMAIL_HOST`를 교체하고 Mailpit을 내린다 |
 | `scheduler` | ○ | ○ | app 이미지 재사용 | supercronic + `deploy/crontab`. **백업·파기·아웃박스·요약 알림을 전부 여기서 실행**(§3.3) |
 | `proxy` (nginx) | **△ 선택 프로필 `proxy`** — `http://localhost:8080` | ✕ (**기존 nginx 재사용 — 우리 compose에 포함하지 않는다**) | `nginx:alpine` + `deploy/nginx/*.conf.sample` 마운트 | §3.2.1 |
 | `backup` | **△ 선택 프로필 `backup`** — `scheduler`와 같은 명령을 짧은 주기로 도는 1회성 실행자 | **서비스로 존재하지 않는다** (`scheduler`가 수행) | app 이미지 재사용 | §3.2.1 · §12.5 |
@@ -255,8 +276,8 @@ infra §4와 CR-001 R2 §2의 권고를 **그대로 채택**한다. 결정 근�
 
 | 프로필 | 기동 | 무엇을 로컬에서 선검증하게 되는가 | 왜 기본 기동이 아닌가 |
 |---|---|---|---|
-| `proxy` | `docker compose -f compose.yaml -f compose.local.yaml --profile proxy up` → `http://localhost:8080` | §12.3에서 **기존 nginx에 요청할 설정 9행을 그대로 로컬에서 적용·확인**한다: `proxy_intercept_errors off`(→ REQ-F-060 실제 404), `X-Forwarded-*` 전달과 `TRUSTED_PROXY_COUNT` 동작(§13 #6 — TR-3 Critical급), HTML `gzip`(§13 #11), `error_page 502 503` 정적 점검 화면(§13 #9), 별도 로그 파일. **스테이징 지연(TR-2·TR-5) 시의 방어선**이 된다 | 일상 개발에서는 `:8000` 직접 접근이 빠르고 `runserver`의 자동 리로드·디버그 경로가 단순하다. **프로필은 검증·재현용**이며 `compose.local.yaml` 안에 정의되어 있으므로 누구나 같은 명령으로 켤 수 있다 |
-| `backup` | `… --profile backup up` 또는 `… run --rm app python manage.py run_backup` | `run_backup`의 정상 경로·회전·`pg_restore --list` 검증·**실패 주입 ⑨ⓑ**(`QA_FAIL_INJECT=backup`)·`core_jobrunlog` 기록·`mailer_outbox`의 `kind=backup_failed` INSERT를 **로컬에서 전부 재현**한다(qa R1 #2 부수 영향 해소 — 백업 판정이 스테이징에만 의존하지 않는다) | 로컬 디스크에 덤프 파일이 쌓이는 것을 기본 동작으로 두지 않기 위함. `${BACKUP_DIR}`는 로컬에서 `./backups`(`.gitignore` 대상) |
+| `proxy` | **`docker compose -f compose.yaml -f compose.local.yaml up`** (플래그 불필요 — `.env`의 `COMPOSE_PROFILES=proxy` 가 켠다, v0.3/qa R2 #1) → `http://localhost:8080` | §12.3에서 **기존 nginx에 요청할 설정 9행을 그대로 로컬에서 적용·확인**한다: `proxy_intercept_errors off`(→ REQ-F-060 실제 404), `X-Forwarded-*` 전달과 `TRUSTED_PROXY_COUNT` 동작(§13 #6 — TR-3 Critical급), HTML `gzip`(§13 #11), `error_page 502 503` 정적 점검 화면(§13 #9), 별도 로그 파일. **스테이징 지연(TR-2·TR-5) 시의 방어선**이 된다 | 일상 개발에서는 `:8000` 직접 접근이 빠르고 `runserver`의 자동 리로드·디버그 경로가 단순하다. **프로필은 검증·재현용**이며 `compose.local.yaml` 안에 정의되어 있으므로 누구나 같은 명령으로 켤 수 있다 |
+| `backup` | 같은 방식(`COMPOSE_PROFILES=proxy,backup`) 또는 `… run --rm scheduler python manage.py run_backup` (devops R2 #5 — 백업 디렉토리는 `scheduler`에만 붙인다) | `run_backup`의 정상 경로·회전·`pg_restore --list` 검증·**실패 주입 ⑨ⓑ**(`QA_FAIL_INJECT=backup`)·`core_jobrunlog` 기록·`mailer_outbox`의 `kind=backup_failed` INSERT를 **로컬에서 전부 재현**한다(qa R1 #2 부수 영향 해소 — 백업 판정이 스테이징에만 의존하지 않는다) | 로컬 디스크에 덤프 파일이 쌓이는 것을 기본 동작으로 두지 않기 위함. `${BACKUP_DIR}`는 로컬에서 `./backups`(`.gitignore` 대상) |
 
 **"세 환경 동일 구성"의 판정 정의 (REQ-N-034 수용 기준 대조용 — devops R1 #3)**
 
@@ -264,6 +285,8 @@ infra §4와 CR-001 R2 §2의 권고를 **그대로 채택**한다. 결정 근�
 > **애플리케이션 스택 `app`·`db`·`scheduler`는 3환경 모두 동일하게 존재**한다.
 > `proxy`·`backup`·`mail`은 **환경 전용 보조 서비스**이며 override에서만 정의된다 — 로컬은 프로필로 **켤 수 있고**(구조가 없는 것이 아니다), 운영·스테이징의 프록시는 **기존 nginx**가, 백업은 **`scheduler`의 작업**이 담당한다.
 > 따라서 **"로컬에서 앱·DB·프록시가 모두 뜨고 사이트가 동작한다"는 수용 기준은 `--profile proxy`로 충족**되고, **"구조적 차이 0건"은 위 정의로 판정**한다.
+
+**v0.3 보강 (qa R2 #1 — 문면-실행 간극 0)**: `.env.example`에 **`COMPOSE_PROFILES`** 키를 두고 기본값을 `proxy`(작업 12에서 `run_backup` 구현이 끝나면 `proxy,backup`)로 둔다. compose 가 이 환경 변수로 프로필을 켜므로 **문서가 안내하는 명령과 수용 기준이 적은 명령이 같아진다** — `docker compose -f compose.yaml -f compose.local.yaml up` 한 줄로 `app`·`db`·`proxy` 가 함께 뜬다(2026-09-13 실행 확인: 5개 서비스 healthy). 일상 개발에서 끄고 싶으면 `.env`에서 값을 비우면 되므로 "기본 기동이 아닌 이유"의 취지도 유지된다. planner 문구 정렬 요청은 하지 않는다(qa R2 Q-9 회신 = 정렬 불필요).
 
 - **planner 티켓 경로와 비용(채택하지 않았을 경우의 대안 — 기록용)**: 프로필을 만들지 않았다면 planner에게 **REQ-N-034 수용 기준 문구 정렬**(프록시·백업의 로컬 제외 명시)을 티켓으로 요청해야 했다. 비용은 문서 작업 자체(0.1작업일)보다 **일정 리스크**가 크다 — 요구사항 개정 → planner 반영 → qa 판정 기준 갱신 → G5a 전 종결까지 팀 3곳을 거치고, 그 사이 §13의 스테이징 판정 5건이 스테이징 가용에만 묶인다. **프로필 추가(+0.5작업일, §11.1 #12)가 더 싸고 검증 이득이 크다고 판단해 ⓐ를 채택**했다.
 - 다만 **요구사항 문면의 "리버스 프록시·백업"이 로컬 기본 기동을 뜻하는지**는 planner·qa와 한 번 맞추는 것이 안전하다. **이 문서의 판정 정의로 충분한지 확인**을 R2에서 요청한다(§16 Q-9).
@@ -291,16 +314,17 @@ infra §4와 CR-001 R2 §2의 권고를 **그대로 채택**한다. 결정 근�
 
 | 포함 항목 | 출처 | 무엇을 알려 주는가 |
 |---|---|---|
-| ⓐ 앱 `/healthz` 폴링 결과(최근 24시간 성공/실패 횟수) | 스케줄러가 5분마다 `/healthz`를 호출해 `core_jobrunlog`에 기록 | **`unless-stopped`가 잡지 못하는 "살아 있지만 응답 실패" 상태**(devops R1 #15) |
+| ⓐ 앱 `/healthz` 폴링 결과(최근 24시간 성공/실패 횟수) | 스케줄러가 5분마다 `/healthz`를 호출해 `core_jobrunlog`에 기록. **호출 대상은 항상 앱에 직접(`http://app:8000/healthz`) — nginx 를 경유하지 않고 `SITE_BASE_URL`을 쓰지 않는다**(v0.3, devops R2 #3). 그래서 스테이징의 `auth_basic` 예외 0건 정책과 충돌하지 않는다 | **`unless-stopped`가 잡지 못하는 "살아 있지만 응답 실패" 상태**(devops R1 #15) |
 | ⓑ 컨테이너 재시작 횟수 | `docker` 소켓을 마운트하지 않기 위해 **앱 기동 시각(프로세스 시작 시간)** 을 기록해 비교 | 반복 크래시 |
-| ⓒ **최근 백업 성공 여부·파일 크기·소요 시간** | `core_jobrunlog`의 `run_backup` | REQ-N-032 ③ |
-| ⓓ 아웃박스 실패 건수·배치 실패 건수 | `mailer_outbox` · `core_jobrunlog` | REQ-N-037 · REQ-N-038 |
+| ⓒ **최근 24시간 내 `run_backup` 성공 기록의 존재 여부**·파일 크기·소요 시간 | `core_jobrunlog`의 `run_backup` | REQ-N-032 ③. **v0.3 판정 반전(devops R2 #2 ①): "성공 기록이 없으면(실패·`skipped`·기록 자체 없음 전부) `[점검필요]`".** 실패가 아니라 **실행되지 않은 경우**를 잡기 위한 것이며, 같은 규칙을 `deploy.sh` 0단계 사전 점검에도 쓴다 |
+| ⓓ 아웃박스 실패 건수·배치 실패 건수 · **`skipped` 건수(작업별 별도 집계)** | `mailer_outbox` · `core_jobrunlog` | REQ-N-037 · REQ-N-038. **`skipped` 반복은 락 경합/설계 문제의 신호**이므로 실패와 분리해 보여 준다(v0.3, devops R2 #2 ②) |
 | ⓔ 디스크 여유율(`${BACKUP_DIR}`가 있는 파일시스템) | `shutil.disk_usage` | 백업 중단의 최다 원인 |
 | ⓕ 빈도 제한 차단 건수(사용량 알림 임계 §5.3) | `core_ratelimitcounter` | REQ-N-019 |
 
 - **스케줄러는 `app`과 별도 프로세스**라 **app이 죽어도 db·SMTP만 살아 있으면 이 메일은 발송된다** — 그래서 장애 인지 수단이 된다.
 - 수신자는 `OPS_ALERT_TO`. 실패 항목이 하나라도 있으면 **제목 앞에 `[점검필요]`** 를 붙인다.
 - 이 메일 1통이 **P8 운영 가이드의 "정기 점검" 절차를 대체**한다(devops R1 §5 목록 "일상" 항목).
+- **`scheduler` 는 단일 실패점이다**(백업·아웃박스·요약이 한 컨테이너에 있다 — devops R2 #2 ③). 설계로 없애지 않고 **인지 수단으로 받는다**: ⓐ **"요약 메일이 오지 않는 날 자체가 이상 신호"** 를 P8 운영 가이드 1번 항목으로 쓰고 **수신 시각·제목 규칙을 고정**한다(부재를 인지할 수 있어야 한다) ⓑ `scheduler` 헬스 상태를 **§12.2 5단계 배포 확인 항목**에 넣는다.
 - 공수: **+0.25작업일**(§11.1 #12에 포함).
 
 ### 3.4 헬스체크·재시작·로그 (REQ-N-031 · 033)
@@ -312,7 +336,7 @@ infra §4와 CR-001 R2 §2의 권고를 **그대로 채택**한다. 결정 근�
 | `scheduler` | **supercronic 프로세스 생존** + `core_jobrunlog`에 최근 10분 내 기록 1건 이상 | `unless-stopped` |
 | `proxy`(로컬 프로필) | `nginx -t` 통과 + `:80` 응답 | `unless-stopped` |
 
-- `/healthz`는 **`noindex` + 캐시 금지 + 개인정보·버전 정보 미노출**. 배포 스크립트가 이 엔드포인트로 기동 성공을 판정한다(§12.2). **`QA_CLOCK_OFFSET_SECONDS` 적용 여부를 `/healthz`에 노출하지 않는다**(qa R1 Q-4 — 확인은 기동 로그 1줄로 한다, §10.5).
+- `/healthz`는 **`noindex` + 캐시 금지 + 개인정보·버전 정보 미노출**. **호출 주체가 셋(컨테이너 헬스체크 · 스케줄러 5분 폴링 · `deploy.sh` 5단계)인데 전부 앱에 직접 호출한다**(`http://app:8000/healthz` 또는 `http://127.0.0.1:${APP_PORT}/healthz`) — **nginx 를 경유하지 않으며 `SITE_BASE_URL`을 쓰지 않는다**(v0.3, devops R2 #3). 배포 스크립트가 이 엔드포인트로 기동 성공을 판정한다(§12.2). **`QA_CLOCK_OFFSET_SECONDS` 적용 여부를 `/healthz`에 노출하지 않는다**(qa R1 Q-4 — 확인은 기동 로그 1줄로 한다, §10.5).
 - 로그: 전 서비스 `json-file` 드라이버 + `max-size: 10m`, `max-file: 5`(로그 회전).
 - **`unless-stopped`는 "종료"만 잡고 "unhealthy"는 잡지 않는다**(devops R1 #15). 자동 복구기(autoheal)는 운영 요소를 늘리므로 도입하지 않고, **인지 수단만 §3.3의 일일 운영 요약 메일 ⓐ로 확보**한다. REQ-N-031 수용 기준(강제 종료 → 자동 재기동)은 `unless-stopped`로 충족된다.
 - **`backup` 서비스는 없다** — 백업은 `scheduler`의 작업이다(§12.5).
@@ -329,12 +353,13 @@ site/
 
 | 환경 | 실행 | 구분 수단 |
 |---|---|---|
-| 로컬 | `docker compose -f compose.yaml -f compose.local.yaml up`<br>(검증 시 `--profile proxy --profile backup` 추가) | `.env`(개발 값) |
-| 스테이징 | `docker compose -f compose.yaml -f compose.prod.yaml -p yogapass-stg up -d` | **`COMPOSE_PROJECT_NAME=yogapass-stg` + 별도 `.env.staging` + 별도 볼륨 + 별도 포트 + 별도 서브도메인 + `X-Robots-Tag: noindex` 강제 + nginx `auth_basic`(아래)** |
-| 운영 | `docker compose -f compose.yaml -f compose.prod.yaml -p yogapass up -d` | `.env`(운영 값, 서버에만 존재) |
+| 로컬 | `docker compose -f compose.yaml -f compose.local.yaml up`<br>(프로필은 `.env`의 `COMPOSE_PROFILES` 가 켠다 — 플래그 불필요, v0.3/qa R2 #1) | `.env`(개발 값) |
+| 스테이징 | `ENV_FILE=.env.staging docker compose -f compose.yaml -f compose.prod.yaml -p yogapass-stg up -d` | **`COMPOSE_PROJECT_NAME=yogapass-stg` + 별도 `.env.staging` + 별도 볼륨 + 별도 포트 + 별도 서브도메인 + `X-Robots-Tag: noindex` 강제 + nginx `auth_basic`(아래)** |
+| 운영 | `ENV_FILE=.env docker compose -f compose.yaml -f compose.prod.yaml -p yogapass up -d` | `.env`(운영 값, 서버에만 존재). **`COMPOSE_PROFILES` 를 비워 `mail` 을 띄우지 않는다**(qa R2 #2) |
 
 - **세 환경의 `compose.yaml`은 같은 파일이다.** 차이는 override 파일 1개와 환경 변수뿐 → REQ-N-034의 "세 환경 compose 정의 diff" 검증이 `compose.local.yaml` vs `compose.prod.yaml` 한 쌍으로 끝난다. **판정 정의는 §3.2.1 말미**를 따른다.
-- 볼륨: `pgdata`(DB) · `media`(2차 업로드) · 호스트 바인드 `${BACKUP_DIR}`(운영·스테이징은 호스트 경로, 로컬 프로필은 `./backups`).
+- 볼륨: `pgdata`(DB) · `media`(2차 업로드) · 호스트 바인드 `${BACKUP_DIR}`(운영·스테이징은 호스트 경로, 로컬 프로필은 `./backups`). **백업 디렉토리는 `scheduler`(와 로컬 `backup` 프로필)에만 붙이고 `app` 에는 붙이지 않는다**(v0.3, devops R2 #5).
+- **구현 사실(v0.3)**: 환경별 `.env` 선택은 `compose.yaml` 의 `env_file: ["${ENV_FILE:-.env}"]` 로 한다 — 파일은 그대로 두고 **`ENV_FILE` 값만 바꿔** 스테이징(`.env.staging`)·운영(`.env`)을 가른다. 이렇게 해야 §3.5 표의 "세 환경이 같은 `compose.yaml`" 이 실제로 성립한다.
 
 #### 3.5.1 스테이징 접근 제어 (REQ-N-040 · REQ-N-039 — devops R1 #2 **Must**)
 
@@ -344,7 +369,7 @@ site/
 
 | 장치 | 내용 | 비고 |
 |---|---|---|
-| `auth_basic` | 스테이징 server 블록 전체에 **HTTP Basic 인증**을 건다. 예외 경로 **0건**(`/healthz`도 인증 뒤에 둔다 — 헬스체크는 컨테이너 내부에서 수행하므로 영향 없다) | **server 레벨 지시어**라 운영·타 서비스 블록에 영향 없음(I-2-c 충돌 0건) |
+| `auth_basic` | 스테이징 server 블록 전체에 **HTTP Basic 인증**을 건다. 예외 경로 **0건**. **v0.3 정정(devops R2 #3): "외부에서 오는 `/healthz` 는 인증 뒤에 둔다 — 내부 호출은 nginx 를 거치지 않는다."** 헬스체크·스케줄러 폴링·`deploy.sh` 5단계는 모두 앱에 직접 호출하므로 영향이 없다. 다만 **5단계의 "주요 4경로 200 확인"은 공개 화면이라 프록시 경유가 의미 있으므로 스테이징에서는 인증 자격으로 호출**한다 — 자격 취득·주입 방식은 devops 배포 계획서 소관이며 값은 스크립트·문서에 하드코딩하지 않고 환경 변수로 넣는다 | **server 레벨 지시어**라 운영·타 서비스 블록에 영향 없음(I-2-c 충돌 0건) |
 | 출처 IP 제한 | 가능하면 `allow`/`deny`로 **운영팀·제작팀 출처만 허용**(2중 방어). 출처가 고정되지 않으면 basic auth 단독으로 둔다 | devops 판단 |
 | `X-Robots-Tag` | `noindex, nofollow` 전 응답 강제(앱 + nginx 양쪽) | 기존 유지 |
 | 계정 전달 | **`.htpasswd` 생성과 계정 전달 방식은 devops가 배포 계획서에 정한다. 값(아이디·비밀번호)은 이 문서를 포함한 어떤 산출물에도 쓰지 않는다** | CLAUDE.md §8 |
@@ -383,6 +408,7 @@ developer/site/
 │
 ├── config/                       # Django 프로젝트 설정
 │   ├── settings/{base,local,staging,production,test}.py
+│   ├── env.py                    # 환경 변수 해석 헬퍼 (v0.3 — 외부 의존성 대신 자체 구현)
 │   └── urls.py · wsgi.py
 │                                 # ⚠ v0.2: 검증 전용 설정 해석기를 config/에서 qa/로 옮겼다
 │                                 #    (qa R1 #4 — prod 이미지에서 구조적으로 제외하기 위함)
@@ -426,6 +452,7 @@ developer/site/
 │       ├── yogapass-prod.conf.sample  # 운영 server 블록 예시 (devops 확정)
 │       ├── yogapass-stg.conf.sample   # 스테이징 server 블록 예시 (auth_basic·noindex 포함)
 │       ├── local.conf                 # 로컬 proxy 프로필이 그대로 마운트해 쓰는 설정 (§3.2.1)
+│       ├── htpasswd.dummy             # 검증 전용 더미 자격 (v0.3 — REQ-N-040 로컬 선검증, devops R2 #4)
 │       └── maintenance.html           # 자립형 정적 점검·502 화면 (인라인 CSS, 외부 자산 0건)
 │
 ├── qa/                           # 검증 지원 도구 (§10) — **운영 이미지에서 제외(.dockerignore)**
@@ -522,6 +549,8 @@ content_instructor 테이블  →  화면 렌더
 | 저장소 | **PostgreSQL 테이블 + UPSERT 원자 증가** | 앱 인스턴스 1개, 분당 수십 건 수준. Redis를 넣으면 compose·백업·장애 지점이 하나 늘어난다. 복제·성능 문제가 실제로 생기면 교체하도록 인터페이스를 1개로 추상화 |
 | 식별 단위 | **출처 IP의 솔트 해시**(원본 IP 미저장) + 계정 기준이 필요한 항목은 계정 식별자 해시 | REQ-N-020 최소 수집 |
 | 폼 제출(문의·상담) | **10분 5회 / 1일 20회**(M-3 잠정값 채택) | 실측 데이터가 없어 조정 여지를 남긴다 |
+| **폼 차단 지속 시간 (v0.3 — qa R2 #3)** | **① 10분 창 초과 → `blocked_until` = 해당 창의 잔여 시간(최대 10분)** / **② 1일 한도 초과 → `blocked_until` = 익일 00:00(Asia/Seoul)** . 둘 다 걸리면 **더 늦은 쪽**을 쓴다 | `Retry-After` 값의 근거이자 "429 → 대기 → 200 복귀" TC 의 기대값 |
+| **`Retry-After` 계산 (v0.3)** | **`ceil(blocked_until − clock.now())` 초**(최소 1). 응답 본문 문구는 여전히 사유를 구분하지 않는다 | `clock.now()` 를 쓰므로 `QA_CLOCK_OFFSET_SECONDS` 로 시간을 넘겨 **해제까지 판정**할 수 있다(§10.3) |
 | 상담 조회 | 10분 10회, 초과 시 10분 차단 | M-3 |
 | 로그인 | 계정당 10분 5회 / 출처당 10분 20회, 관리자 계정당 10분 3회 | D-34 |
 | 재설정 요청 | 출처당 10분 3회 / 1일 10회 | D-34 |
@@ -831,6 +860,8 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 | **결과 블록 6종과의 대응** | 페이지 디자인 §4.3의 6종 중 1차에서 실제로 나타나는 것은 **성공 · 오류(항목별) · 실패(일반) · 전송 중(JS 한정)** 4종이다. 나머지 2종(부분 실패·재시도 안내)은 2차 상담/예약 화면에서 쓰인다 — 1차 P5 판정 대상이 아님을 명시한다 |
 | **JS 비활성 시** | ①~⑥ 전부 동일하다. 차이는 "전송 중" 상태가 표시되지 않는 것뿐이다(REQ-N-030) |
 | **CSRF 토큰 불일치** | Django 기본 동작인 **403**이며 위 6종과 별개다. 정상 사용에서는 발생하지 않으므로 P5 판정 대상에 넣지 않는다(발생 시 결함) |
+| **판정용 로그 형식 (v0.3 — qa R2 #4)** | 위 표의 "서버 기록" 열은 **`key=value` 형식으로 고정**한다: `inquiry.created ref=…` · `inquiry.invalid fields=[…]` · `inquiry.blocked reason=honeypot|rate_limit ip_hash=… scope=…` · `inquiry.duplicate token_state=used|expired ref=…`. 로그 포맷은 `%(asctime)s %(levelname)s %(name)s %(message)s` 이며 **③(honeypot) 과 ⑤(토큰 재사용)의 유일한 구분 증거**이므로 키 이름을 바꾸지 않는다 |
+| **로그 조회 수단 (v0.3 — qa R2 #4)** | **로컬: `docker compose -f compose.yaml -f compose.local.yaml logs app`**(§3.4 의 json-file 드라이버·회전 설정으로 보존된다). **스테이징: qa 에게 셸 접근이 없으므로 devops 가 대행해 해당 구간 로그를 파일로 전달**한다(요청 창구는 티켓). 새 명령을 만들지 않는다 |
 
 ---
 
@@ -845,9 +876,9 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 | ① 스테이징 DB + qa 조회 수단 | `manage.py qa_show inquiry --masked` 등 **읽기 전용·마스킹 조회 명령**. 운영 DB 권한은 부여하지 않는다. **출력 규격은 §10.2** | ○ | **0.25** | 0.25 |
 | ② 테스트 수신 주소·목 발송 + 발송 로그 조회 | Mailpit(로컬·스테이징) + `manage.py qa_mail_log` | ○ | **0.25** | 0.1 |
 | ③ 로컬 HTTPS 또는 localhost | `http://localhost:8000`은 **보안 컨텍스트**라 클립보드 API가 동작한다. LAN·스테이징 http 접근 대비로 `execCommand` 폴백 병행 | ○ | 0.1 (§9 포함) | — |
-| ④ 검증 전용 설정(보관·빈도·세션) **항목별 독립** | `config/qa_settings.py`가 `QA_*` 키를 **각각 독립적으로** 해석. `QA_RETENTION_MINUTES__INQUIRY=10` + `QA_RATE_LIMIT_MODE=off` 조합 가능(단일 모드 스위치 금지) | ○ | **0.5** | 0.25 |
+| ④ 검증 전용 설정(보관·빈도·세션) **항목별 독립** | `qa/qa_settings.py`(경로는 `developer/site/` 기준 — v0.3, qa R2 #6)가 `QA_*` 키를 **각각 독립적으로** 해석. `QA_RETENTION_MINUTES__INQUIRY=10` + `QA_RATE_LIMIT_MODE=off` 조합 가능(단일 모드 스위치 금지) | ○ | **0.5** | 0.25 |
 | ⑤ 테스트 데이터 삭제 규칙 | 시드에 `TEST-` 접두어 + `manage.py qa_purge_test_data --confirm` + **테이블별 삭제 건수 출력** + `--dry-run`. **삭제 대상 테이블과 식별 규칙은 §10.4**(qa R1 #10) | ○ | **0.35** | — |
-| ⑥ 가상 키보드 검증 수단 | **기기 확보는 qa·PM 소관.** 제작 측은 ⓐ G-9 구현(메타 + WebKit `visualViewport` 폴백) ⓑ **폴백 적용 여부의 관측 신호**(`html[data-vk-fallback]`) ⓒ **WebKit 자동화 판정 절차 + 실기기 체크리스트 문서**(`qa/webkit_checklist.md`)를 제공 → **§10.5**(qa R1 #8) | ○ | **0.35** (§9 포함분 별도) | — |
+| ⑥ 가상 키보드 검증 수단 | **기기 확보는 qa·PM 소관.** 제작 측은 ⓐ G-9 구현(메타 + WebKit `visualViewport` 폴백) ⓑ **폴백 적용 여부의 관측 신호**(`html[data-vk-fallback]`) ⓒ **WebKit 자동화 판정 절차 + 실기기 체크리스트 문서**(`developer/site/qa/webkit_checklist.md` — v0.3, qa R2 #7)를 제공 → **§10.5**(qa R1 #8) | ○ | **0.35** (§9 포함분 별도) | — |
 | ⑦ **검증 전용 로그인 세션 수단** | `manage.py qa_session --role member1\|member2\|staff` → 세션 발급(스크립트가 쿠키 주입). 회원 2·관리자 1 계정 시드. **`QA_TOOLS_ENABLED=1`인 환경에서만 동작**하며 **HTTP 경로로 노출하지 않는다**(§3.5.1 ②) | **1차 = 골격만 / 본체 2차** (qa R1 #16 표기 정리) | **0.25**(골격) | **0.75~1.0** |
 | ⑧ **표준 시드 + 동시 요청 스크립트** | `manage.py seed_standard`(2차: 슬롯 400·예약 200·상담 100) + `qa/concurrency.py`(동시 N건 발사·성공/거부 집계). 1차는 문의 폼 동시 제출·빈도 제한 재현 + 번호 1,000건 생성 스크립트 골격 | 일부 | **0.5** | **1.0~1.5** |
 | ⑨ **실패 주입 수단** | `QA_FAIL_INJECT=smtp,backup,purge` — ⓐ SMTP 자격 증명 강제 오류 ⓑ **`run_backup` 강제 실패**(§12.5 — v0.2부터 **로컬 `backup` 프로필로도 재현 가능**) ⓒ 파기 배치 강제 예외. **각각 독립 토글**이며 실패 알림 경로(`core_jobrunlog` + `mailer_outbox`)까지 확인 가능. **주입이 걸리면 로그에 `QA_FAIL_INJECT: <대상> 주입됨` 1줄**(거짓 실패와 구분) | ○ (1차 REQ-N-032·037·038) | **0.5~0.75** | 0.25 |
@@ -903,7 +934,7 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 |---|---|
 | **① 관측 신호(제작 구현)** | G-9 폴백이 실행되면 `<html>`에 **`data-vk-fallback="1"`** 을 설정한다(`visualViewport` 경로 진입 시). 미지원·미적용이면 속성 자체가 없다. 동시에 **`--fixed-bar-h`의 실측값**을 `document.documentElement.style`에 반영하므로 자동화에서 `getComputedStyle`로 읽을 수 있다 |
 | **② WebKit 자동화 판정** | WebKit 엔진 자동화에서 ⓐ `html[data-vk-fallback="1"]` 존재 ⓑ `visualViewport` 크기 변경 이벤트 발생 시 `--fixed-bar-h`·`--body-pad-bottom`이 갱신되는지 ⓒ `scroll-padding-bottom`이 `--body-pad-bottom`과 같은지 를 확인한다. **"폴백 경로가 실제로 실행됐는가"를 판정**하는 것이 목적이며, 가상 키보드 자체의 재현이 아니다 |
-| **③ 실기기 체크리스트(제작 제공, `qa/webkit_checklist.md`)** | 초안 항목: ⓐ iOS Safari 360px에서 문의 폼 입력란 포커스 → **키보드가 올라온 상태에서 고정 바가 입력란·전송 버튼을 가리지 않는가** ⓑ 키보드를 닫았을 때 레이아웃이 원복되는가 ⓒ 입력란 포커스 시 **자동 확대(zoom)가 일어나지 않는가**(`font-size` 16px 하한, §9.1) ⓓ 주소 복사(`execCommand` 폴백 포함) 동작 ⓔ `<details>` 기반 모바일 메뉴(CMP-005) 개폐와 포커스 순서 ⓕ Safari 하단 툴바가 겹치는 구간(`env(safe-area-inset-bottom)`) — 각 항목에 **기대 결과·캡처 지점**을 적는다 |
+| **③ 실기기 체크리스트(제작 제공, `developer/site/qa/webkit_checklist.md` — 이 문서의 다른 `qa/` 표기도 전부 `site/` 기준이다)** | 초안 항목: ⓐ iOS Safari 360px에서 문의 폼 입력란 포커스 → **키보드가 올라온 상태에서 고정 바가 입력란·전송 버튼을 가리지 않는가** ⓑ 키보드를 닫았을 때 레이아웃이 원복되는가 ⓒ 입력란 포커스 시 **자동 확대(zoom)가 일어나지 않는가**(`font-size` 16px 하한, §9.1) ⓓ 주소 복사(`execCommand` 폴백 포함) 동작 ⓔ `<details>` 기반 모바일 메뉴(CMP-005) 개폐와 포커스 순서 ⓕ Safari 하단 툴바가 겹치는 구간(`env(safe-area-inset-bottom)`) — 각 항목에 **기대 결과·캡처 지점**을 적는다 |
 | **④ 뷰포트 축소로 대체하지 않는다** | 페이지 디자인 §8.5 D-12가 경고한 대로 **데스크톱 브라우저의 뷰포트 축소는 거짓 Pass**를 만든다. ②는 "폴백 실행 여부"만, ③은 "실제 가림 여부"만 판정한다 |
 | 산출물 등록 | ①은 §11.1 작업 3·13에, ③ 문서는 **작업 13의 산출물 목록에 명시**한다 |
 
@@ -1001,18 +1032,25 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 0)   사전 점검 : 릴리스 태그 확인 · .env 존재 · 디스크 여유 5GB 이상(미만이면 중단)
                 · 현재 이미지 태그 기록 · ★롤백 대상 이미지 존재 확인(없으면 중단)
                 · # IRREVERSIBLE 마이그레이션 유무 확인
-1)   백업      : docker compose … run --rm app python manage.py run_backup --label pre-deploy
+                · ★최근 24시간 내 run_backup 성공 기록 확인(없으면 경고 — devops R2 #2 ①)
+0.5) ★스케줄러 정지 : docker compose … stop scheduler        ← v0.3에서 2.5단계를 여기로 앞당겼다
+                     (정기 03:00 run_backup 과 1단계 라벨 백업의 락 경합 자체를 없앤다 — devops R2 #1 ①)
+1)   백업      : docker compose … run --rm scheduler python manage.py run_backup --label pre-deploy
                 ← 되돌릴 수 없는 마이그레이션이 있으면 필수
+                ← ★라벨 백업은 락 충돌 시 skipped 를 성공으로 보지 않는다. 종료 코드 ≠ 0 이면 배포 중단
+                  (devops R2 #1 ②). 실행 주체를 app 이 아니라 scheduler 로 둔 이유는 §3.5(devops R2 #5)
 2)   빌드      : docker compose -f compose.yaml -f compose.prod.yaml build
-2.5) ★스케줄러 정지 : docker compose … stop scheduler        ← 마이그레이션 중 구버전 배치 차단
 3)   마이그레이션: docker compose … run --rm app python manage.py migrate --noinput
 4)   기동      : docker compose … up -d --no-deps app scheduler   ← 스케줄러 재기동 포함
-5)   확인      : /healthz 200 · 주요 4경로 200 · 로그 오류 0 · 정적 파일 해시 응답
-                · ★다운타임 실측값 기록(2.5단계 시작 ~ /healthz 최초 200)
+5)   확인      : /healthz 200 (★앱에 직접 호출 — nginx 비경유, devops R2 #3)
+                · 주요 4경로 200 (프록시 경유. 스테이징은 인증 자격으로 호출)
+                · 로그 오류 0 · 정적 파일 해시 응답 · ★scheduler 헬스 상태 확인(devops R2 #2 ③)
+                · ★다운타임 실측값 기록(0.5단계 시작 ~ /healthz 최초 200)
 6)   실패 시    : deploy/rollback.sh 자동 호출 (rollback.sh도 같은 정지→복귀→기동 순서)
 ```
 
-**2.5단계를 넣는 이유 (devops R1 #6)**: 3단계 시점에 `scheduler`는 **구버전 이미지로 1분 주기 `send_outbox`·`purge_expired`를 계속 실행 중**이다. 스키마가 바뀌는 순간 배치가 실패해 **거짓 실패 알림**이 나가거나, 파괴적 변경 시 데이터에 손을 댈 수 있다. 1분 주기 작업이라 **정지 구간의 부작용은 없다**(다음 주기에 밀린 것이 처리된다 — 모든 명령이 재실행 안전이기 때문).
+**0.5단계(구 2.5단계)를 넣는 이유 (devops R1 #6 · v0.3에서 순서 변경 — devops R2 #1)**: 3단계 시점에 `scheduler`는 **구버전 이미지로 1분 주기 `send_outbox`·`purge_expired`를 계속 실행 중**이다. 스키마가 바뀌는 순간 배치가 실패해 **거짓 실패 알림**이 나가거나, 파괴적 변경 시 데이터에 손을 댈 수 있다. 1분 주기 작업이라 **정지 구간의 부작용은 없다**(다음 주기에 밀린 것이 처리된다 — 모든 명령이 재실행 안전이기 때문).
+> **v0.3에서 2.5 → 0.5단계로 앞당긴 이유**: 락(§3.3)이 도입되면서 **03:00 정기 `run_backup` 이 도는 중에 배포가 시작되면 1단계 라벨 백업이 `skipped` 로 정상 종료**되어, `# IRREVERSIBLE` 마이그레이션의 유일한 복구 전제가 **무음으로 사라진다**(devops R2 #1). 정지를 백업보다 앞에 두면 경합 자체가 없어지고, 정지 구간이 빌드 시간만큼 늘 뿐이다. 보강으로 **라벨 백업은 `skipped` 를 실패로 다룬다**(§12.5.1 · `restore.sh` 도 동일).
 
 **배포 창·다운타임 목표 (devops R1 #8 — TR-9)**
 
@@ -1038,7 +1076,7 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 | 5 | 로그 | **별도 access/error 로그 파일**(다른 서비스와 분리, I-2-c). **호스트 logrotate 대상에 새 파일 2개 등록 필요**(운영팀 작업 — 누락 시 디스크 증가) | ○ | ○ | ○ |
 | 6 | **장애·점검 화면 (v0.2 보강 — devops R1 #5)** | `error_page 502 503 504 /maintenance.html;` + `location = /maintenance.html { root <정적 경로>; internal; }`<br>**대상 파일은 `deploy/nginx/maintenance.html`**(아래 설명) | ○ | ○ | ○ |
 | 7 | HTTPS | HTTP→HTTPS 301, HSTS (REQ-N-017) — devops 소관. **`includeSubDomains`·`preload`는 도메인 구조 확인 전 금지**(§9.5, devops R1 #12) | ○ | ○ | ✕ (로컬 http) |
-| 8 | **접근 제어 (v0.2 신설 — devops R1 #2 Must)** | **스테이징 server 블록 전체에 `auth_basic` + (가능하면) `allow`/`deny` 출처 제한.** 예외 경로 0건. 계정 생성·전달은 devops 배포 계획서(값은 문서에 쓰지 않는다) | ✕ | **○ 필수** | ✕ |
+| 8 | **접근 제어 (v0.2 신설 — devops R1 #2 Must)** | **스테이징 server 블록 전체에 `auth_basic` + (가능하면) `allow`/`deny` 출처 제한.** 예외 경로 0건(외부 요청 기준 — 내부 `/healthz` 호출은 nginx 를 거치지 않는다, v0.3). 계정 생성·전달은 devops 배포 계획서(값은 문서에 쓰지 않는다) | **△ 선검증용 주석 블록** (v0.3, devops R2 #4) | **○ 필수** | ✕ |
 | 9 | **색인 차단** | 스테이징 응답에 `add_header X-Robots-Tag "noindex, nofollow" always;` (앱에서도 강제 — 2중) | ✕ | ○ | ✕ |
 | — | 업로드 | `client_max_body_size`(2차 사진 업로드 5MB 기준) — **1차에는 업로드가 없으므로 1차 요청 목록에서 제외**하고 2차에 요청한다(devops R1 Q-5) | 2차 | 2차 | 2차 |
 
@@ -1085,7 +1123,7 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 | **REQ-N-032 ③ 실패 알림 경로** | ⑤ `mailer_outbox` → `send_outbox`(1분 주기) → SMTP. **아웃박스 경로를 그대로 타므로 재시도·발송 로그가 공짜로 따라온다.** 알림이 안 나가도 ④의 `core_jobrunlog`에 남고 ⑥의 요약 메일에 다시 나타난다(**2중 통지**) |
 | **검증 요건 ⑨ⓑ(백업 강제 실패) 충족 경로** | `QA_TOOLS_ENABLED=1 QA_FAIL_INJECT=backup` → `run_backup`이 ①에서 의도적으로 실패 → ④ `status=failed` → ⑤ `kind=backup_failed` INSERT. qa는 **`qa_mail_log --kind backup_failed`** 와 **Mailpit 수신**으로 판정한다. **v0.2부터 로컬 `backup` 프로필에서도 재현된다**(스테이징 의존 해소 — qa R1 #2 부수 영향) |
 | **`--dry-run`·재실행 안전** | `run_backup --dry-run`은 대상 경로·여유 공간·회전 예정 파일만 출력한다. 같은 시각 중복 실행은 §3.3의 어드바이저리 락이 막는다 |
-| **배포 직전 임시 백업** | `run_backup --label pre-deploy` (§12.2 1단계). 라벨이 붙은 파일은 **회전 대상에서 제외**하고 최근 3개만 유지 |
+| **배포 직전 임시 백업** | `run_backup --label pre-deploy` (§12.2 1단계, 실행 주체는 `run --rm scheduler` — devops R2 #5). 라벨이 붙은 파일은 **회전 대상에서 제외**하고 최근 3개만 유지. **v0.3(devops R2 #1 ②): 라벨이 붙은 실행은 `required=True` 로 동작해 락 충돌 시 `skipped` 로 조용히 끝나지 않고 종료 코드 ≠ 0 으로 실패**하며, `deploy.sh`·`restore.sh` 는 이를 **중단 사유**로 처리한다 |
 
 #### 12.5.2 백업 설정
 
@@ -1104,7 +1142,7 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 | 항목 | 값 |
 |---|---|
 | 절차 | `restore.sh <파일>` → 빈 DB 생성 → `pg_restore` → `migrate --check` → `/healthz` 확인까지 자동 |
-| **안전 가드 (devops R1 #14)** | 실제 사용 시점은 **사고 직후, 운영자가 가장 긴장한 상태**다. 3중으로 막는다: ⓐ **대상 프로젝트명·DB명·백업 파일명을 출력하고 명시적 확인 입력**(`yes`)을 요구 ⓑ **대상이 운영이면 추가 플래그**(`--i-know-this-is-production`) 요구 ⓒ **복구 전 현재 DB를 자동 덤프**(`run_backup --label pre-restore`) — 잘못 복구해도 되돌릴 수 있다 |
+| **안전 가드 (devops R1 #14)** | 실제 사용 시점은 **사고 직후, 운영자가 가장 긴장한 상태**다. 3중으로 막는다: ⓐ **대상 프로젝트명·DB명·백업 파일명을 출력하고 명시적 확인 입력**(`yes`)을 요구 ⓑ **대상이 운영이면 추가 플래그**(`--i-know-this-is-production`) 요구 ⓒ **복구 전 현재 DB를 자동 덤프**(`run_backup --label pre-restore`) — 잘못 복구해도 되돌릴 수 있다. **이 덤프도 라벨 실행이므로 락 충돌 시 실패로 끝나며, 실패하면 복구를 진행하지 않는다**(v0.3, devops R2 #1 ②) |
 | **복구 리허설** | **스테이징에서 1회 이상 실제 수행**(10-28). **가능하면 운영자 입회·운영자 손으로 수행**한다(devops R1 Q-6 ③ — 막히는 지점이 곧 P8 운영 가이드에 더 써야 할 내용이다). 소요 시간·문제점을 기록해 P8 운영 가이드에 싣는다. ⚠ **복구해 본 적 없는 백업은 백업이 아니다** |
 | 실행 예시 | 리허설 결과와 함께 P8 운영 가이드에 싣는다 |
 
@@ -1156,6 +1194,7 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 - **스테이징 TLS는 도메인 확정(10-16)과 무관하게 선행한다**(devops R1 #11). **사설 인증서(self-signed) 또는 운영팀 보유 도메인의 임시 서브도메인**으로 먼저 세운다 — 브라우저 경고는 검증에 지장이 없고 **보안 쿠키·HSTS·`X-Forwarded-Proto`·프록시 IP·헤더 확인은 모두 성립**한다. 스테이징 TLS 선행 구성은 devops가 맡는다.
 - **스테이징 가용 기한 10-15를 넘기면 §13의 스테이징 판정 5건 + 메일 판정이 통째로 P7로 밀린다**(qa #6). qa 테스트 계획에 같은 문장을 쓴다.
 - **`mail`(Mailpit)은 스테이징 필수 배치**로 확정했다(§3.2) — 선택적이면 스테이징 메일 판정 수단이 사라진다. 실제 SMTP 계정이 연결되면 그때 `EMAIL_HOST`를 교체한다.
+- **선행 조건 #3·#4(구현 배포 가능 · `run_backup` 완료)는 10-16 종료 시점에 재확인하고 결과를 즉시 pmo·qa 에 통지한다**(v0.3 체크포인트 — qa R2 #5). PM-5 결정 기한(10-14)과 이 조건들의 판명 시점(10-16) 사이에 이틀의 시차가 있어, **테스트 계획 확정 시점에는 판정 범위가 확정되지 않는다**. qa 는 그 사이 REQ-N-032·033 TC 를 **"조건부(10-16 재확인)"** 로 태깅하고 ⓐ·ⓑ 두 경로의 판정 문구를 미리 써 두기로 했다.
 - **G5 판정 범위(REQ-N-032·033을 포함할지)는 최종적으로 pmo·PM 결정 사항**이다 → **§14.4 PM-5**.
 
 ---
@@ -1175,11 +1214,11 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 | 9 | 404·502 화면 가로채기 | 재현 불가 | 스테이징에서 앱을 내린 뒤 502 화면, 없는 경로에서 404 상태 코드 확인 | REQ-F-060·065 |
 | 10 | canonical·OG·sitemap 절대 URL | `SITE_BASE_URL`이 localhost | 도메인 확정 후 스테이징·운영에서 값 확인 | REQ-N-013 |
 | **11** | **HTML 응답 압축**(신설 — devops R1 #4) | **v0.2: `--profile proxy`로 로컬 검증 가능**(nginx 없이 `:8000` 직접 접근에서는 HTML이 비압축) | `:8080` 응답의 `Content-Encoding: gzip` 확인(로컬) → 스테이징에서 기존 nginx 형태로 재확인. **Lighthouse "텍스트 압축" 항목이 여기에 달려 있다** | REQ-N-004 |
-| **12** | **스테이징 접근 제어**(신설 — devops R1 #2) | 재현 불가(로컬은 인증 없음) | **인증 없이 스테이징 URL 요청 → 401** + 인증 후 200 + 응답 헤더 `X-Robots-Tag: noindex, nofollow`. **스테이징 판정** | REQ-N-040·039 |
+| **12** | **스테이징 접근 제어**(신설 — devops R1 #2) | **부분 재현 가능(v0.3, devops R2 #4)**: `deploy/nginx/local.conf` 의 `auth_basic` 블록 주석을 풀고 검증 전용 더미 `deploy/nginx/htpasswd.dummy` 를 쓰면 로컬 `:8080` 에서 **무인증 401 → 인증 후 200 + `X-Robots-Tag`** 를 선검증할 수 있다(더미는 운영·스테이징 계정과 무관) | **인증 없이 스테이징 URL 요청 → 401** + 인증 후 200 + 응답 헤더 `X-Robots-Tag: noindex, nofollow`. **로컬 선검증 + 스테이징 최종 확인** | REQ-N-040·039 |
 
 > **정리 (v0.2 갱신)**
 > - **P7(운영) 판정**: 1 · 3 · 7 · 10 — 4건
-> - **스테이징 판정**: 2 · 5 · 8 · 9 · 12 — 5건 (**#6·#11은 로컬 선검증 + 스테이징 최종 확인**으로 바뀌었다)
+> - **스테이징 판정**: 2 · 5 · 8 · 9 — **4건** (**#6·#11·#12는 로컬 선검증 + 스테이징 최종 확인**으로 바뀌었다 — #12는 v0.3/devops R2 #4)
 > - **로컬 선검증 가능(신규)**: 6 · 9 · 11 — `--profile proxy` 도입 효과. **스테이징 지연(TR-2·TR-5) 시의 방어선**이다
 > - **스테이징 판정 항목은 도메인 확정과 무관하게 선행한다**(devops #11) — 사설 인증서·임시 서브도메인으로 TLS를 먼저 세운다(§12.6.2).
 > - **로컬에서 "통과"로 보고하지 않는다.** 로컬 선검증은 "구현이 맞는지 먼저 본다"는 뜻이며, **판정 단계는 위 구분을 따른다.** qa 테스트 계획에 같은 구분으로 반영해 주기를 요청한다(§16 Q-3 — qa 수용 완료).
@@ -1383,6 +1422,25 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 
 **미반영: 0건** (Must·Should 전건 반영, Could 7건 중 6건 반영 · 1건(devops #13)은 설계 범위 밖 부분을 devops 문서로 이관)
 
+### 17.4 R2 리뷰 처리 대장 (v0.3 — 신규 Must 0건 · Should 8 · Could 4, **전건 반영 · 미반영 0건**)
+
+| 출처 | 등급 | 요지 | 반영 | 위치 |
+|---|---|---|---|---|
+| devops #1 | Should | 배포 직전 백업이 락 경합으로 `skipped` 되어 조용히 건너뛰어질 수 있다 | **반영(① ② 모두)** — 스케줄러 정지를 **0.5단계**로, 라벨 백업은 `required=True` 로 **`skipped`를 실패로** 처리하고 `deploy.sh`·`restore.sh` 가 중단한다 | §12.2 · §12.5.1 · §12.5.3 |
+| devops #2 | Should | 백업 "미실행"이 2중 통지 어디에도 걸리지 않는다 · `scheduler` 단일 실패점 | **반영(①②③)** — 요약 메일 ⓒ 판정을 **"24시간 내 성공 기록 없음 = `[점검필요]`"** 로 반전, `skipped` 를 ⓓ에 별도 집계, `deploy.sh` 0단계에도 같은 규칙. ③(단일 실패점)은 **"요약 메일이 오지 않는 날 = 이상 신호" + 수신 시각·제목 규칙 고정 + 5단계 scheduler 헬스 확인**으로 받는다 | §3.3 · §12.2 |
+| devops #3 | Should | `auth_basic` 예외 0건과 `/healthz` 호출 주체가 충돌 → 스테이징 알림 피로 + 자동 롤백 오발동 | **반영** — **"`/healthz` 호출은 항상 앱에 직접, nginx 비경유, `SITE_BASE_URL` 미사용"** 을 §3.3 ⓐ·§3.4·§12.2 5단계에 명시하고 §3.5.1 ① 근거 문장을 정정. 5단계의 주요 4경로 확인은 프록시 경유(스테이징은 인증 자격, 값은 환경 변수) | §3.3 · §3.4 · §3.5.1 · §12.2 |
+| devops #4 | Could | REQ-N-040 판정만 스테이징 단독 의존 | **반영(채택)** — `local.conf` 에 `auth_basic` 주석 블록 + 검증 전용 더미 `htpasswd.dummy`. §13 #12 가 **로컬 선검증 + 스테이징 최종**으로 내려와 스테이징 판정이 5건 → **4건** | §3.2.1 · §12.3 #8 · §13 #12 |
+| devops #5 | Could | 웹 프로세스 이미지에 `pg_dump` 가 들어간다 | **반영(권고분 채택)** — 이미지는 나누지 않고, **`${BACKUP_DIR}` 바인드를 `scheduler` 에만** 두고 배포 직전 백업도 `run --rm scheduler` 로 실행한다(비용 0) | §3.5 · §12.2 1단계 |
+| qa #1 | Should | REQ-N-034 수용 기준 문면과 프로필 기동 명령의 간극 | **반영(채택)** — `.env.example` 의 **`COMPOSE_PROFILES`** 로 플래그 없는 `docker compose up` 이 프록시까지 띄운다. **2026-09-13 실행 확인**(5개 서비스 healthy). 작업 12 완료 시 값에 `backup` 을 추가한다 | §3.2.1 · §3.5 · §8 |
+| qa #2 | Should | 스테이징·운영이 같은 override 를 쓰는데 `mail` 을 갈라내는 수단이 없다 | **반영** — `mail` 을 `compose.prod.yaml` 에 **프로필 `mail`** 로 정의하고 스테이징 `.env.staging` 에서만 켠다. 판정 지점 = **운영 `ps` 에 `mail` 0건 / 스테이징 1건**(운영 미리보기 실행으로 0건 확인) | §3.2 · §3.5 |
+| qa #3 | Should | `Retry-After` 의 근거인 폼 차단 지속 시간이 없다 | **반영** — ① 10분 창 초과 → 창 잔여 시간 ② 1일 한도 초과 → 익일 00:00(Asia/Seoul), 둘 다면 늦은 쪽 ③ `Retry-After = ceil(blocked_until − clock.now())` | §5.3 · §9.6 ④ |
+| qa #4 | Should | honeypot ↔ 토큰 재사용을 구분할 로그 형식·조회 수단이 없다 | **반영** — 판정용 로그를 **`key=value` 로 고정**(`inquiry.blocked reason=…` / `inquiry.duplicate token_state=…`)하고 조회 수단(로컬 `docker compose logs app` / 스테이징 devops 대행)을 명시. 로그 포맷은 구현에서 이미 적용했다 | §9.6 · §10.2 |
+| qa #5 | Should | PM-5 기한(10-14)과 선행 조건 판명(10-16)의 시차 | **반영** — **"선행 조건 #3·#4는 10-16 종료 시점에 재확인하고 즉시 pmo·qa 통지"** 체크포인트 신설 | §12.6.2 |
+| qa #6 | Could | `config/qa_settings.py` ↔ `qa/qa_settings.py` 표기 불일치 | **반영** — §10.1 ④ 경로 정정 | §10.1 |
+| qa #7 | Could | `qa/webkit_checklist.md` 가 `{PROJECT}/qa/` 로 읽힐 수 있다 | **반영** — `developer/site/qa/webkit_checklist.md` 로 명시하고 "이 문서의 `qa/` 표기는 전부 `site/` 기준"을 덧붙였다 | §10.5 ③ |
+
+**미반영: 0건.** 구현 1단계에서 확정된 사실(의존성 PyYAML 추가, 패치 버전 고정, `ENV_FILE` 로 환경별 `.env` 선택)도 §2.7·§3.5·§4에 반영했다.
+
 ---
 
 ## 변경 이력
@@ -1391,3 +1449,4 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 |---|---|---|---|---|
 | 0.1 | 2026-09-12 | developer | 최초 작성 — 스택(Django 5.2 LTS + PostgreSQL 17) 확정, 로컬·운영 compose 구성, 1차/2차 데이터 모델과 DB 제약, 검증 지원 도구 ①~⑩ 별도 산정, 배포·백업·복구 설계, 로컬/운영 차이 10건, 기술 리스크 12건. 결정 대기 항목 10건(D-5·6·7·8·9·13·28·29·33·34) 확정 | CR-001, `shared/reviews/CR-001_impact_developer_r2.md`, `shared/reviews/P3_design-docs_developer_r1.md`, `interviews/2026-09-12_infra-constraints.md` v0.5 |
 | **0.2** | **2026-09-12** | developer | **R1 교차 검토 반영 (Must 5 · Should 19 전건 반영, 미반영 0건 — §17 처리 대장).** ① 백업을 `scheduler`의 `manage.py run_backup`으로 일원화하고 실행 기록·실패 알림(`kind=backup_failed`)·실패 주입 경로를 확정(§12.5.1, `backup` 상시 컨테이너 폐지) ② 스테이징 접근 제어 신설 — nginx `auth_basic`·`QA_TOOLS_ENABLED` 마스터 스위치·검증 도구 HTTP 노출 0(§3.5.1·§10.6 5중 장치) ③ **문의 폼 응답 형태 표 6행×5열 신설**(§9.6 — REQ-F-042의 P5 판정 기준) ④ 로컬 compose에 `proxy`·`backup` **선택 프로필** 추가 + "세 환경 동일 구성" 판정 정의(§3.2.1) ⑤ REQ-N-032·033을 P5 창 안(10-17·10-20)으로 선행 배치하고 선행 조건·G7 이월 전환 규칙 명시(§12.6.2). 그 밖에 nginx 요청 9행화·HTML 압축 주체·정적 점검 화면·배포 절차 2.5단계·이미지 보존·다운타임 목표·일일 운영 요약 메일·`.env` 재발급·clock 적용 범위(§10.3)·`qa_purge_test_data` 규칙(§10.4)·Safari 검증 수단(§10.5)·도구 출력 규격(§10.2)·`qa_pii_columns`(⑪ 신설)·빈도 제한 알림 임계값·§13 #11·#12 신설과 #6 재현 절차(§13.1). 기술 리스크 12 → 15건, 1차 산정 약 15 → **약 16작업일**. **PM 결정 5건을 §14.4로 분리**(일정·SMTP 선연결·오프사이트 백업·소스 반입 수단·G5 판정 범위) | `shared/reviews/P4a_tech-design_devops_r1.md`, `shared/reviews/P4a_tech-design_qa_r1.md` |
+| **0.3** | **2026-09-13** | developer | **R2 교차 검토 반영 (신규 Must 0건 · Should 8 · Could 4 — 전건 반영, 미반영 0건 — §17.4).** ① 배포 절차의 **스케줄러 정지를 0.5단계로 앞당기고 라벨 백업의 `skipped` 를 배포 중단 사유로** 확정(§12.2·§12.5.1·§12.5.3) ② 일일 운영 요약의 백업 판정을 **"24시간 내 성공 기록 없음 = 점검 필요"로 반전**하고 `skipped` 별도 집계(§3.3) ③ **`/healthz` 호출은 항상 앱에 직접(nginx 비경유)** 을 명시해 스테이징 `auth_basic` 과의 충돌·자동 롤백 오발동을 차단(§3.3·§3.4·§3.5.1·§12.2) ④ `.env.example` 의 **`COMPOSE_PROFILES`** 로 플래그 없는 로컬 기동 = REQ-N-034 문면 충족(§3.2.1·§3.5) ⑤ **`mail` 을 프로필로 분리**해 운영·스테이징 판정 지점 확정(§3.2) ⑥ **폼 차단 지속 시간·`Retry-After` 계산식** 확정(§5.3) ⑦ **판정용 로그 `key=value` 형식·조회 수단** 명시(§9.6) ⑧ 선행 조건 **10-16 재확인 체크포인트**(§12.6.2) ⑨ 로컬 `auth_basic` 선검증(더미 자격)으로 **스테이징 단독 판정 5건 → 4건**(§13) ⑩ `${BACKUP_DIR}` 를 `scheduler` 에만 마운트(§3.5). **구현 1단계 착수에 따른 사실 반영**: PyYAML 6.0.3 의존성 추가·패치 버전 고정(§2.7), `config/env.py`·`deploy/nginx/htpasswd.dummy` 추가(§4), 환경별 `.env` 선택을 `ENV_FILE` 로 처리(§3.5) | `shared/reviews/P4a_tech-design_devops_r2.md`, `shared/reviews/P4a_tech-design_qa_r2.md` |

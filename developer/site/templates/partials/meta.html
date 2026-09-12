@@ -1,0 +1,12 @@
+{% load static %}{% spaceless %}
+<title>{% if meta_title %}{{ meta_title }} · {{ site_name }}{% else %}{{ site_name }}{% endif %}</title>
+{% if meta_description %}<meta name="description" content="{{ meta_description }}">{% endif %}
+{% if canonical_path %}<link rel="canonical" href="{{ site_base_url }}{{ canonical_path }}">{% endif %}
+{% if force_noindex or noindex %}<meta name="robots" content="noindex, nofollow">{% endif %}
+{# OG: 이미지가 아직 없으면 태그를 빼고 빌드한다 (기술 설계 §9.3) #}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ site_name }}">
+<meta property="og:title" content="{% if meta_title %}{{ meta_title }}{% else %}{{ site_name }}{% endif %}">
+{% if meta_description %}<meta property="og:description" content="{{ meta_description }}">{% endif %}
+{% if canonical_path %}<meta property="og:url" content="{{ site_base_url }}{{ canonical_path }}">{% endif %}
+{% endspaceless %}

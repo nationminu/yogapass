@@ -1,0 +1,12 @@
+# 강사 (SCR-001 미리보기 · SCR-002) — 기술 설계 §5.1.1
+# [TBD: T-C] 강사 정보 미수령. 목록이 비면 관련 섹션을 렌더하지 않는다(빈 카드·자리표시자 금지).
+# 수령 후 예시 형식:
+#   - slug: instructor-1
+#     name: "홍길동"
+#     headline: "하타 요가 담당"
+#     bio: "…"
+#     credentials: ["자격 1", "자격 2"]
+#     classes: ["그룹 요가"]
+#     display_order: 1
+#     is_active: true
+instructors: []

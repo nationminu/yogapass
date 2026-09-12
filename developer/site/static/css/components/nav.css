@@ -1,0 +1,67 @@
+/* CMP-003 Header · CMP-004 GNB Item · CMP-005 Mobile Menu Panel */
+
+.hdr {
+  position: sticky; top: 0; z-index: var(--z-header);
+  background: var(--color-surface);             /* 반투명 금지 */
+  border-bottom: 1px solid var(--color-border);
+}
+.hdr-row { display: flex; align-items: center; gap: var(--space-6); min-height: var(--header-h); }
+
+.logo { display: flex; align-items: center; color: var(--color-navy); text-decoration: none; }
+.logo .logo-svg { width: auto; height: 32px; max-width: var(--logo-max-w); }
+
+/* --- GNB: 768px 이상에서만 인라인 노출 --- */
+.gnb { display: none; margin-left: auto; gap: var(--space-1); }
+.gnb a {
+  display: flex; align-items: center; min-height: var(--touch-min);
+  padding: 0 var(--gnb-item-pad-x); border-radius: var(--radius-sm);
+  font-size: 15px; font-weight: var(--fw-regular);
+  color: var(--color-ink); text-decoration: none;
+}
+.gnb a[aria-current="page"] {
+  color: var(--color-primary); font-weight: var(--fw-bold);
+  box-shadow: inset 0 -2px 0 var(--color-primary);
+}
+@media (hover: hover) { .gnb a:hover { background: var(--color-primary-subtle); } }
+
+.hdr-right { display: flex; align-items: center; gap: var(--space-2); margin-left: auto; }
+.hdr-tel { display: none; font-size: 15px; font-weight: var(--fw-bold); color: var(--color-ink); text-decoration: none; white-space: nowrap; }
+.hdr-cta { display: none; }
+
+/* --- 모바일 메뉴(CMP-005): <details> 가 정본. aria-expanded 를 수동 부착하지 않는다 --- */
+.mnav { position: static; }
+.mnav-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: var(--touch-min); height: var(--touch-min);
+  border: 1px solid var(--color-border-strong); border-radius: var(--radius-md);
+  background: var(--color-surface); color: var(--color-primary);
+  cursor: pointer; list-style: none;
+}
+.mnav-btn::-webkit-details-marker { display: none; }
+.mnav-icon { display: grid; gap: 4px; }
+.mnav-icon span { display: block; width: 18px; height: 2px; background: currentColor; border-radius: 2px; }
+.mpanel {
+  position: absolute; left: 0; right: 0; top: 100%;
+  background: var(--color-surface); border-bottom: 1px solid var(--color-border);
+  animation: mpanel-in var(--motion-base) var(--ease-out);
+}
+@keyframes mpanel-in {
+  from { opacity: 0; transform: translateY(calc(-1 * var(--motion-distance))); }
+  to   { opacity: 1; transform: none; }
+}
+.mpanel a {
+  display: flex; align-items: center; min-height: 52px;
+  padding: 0 var(--container-pad); font-size: 16px; font-weight: var(--fw-regular);
+  color: var(--color-ink); text-decoration: none; border-top: 1px solid var(--color-border);
+}
+.mpanel a[aria-current="page"] { color: var(--color-primary); font-weight: var(--fw-bold); }
+
+@media (min-width: 768px) {
+  .gnb { display: flex; }
+  .mnav { display: none; }
+}
+@media (min-width: 1280px) {
+  .hdr-tel { display: inline-flex; align-items: center; min-height: var(--touch-min); }
+  .hdr-tel-icon { display: none; }
+  .hdr-cta { display: inline-flex; }
+}

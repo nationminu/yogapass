@@ -1,0 +1,46 @@
+{% load static icons %}
+{# CMP-003 Header — 3구간 변형은 CSS 가 담당한다(마크업 1벌).
+   · <768px  로고 + 전화 아이콘(확정 시) + 햄버거
+   · 768~1279px 로고 + 인라인 GNB + 전화 아이콘, 헤더 주 CTA 없음(G-8)
+   · ≥1280px 로고 + GNB + 전화번호 텍스트 + 주 CTA(H1/H2/H3) #}
+<header class="hdr">
+  <div class="wrap hdr-row">
+    <a class="logo" href="/" aria-label="{{ site_name }} 홈">
+      {% inline_svg "img/logo-horizontal.svg" "logo-svg" %}
+    </a>
+
+    <nav class="gnb" aria-label="주 메뉴">
+      {% for item in nav_items %}
+        <a href="{{ item.url }}"{% if item.is_current %} aria-current="page"{% endif %}>{{ item.label }}</a>
+      {% endfor %}
+    </nav>
+
+    <div class="hdr-right">
+      {% if has_phone %}
+        <a class="hdr-tel" href="{% tel_href site_phone %}">{{ site_phone }}</a>
+        <a class="btn btn-icon hdr-tel-icon" href="{% tel_href site_phone %}" aria-label="전화 문의">
+          {% icon "phone" %}
+        </a>
+      {% endif %}
+
+      {% if cta.header == "H1" %}
+        <a class="btn btn-p hdr-cta" href="{{ cta.contact_url }}">문의하기</a>
+      {% elif cta.header == "H2" %}
+        <a class="btn btn-p hdr-cta" href="{% tel_href site_phone %}">{% icon "phone" %}전화 문의</a>
+      {% endif %}{# H3 = 렌더하지 않는다 #}
+
+      <details class="mnav">
+        <summary class="mnav-btn" aria-label="메뉴">
+          <span class="mnav-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+        </summary>
+        <nav class="mpanel" aria-label="모바일 메뉴">
+          {% for item in nav_items %}
+            <a href="{{ item.url }}"{% if item.is_current %} aria-current="page"{% endif %}>{{ item.label }}</a>
+          {% endfor %}
+          {% if has_phone %}<a href="{% tel_href site_phone %}">전화 문의</a>{% endif %}
+          <a href="/privacy">개인정보 처리방침</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>

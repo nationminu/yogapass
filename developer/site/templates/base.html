@@ -1,0 +1,38 @@
+{% load static icons %}<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% include "partials/meta.html" %}
+
+  {# 폰트: Latin + 한글 기본 chunk 의 400 두 개만 preload (기술 설계 §9.4) #}
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+        href="{% static 'fonts/pretendard/Pretendard-Regular.subset.91.woff2' %}">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+        href="{% static 'fonts/pretendard/Pretendard-Regular.subset.90.woff2' %}">
+
+  <link rel="stylesheet" href="{% static 'css/fonts.css' %}">
+  <link rel="stylesheet" href="{% static 'css/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/layout.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/nav.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components/base.css' %}">
+  {% block page_css %}{% endblock %}
+
+  <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+  <script defer src="{% static 'js/viewport.js' %}"></script>
+  <script defer src="{% static 'js/menu.js' %}"></script>
+</head>
+<body{% if page_id %} data-page="{{ page_id }}"{% endif %}>
+  {% include "partials/skip_link.html" %}
+  {% include "partials/noscript.html" %}
+  {% include "partials/header.html" %}
+
+  <main id="main" tabindex="-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include "partials/footer.html" %}
+  {% include "partials/fixed_bar.html" %}
+</body>
+</html>

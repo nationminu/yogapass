@@ -1,0 +1,13 @@
+# supercronic crontab — scheduler 컨테이너 (기술 설계 §3.3)
+# ⚠ 여기에는 **구현이 끝난 작업만** 적는다. 남은 작업은 아래 주석으로 예약해 둔다.
+# 시각은 컨테이너 TZ(Asia/Seoul) 기준.
+
+# 메일 아웃박스 플러시·재시도 (1분)
+* * * * * cd /app && python manage.py send_outbox
+
+# --- 작업 12 에서 추가한다 (구현 전에는 켜지 않는다) ---
+# 0 3 * * *  cd /app && python manage.py run_backup
+# 10 3 * * * cd /app && python manage.py purge_expired
+# 0 * * * *  cd /app && python manage.py prune_rate_limit
+# 0 8 * * *  cd /app && python manage.py report_failures
+# */5 * * * * cd /app && python manage.py ping_health   # /healthz 는 항상 앱에 직접 호출한다(devops R2 #3)

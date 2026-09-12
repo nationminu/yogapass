@@ -1,0 +1,14 @@
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+staticfiles/
+media/
+backups/
+qa/
+tests/
+README.md
+.ruff_cache/

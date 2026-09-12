@@ -1,0 +1,8 @@
+# 운영 의존성 — 정확한 버전으로 고정한다 (기술 설계 §2.7).
+# 업그레이드는 별도 작업 단위로 하고, 변경 시 개발 보고서에 기록한다.
+# 해시 고정(--require-hashes)은 작업 12(운영 compose·배포)에서 requirements.lock 으로 추가한다.
+Django==5.2.9
+psycopg[binary]==3.3.5
+gunicorn==26.2.0
+whitenoise[brotli]==6.12.0
+PyYAML==6.0.3

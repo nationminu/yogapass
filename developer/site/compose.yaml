@@ -1,0 +1,72 @@
+# 공통 정의 — 로컬·스테이징·운영 **세 환경이 같은 파일을 쓴다** (REQ-N-034).
+# 차이는 override 파일 1개(compose.local.yaml / compose.prod.yaml)와 환경 변수에만 둔다.
+# 실행:
+#   로컬       docker compose -f compose.yaml -f compose.local.yaml up
+#   스테이징   docker compose -f compose.yaml -f compose.prod.yaml -p yogapass-stg up -d
+#   운영       docker compose -f compose.yaml -f compose.prod.yaml -p yogapass up -d
+
+name: ${COMPOSE_PROJECT_NAME:-yogapass}
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+services:
+  app:
+    env_file: ["${ENV_FILE:-.env}"]
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *default-logging
+    healthcheck:
+      # ⚠ /healthz 호출은 항상 앱에 직접 한다 — nginx 를 경유하지 않는다 (devops R2 #3)
+      test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/healthz').read()"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks: [internal]
+
+  db:
+    image: postgres:17-alpine
+    env_file: ["${ENV_FILE:-.env}"]
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [internal]
+
+  scheduler:
+    env_file: ["${ENV_FILE:-.env}"]
+    command: ["supercronic", "-passthrough-logs", "deploy/crontab"]
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *default-logging
+    healthcheck:
+      test: ["CMD", "python", "manage.py", "scheduler_health", "--minutes", "10"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+    networks: [internal]
+
+volumes:
+  pgdata:
+  media:
+
+networks:
+  internal:

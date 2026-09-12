@@ -1,0 +1,51 @@
+/* CMP-009 Container / Section · CMP-006 Footer · CMP-007 Bottom Fixed Bar */
+
+.wrap {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+.sec { padding-block: var(--space-10); border-bottom: 1px solid var(--color-border); }
+.sec--hero { padding-block: var(--space-11); border-bottom: 1px solid var(--color-border); }
+.sec-h { margin-bottom: var(--space-7); }
+.sec-h p { margin-top: 10px; color: var(--color-muted); }
+@media (min-width: 768px)  { .sec { padding-block: var(--space-12); } .sec--hero { padding-block: var(--space-13); } }
+@media (min-width: 1280px) { .sec { padding-block: var(--space-14); } .sec--hero { padding-block: var(--space-15); } }
+
+/* ---- Footer (CMP-006) ---- */
+.ftr {
+  background: var(--color-navy); color: var(--color-on-navy);
+  padding-block: var(--space-8) var(--space-7);
+  font-size: var(--fs-body-sm); line-height: 1.9;
+}
+.ftr-grid { display: grid; gap: 28px; }
+.ftr a { color: var(--color-on-navy); text-decoration: none; display: block; min-height: 32px; }
+.ftr a:hover { text-decoration: underline; }
+.ftr .ft-muted { color: var(--color-on-navy-muted); }
+.ftr .ft-small { font-size: 13px; }
+.ftr-h { font-size: 14px; margin-bottom: 10px; }
+.ftr .strong { font-weight: var(--fw-bold); }
+.ftr-copy { grid-column: 1 / -1; border-top: 1px solid var(--color-on-navy-line); padding-top: var(--space-4); }
+.ftr .logo-svg { color: var(--color-on-navy); width: 140px; height: auto; }
+@media (min-width: 768px)  { .ftr { padding-block: var(--space-9); } .ftr-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1280px) { .ftr { padding-block: var(--space-10); } .ftr-grid { grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: var(--space-7); } }
+
+/* ---- Bottom Fixed Bar (CMP-007) ---- */
+.barwrap { position: fixed; left: 0; right: 0; bottom: 0; z-index: var(--z-fixed-bar); }
+.bar {
+  display: flex; gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  padding-bottom: calc(var(--space-2) + var(--safe-b));
+  background: var(--color-surface); border-top: 1px solid var(--color-border);
+}
+.bar .btn { flex: 1 1 0; min-height: 44px; }
+.bar .bar-tel { flex: 0 0 40%; }
+.bar-full .btn { flex: 1 1 100%; }
+/* ≥1280px 미노출 (G-1) — 본문 하단 여백은 토큰이 0 으로 바뀐다 */
+@media (min-width: 1280px) { .barwrap { display: none; } }
+/* G-11 400% 확대 상황: 정적 배치 */
+@media (max-height: 420px) and (max-width: 400px) {
+  .barwrap { position: static; }
+  .hdr { position: static; }
+}

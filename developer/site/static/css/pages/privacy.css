@@ -1,0 +1,97 @@
+/* SCR-006 개인정보 처리방침 (페이지 디자인 §5)
+   이 화면에만 있는 패턴 2가지
+     ⓐ ≥1024px 좌측 240px sticky 목차 + 우측 720px 본문 2단
+     ⓑ <768px 표 → 카드 전환 (가로 스크롤 금지) */
+
+.doc { padding-block: var(--space-8) var(--space-10); }
+.doc-grid { display: grid; gap: var(--space-6); }
+@media (min-width: 1024px) {
+  .doc-grid { grid-template-columns: 240px minmax(0, 720px); gap: var(--space-8); align-items: start; }
+}
+
+/* ---- CMP-028 TOC ---- */
+.toc-d {
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  background: var(--color-surface-alt); overflow: hidden;
+}
+.toc-d > summary {
+  display: flex; align-items: center; gap: var(--space-2);
+  min-height: 52px; padding: 0 var(--space-4);
+  font-weight: var(--fw-bold); cursor: pointer; list-style: none;
+}
+.toc-d > summary::-webkit-details-marker { display: none; }
+.toc-d > summary .toc-caret {
+  width: 18px; height: 18px; margin-left: auto; color: var(--color-primary);
+  transition: transform var(--motion-base) var(--ease-standard);
+}
+.toc-d[open] > summary { border-bottom: 1px solid var(--color-border); }
+.toc-d[open] > summary .toc-caret { transform: rotate(180deg); }
+.toc-list { margin: 0; padding: 6px 0; list-style: none; counter-reset: toc; }
+.toc-list li { counter-increment: toc; }
+.toc-list a {
+  display: flex; align-items: center; gap: 10px; min-height: var(--touch-min);
+  padding: 4px var(--space-4); font-size: var(--fs-body-sm);
+  color: var(--color-ink); text-decoration: none;
+}
+.toc-list a::before {
+  content: counter(toc) "."; flex: none; width: 20px;
+  color: var(--color-muted); font-size: var(--fs-caption);
+}
+.toc-list a[aria-current] {
+  color: var(--color-primary); font-weight: var(--fw-bold);
+  background: var(--color-primary-subtle); box-shadow: inset 2px 0 0 var(--color-primary);
+}
+@media (hover: hover) { .toc-list a:hover { background: var(--color-primary-subtle); } }
+
+/* ≥1024px: 접이식을 항상 펼친 sticky 목차로 바꾼다 (JS 없이 동작) */
+@media (min-width: 1024px) {
+  .toc { position: sticky; top: calc(var(--header-h) + var(--space-6)); }
+  .toc-d > summary { cursor: default; }
+  .toc-d > summary .toc-caret { display: none; }
+}
+
+/* ---- 본문 (장문 전용 규칙) ---- */
+.prose { line-height: 1.8; }
+.prose h2 {
+  font-size: 20px; margin-top: var(--space-8); margin-bottom: var(--space-4);
+  scroll-margin-top: var(--anchor-offset);
+}
+.prose h2:first-of-type { margin-top: 0; }
+.prose h3 { font-size: 16px; margin-top: var(--space-6); margin-bottom: var(--space-2); }
+.prose p { margin-bottom: var(--space-3); }
+.prose ul { margin: 0 0 var(--space-3); padding-left: 20px; }
+.prose li { margin-bottom: 6px; }
+.prose strong { font-weight: var(--fw-bold); color: var(--color-ink); }
+@media (min-width: 768px)  { .prose h2 { font-size: 22px; } .prose h3 { font-size: 17px; } }
+@media (min-width: 1280px) { .prose h2 { font-size: 24px; } }
+
+/* ---- 표 : ≥768px 표 / <768px 카드 전환 ---- */
+.tbl-wrap { margin-bottom: var(--space-5); }
+.tbl { width: 100%; border-collapse: collapse; font-size: var(--fs-body-sm); }
+.tbl caption { text-align: left; padding-bottom: 6px; color: var(--color-muted); font-size: var(--fs-caption); }
+.tbl th, .tbl td { border: 1px solid var(--color-border); padding: 10px 12px; text-align: left; vertical-align: top; }
+.tbl thead th { background: var(--color-neutral-bg); font-weight: var(--fw-bold); }
+
+@media (max-width: 767px) {
+  .tbl, .tbl tbody, .tbl tr, .tbl td { display: block; width: 100%; }
+  .tbl thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .tbl tr {
+    border: 1px solid var(--color-border); border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-3); margin-bottom: var(--space-3);
+  }
+  .tbl td { border: 0; padding: 8px 0; border-bottom: 1px solid var(--color-border); }
+  .tbl tr td:last-child { border-bottom: 0; }
+  .tbl td::before {
+    content: attr(data-label); display: block;
+    font-size: var(--fs-caption); font-weight: var(--fw-bold); color: var(--color-muted);
+    margin-bottom: 2px;
+  }
+}
+
+/* ---- 인쇄 (Could) ---- */
+@media print {
+  .hdr, .ftr, .barwrap, .toc, .skip, .noscript-note { display: none !important; }
+  .doc { padding: 0; }
+  .prose { font-size: 12pt; max-width: none; }
+  .prose a::after { content: " (" attr(href) ")"; font-size: 10pt; }
+}

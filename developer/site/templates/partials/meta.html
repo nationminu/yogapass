@@ -3,10 +3,17 @@
 {% if meta_description %}<meta name="description" content="{{ meta_description }}">{% endif %}
 {% if canonical_path %}<link rel="canonical" href="{{ site_base_url }}{{ canonical_path }}">{% endif %}
 {% if force_noindex or noindex %}<meta name="robots" content="noindex, nofollow">{% endif %}
-{# OG: 이미지가 아직 없으면 태그를 빼고 빌드한다 (기술 설계 §9.3) #}
+{% comment %} OG: 대표 이미지(og-image.png)가 아직 없으면 og:image 계열 4줄을 **통째로 빼고 빌드**한다
+(TKT-DSN-002 · 디자인 시스템 §6.3 ②). 래스터가 준비되면 context_processors.site 의
+og_image 값만 채워지고 이 템플릿은 고치지 않는다. {% endcomment %}
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{{ site_name }}">
 <meta property="og:title" content="{% if meta_title %}{{ meta_title }}{% else %}{{ site_name }}{% endif %}">
 {% if meta_description %}<meta property="og:description" content="{{ meta_description }}">{% endif %}
 {% if canonical_path %}<meta property="og:url" content="{{ site_base_url }}{{ canonical_path }}">{% endif %}
+{% if og_image %}<meta property="og:image" content="{{ site_base_url }}{{ og_image }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="강남 요가패스 로고와 '강남 요가 스튜디오' 문구가 있는 대표 이미지">
+<meta name="twitter:card" content="summary_large_image">{% endif %}
 {% endspaceless %}

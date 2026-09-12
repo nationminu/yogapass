@@ -1,20 +1,21 @@
 ---
 doc_id: DEV-REPORT
-title: 개발 보고서 — 1차 구현 (1단계 · 스캐폴딩/compose/공통 레이아웃)
+title: 개발 보고서 — 1차 구현 (2단계 · 전 화면 + 문의 폼)
 phase: P4
 owner: developer
-version: 0.1
+version: 0.2
 status: draft
 reviewers: [designer, planner]
-inputs: [developer/04_tech-design.md, planning/02_requirements.md, planning/02_storyboard.md, design/03_design-system.md, design/03_page-design.md, design/mockups/, shared/reviews/P4a_tech-design_devops_r2.md, shared/reviews/P4a_tech-design_qa_r2.md]
+inputs: [developer/04_tech-design.md, planning/02_requirements.md, planning/02_storyboard.md, design/03_design-system.md, design/03_page-design.md, design/mockups/, shared/tickets/TKT-DSN-002_to-developer_favicon-og-raster.md, shared/reviews/P4a_tech-design_devops_r2.md, shared/reviews/P4a_tech-design_qa_r2.md]
 updated: 2026-09-13
 ---
 
-# 개발 보고서 (초안) — 1차 구현 1단계
+# 개발 보고서 (초안) — 1차 구현 2단계
 
-> **이 문서의 상태**: `draft`. 1차 구현 **14개 작업 중 작업 1~3 + 작업 4(SCR-001) 일부**를 마친 시점의 중간 보고다.
+> **이 문서의 상태**: `draft`. 1차 구현 **14개 작업 중 작업 1~10 + 작업 14 일부**를 마친 시점의 중간 보고다.
 > **규칙**: 이 문서에는 **직접 실행해 확인한 것만** 적는다. 실행하지 않은 항목은 "미확인"으로 적고 "완료"로 쓰지 않는다.
 > 설계 근거는 `developer/04_tech-design.md` v0.3, 실행 절차는 `developer/site/README.md`.
+> v0.1(1단계) 대비 달라진 곳은 **▲** 로 표시했다.
 
 ---
 
@@ -22,129 +23,182 @@ updated: 2026-09-13
 
 | 항목 | 내용 |
 |---|---|
-| 구현 범위 | 기술 설계 §11.1 **작업 1(스캐폴딩·설정 분리·compose·`/healthz`) · 작업 2(커스텀 사용자 모델·콘텐츠 모델·`seed_content`) · 작업 3(디자인 토큰 이식·공통 레이아웃·폰트·아이콘)** + **작업 4(SCR-001 메인) 뼈대**. 그 밖에 메일 아웃박스·스케줄러(작업 8의 기반)를 함께 세웠다 |
-| 진척(작업 단위) | **3.5 / 14 작업** (설계 산정 약 16작업일 중 약 4.2작업일분) |
-| Must REQ 구현률 | **전체 1차 Must 60건 기준 — 완료 9 · 부분 11 · 미착수 40** (§2 표) |
-| 로컬 빌드 · 실행 | **성공** — `docker compose … up` 으로 **app·db·mail·scheduler·proxy 5개 서비스 healthy**, `http://localhost:8000` · `http://localhost:8080` 200 (2026-09-13 확인, §4) |
-| 운영 빌드 | **성공** — prod 타깃 이미지 빌드 + 운영 미리보기 기동 + 해시 정적 파일·brotli·immutable 캐시 확인 (§4) |
-| 자동 테스트 | **9건 전부 통과** (`manage.py test`), `ruff check` 통과 (§5) |
-| 검증팀 전달 가능 여부 | **아직 아니다.** 문의 폼(작업 7)·검증 지원 도구(작업 13)가 없어 P5 판정 대상 대부분을 실행할 수 없다. 다만 **환경 구성(REQ-N-034)·기동·404·로그 형식** 은 지금도 확인 가능하다 |
+| 이번 범위 | ▲ 기술 설계 §11.1 **작업 5(SCR-002) · 6(SCR-003 지도) · 7(문의 폼) · 8(문의 알림 본문) · 9(SCR-006·008·009) · 10(SEO·접근성·`<noscript>` 마감)** + TKT-DSN-002(파비콘·OG 래스터) 처리 |
+| 진척(작업 단위) | ▲ **10 / 14 작업** (남은 것: 11 성능 측정 · 12 배포/백업 · 13 검증 지원 도구 · 14 자체 점검 마감) |
+| 1차 화면 | ▲ **6화면 전부 구현** — SCR-001·002·003·006·008·009 |
+| Must REQ 구현률 | ▲ 1차 Must 60건 기준 **추정** — **완료 약 34 · 부분 약 14 · 미착수 약 12** (§2 표가 근거. **확정 집계는 qa 추적 매트릭스가 한다** — 이 숫자를 게이트 판정에 그대로 쓰지 않는다) |
+| 로컬 빌드 · 실행 | **성공** — `docker compose … up` 으로 app·db·mail·scheduler·proxy **5개 서비스 healthy**, 4개 공개 화면 200 / 없는 경로 404 (§4) |
+| 운영 빌드 | **성공** — prod 이미지 빌드 + gunicorn 기동 + 해시·brotli·`immutable` 확인, 새 화면 4종 200 (§4) |
+| 문의 폼 | ▲ **설계 §9.6 응답 형태 6종을 전부 구현하고 6종 모두 실행 확인**(자동 테스트 + curl) |
+| 자동 테스트 | ▲ **48건 전부 통과** (v0.1 9건 → 48건), `ruff check` 통과 |
+| 검증팀 전달 가능 여부 | ▲ **부분 가능.** 화면·폼·SEO·접근성 마크업은 지금 검증할 수 있다. 백업·배포·검증 지원 도구(작업 12·13)는 아직 없다 |
 
 ---
 
 ## 2. 요구사항별 구현 현황 (REQ ID ↔ 구현 파일)
 
-> 경로는 모두 `developer/site/` 기준이다. **부분**은 "이번 범위의 몫은 끝났고 나머지 화면·기능에서 이어진다"는 뜻이다.
+> 경로는 모두 `developer/site/` 기준이다. **부분**은 "이번 범위의 몫은 끝났고 남은 조건(데이터 수령·측정·배포)이 있다"는 뜻이다.
 
-| REQ ID | 요구사항 | 상태 | 구현 위치 | 비고 |
-|---|---|---|---|---|
-| REQ-F-001 | 공통 헤더 | **완료(1차 화면 기준)** | `templates/partials/header.html` · `static/css/components/nav.css` | 3구간 변형(64/68/72px)·GNB·`aria-current`·모바일 `<details>` 패널·H1~H3 CTA 상태 |
-| REQ-F-002 | 공통 푸터 | **완료** | `templates/partials/footer.html` · `static/css/components/layout.css` | 1/2/4열, 미확정 행 미렌더 |
-| REQ-F-003 | 전역 주 CTA | **완료** | `apps/core/cta.py` · `templates/partials/fixed_bar.html` | 고정 바 S1~S3 · 헤더 H1~H3 을 **한 판정 함수**로 공유(G-6·G-7) |
-| REQ-F-004 | 전화 걸기 링크 | **부분** | `apps/core/templatetags/icons.py`(`tel_href`) · 헤더/푸터/고정 바 | 대표 전화가 `[TBD]` 라 **현재 렌더되는 `tel:` 링크 0건**(의도된 동작). 값이 들어오면 자동 노출 |
-| REQ-F-005 | 처리방침 전역 링크 | **부분** | 푸터·모바일 패널 | 링크는 있고 대상 화면(SCR-006)은 작업 9 |
-| REQ-F-006 | 화면 간 이동 일관성 | **부분** | `apps/content/services.py`(`nav_items`) | GNB 4항목 단일 원본. 나머지 화면 추가 시 그대로 적용 |
-| REQ-F-010 | 메인 Hero | **부분** | `templates/pages/home.html` · `static/css/pages/home.css` | 레이아웃·최소 높이(320/420/520px)·CTA 완료. **헤드라인/서브카피 문구는 `[TBD: T-G]` 라 미노출**(§6 #1) |
-| REQ-F-011 | 스튜디오 소개 요약(강점 3~4) | **부분** | `templates/pages/home.html` 섹션 2 | 그리드·카드·아이콘 프레임 구현. 문구 미수령이라 **섹션 미렌더** 상태 |
-| REQ-F-012 | 강사 미리보기 | **부분** | 섹션 4 + `apps/content/services.featured_instructors` | 이니셜 아바타 포함. 데이터 0건이라 섹션 미렌더 |
-| REQ-F-013 | 위치 요약 | **부분** | 섹션 5 | `<dl>` 3행·브랜드 그래픽(지도 아님)·`/location` 링크. 값 미확정 행은 렌더하지 않는다 |
-| REQ-F-014 | 수업 유형 소개 | **부분** | 섹션 3 + `LessonType` | 설명 없는 유형은 렌더하지 않고 전부 없으면 섹션 미렌더 |
-| REQ-F-015 | 메인 하단 전환 섹션 | **완료** | 섹션 7 (CMP-025) | |
-| REQ-F-021 · REQ-F-064 | 강사·콘텐츠 데이터 분리 | **완료(1차 정의대로)** | `content/*.yml` · `apps/content/models.py` · `apps/content/management/commands/seed_content.py` | **파일 수정 → `manage.py seed_content` 1회 실행**으로 반영(설계 §5.1.1). 실행 확인: `created=11` |
-| REQ-F-022 | 강사 사진 대체 처리 | **완료** | `card--instructor` + `.avatar`(CMP-027) | 인물 스톡 미사용 |
-| REQ-F-060 | 404 화면 | **완료** | `apps/core/views.page_not_found` · `templates/errors/404.html` | **실제 404 상태 코드** 확인(앱·nginx 경유 모두 404) |
-| REQ-F-065 | 공용 오류 화면(5xx·점검) | **부분** | `templates/errors/500.html` · `deploy/nginx/maintenance.html` | 점검 화면은 **외부 자산 0건 자립형**. 앱 다운 상태 검증은 작업 12 |
-| REQ-N-001 · 002 | 반응형 4구간 | **부분** | `static/css/tokens.css`(토큰) · 각 컴포넌트 CSS | 모바일 우선 `min-width` 4구간. **실측 확인은 브라우저 도구가 필요해 미수행**(§6 #4) |
-| REQ-N-006 · 008 · 009 | 접근성(터치 44px·포커스·랜드마크) | **부분** | `tokens.css` 포커스 블록 · `base.css` · 각 템플릿 | h1 1개·`main[tabindex=-1]`·skip link·`aria-current`·44px 하한 적용. 자동 점검 도구 실행은 작업 10 |
-| REQ-N-010~016 | SEO(title·description·canonical·OG·sitemap·robots·구조화 데이터) | **부분** | `templates/partials/meta.html` · `jsonld_localbusiness.html` · `apps/core/sitemaps.py` · `views.robots_txt` | robots(Disallow 0건 + Sitemap 1줄)·sitemap(`SITE_BASE_URL` 기준)·JSON-LD(미확정 속성 제외) 동작 확인 |
-| REQ-N-018 | 비밀 정보 분리 | **완료** | `.env.example` · `.gitignore` · `Dockerfile` | `.env` 는 커밋 대상에서 제외됨을 `git status` 로 확인. 운영 이미지 레이어에서 비밀 문자열 검색 0건 |
-| REQ-N-019 | 폼·인증 악용 방지 | **부분** | `apps/core/models.RateLimitCounter` · `apps/core/net.py` | 저장소·식별자 해시(IP 원본 미저장)까지. 판정 로직은 작업 7 |
-| REQ-N-020 | 개인정보 최소 수집 | **부분** | `apps/core/net.ip_hash` | 솔트 해시만 저장하는 구조 |
-| REQ-N-023 | `[TBD]` 노출 금지 | **완료** | 전 템플릿 + `icons.inline_svg` 주석 제거 | 렌더 HTML 에 `TBD` 문자열 **0건** 확인(자동 테스트에 포함) |
-| REQ-N-027 | 한국어 | **완료** | `LANGUAGE_CODE=ko-kr` · `<html lang="ko">` | |
-| REQ-N-028 · 029 | JS 비활성 동작 · `<noscript>` | **부분** | `<details>` 기반 메뉴 · `templates/partials/noscript.html` | 서버 렌더 HTML 이 기본 산출물. 폼(REQ-N-030)은 작업 7 |
-| REQ-N-031 | 헬스 엔드포인트·헬스체크·재시작 | **완료** | `apps/core/views.healthz` · `compose.yaml` · `apps/core/management/commands/scheduler_health.py` | 5개 서비스 healthy 확인. `unless-stopped` 적용 |
-| REQ-N-034 | 로컬·스테이징·운영 **동일 compose** | **완료(구조)** | `compose.yaml` · `compose.local.yaml` · `compose.prod.yaml` | 공통 파일 1개 + override 1개 + 환경 변수. **플래그 없는 `up` 으로 프록시까지 기동** 확인 |
-| REQ-N-036 | 기본값 거부 권한 레이어 | **완료(1차 골격)** | `apps/core/access.py` · `apps/core/middleware.AccessControlMiddleware` | 공개 경로표 미등록 = 접근 거부 |
-| REQ-N-037 | 알림 메일 체계·발송 로그·재시도 | **부분** | `apps/mailer/models.Outbox` · `services.enqueue` · `management/commands/send_outbox.py` | **아웃박스 → 스케줄러 → SMTP → Mailpit 수신까지 실 경로 확인**(§4). 문의 알림 본문은 작업 8 |
-| REQ-N-041 · N-004 | 성능(폰트·캐시) | **부분** | `static/css/fonts.css` · WhiteNoise 설정 | 폰트 self-host(unicode-range 92청크 × 400/700) + preload 2개, 해시·brotli·`immutable` 확인. **Lighthouse 측정은 작업 11** |
-| REQ-N-017 · 022 · 032 · 033 · 035 · 038 · 039 · 040 | HTTPS·메일 인증·백업·배포/롤백·DB 제약·파기·권한·스테이징 | **미착수** | — | 작업 12(+2차 스키마) 범위 |
-| REQ-F-030~035 · F-040~046 · F-050~053 | 오시는 길·문의 폼·처리방침 | **미착수** | — | 작업 6·7·9 |
+### 2.1 기능 요구사항
+
+| REQ ID | 요구사항 | 상태 | 구현 위치 |
+|---|---|---|---|
+| REQ-F-001·002·003 | 공통 헤더·푸터·전역 주 CTA | 완료 | `templates/partials/{header,footer,fixed_bar}.html` · `apps/core/cta.py` |
+| REQ-F-004 | 전화 걸기 링크 | 부분 | `apps/core/templatetags/icons.tel_href` — 대표 전화 `[TBD]` 라 **현재 렌더되는 `tel:` 0건**(의도된 동작, 테스트로 고정) |
+| REQ-F-005 | 처리방침 전역 링크 | ▲ 완료 | 푸터·모바일 패널·폼 동의 → `/privacy` 실제 화면 존재 |
+| REQ-F-006 | 화면 간 이동 일관성 | ▲ 완료 | `apps/content/services.nav_items` (GNB 단일 원본) + 4화면 상호 링크 |
+| REQ-F-010~015 | 메인 7섹션 | 부분 | `templates/pages/home.html` — 문구·데이터 미수령 섹션은 렌더하지 않는다 |
+| REQ-F-020 | 강사 목록 | ▲ 완료(1차 정의) | `templates/pages/instructors.html` · `apps/content/services.all_instructors` — 비활성 강사 제외 |
+| REQ-F-021 | 강사 데이터 분리 · **경계값 0·1·3·12명** | ▲ 완료 | `content/instructors.yml` → `seed_content`. 인원별 열 수 전환(0=빈 상태 / 1=`g-1c` / 2=`g-2c` / 3·12=`g-3`) — `tests/test_pages.py` 로 고정 |
+| REQ-F-022 | 강사 사진 대체 처리 | ▲ 완료 | CMP-027 이니셜 아바타(`aria-hidden`), **인물 스톡 0장**(`<img>` 0건을 테스트로 고정) |
+| REQ-F-023 | 강사 → 전환 연결 | ▲ 완료 | 하단 CTA 밴드(CMP-025) 1차 문구 |
+| REQ-F-030 | 지도 표시 | ▲ 부분 | `templates/pages/location.html` + `static/css/pages/location.css` — CMP-022 대체 영역(CSS 격자, **지도 캡처 0건**). **임베드 URL 미확정(T-E)이라 지도 자체는 미표시** |
+| REQ-F-031 | 길찾기 외부 링크 | ▲ 부분 | `map_directions_url` 확정 시 새 창 링크 렌더. 값 미확정이라 현재 미노출 |
+| REQ-F-032 | 지도 지연 로딩(클릭 투 로드) | ▲ 완료(구현) | `static/js/map.js` — 버튼 클릭 시에만 iframe 생성. **초기 요청 0건**은 구조상 보장(외부 URL이 `data-map-src` 속성에만 있다) |
+| REQ-F-033 | 오시는 길 정보 | ▲ 완료(구조) | `apps/core/views.LOCATION_ROWS` 7행(주소·지하철·버스·주차·운영시간·휴무일·대표 전화). **값 미확정 행은 렌더하지 않고**, 전부 없으면 CMP-026 빈 상태 |
+| REQ-F-034 | 주소 복사 (Could) | ▲ 완료 | `static/js/map.js` — 클립보드 + CMP-021 토스트 3초(`role="status"`), 비보안 컨텍스트 폴백 포함 |
+| REQ-F-035 | 지도 접근성 대체 | ▲ 완료 | 주소·교통 `<dl>` 이 지도와 **별개 텍스트**로 존재 + iframe `title` + `<noscript>` 대체 |
+| REQ-F-040 | 문의 폼 제공 | ▲ 완료 | `apps/inquiry/forms.py` · `templates/components/form_field.html` — 4항목 + honeypot, 경계값 20/21·500/501 테스트 |
+| REQ-F-041 | 클라이언트 검증(blur 이후) | ▲ 완료 | `static/js/form.js` — blur 이후에만 오류 표시, 입력 중 실시간 오류 없음 |
+| REQ-F-042 | 서버 측 입력 검증 | ▲ 완료 | `apps/inquiry/forms.py` + `services.handle_submission` — **응답 형태는 설계 §9.6 표 그대로**(§3.1) |
+| REQ-F-043 | 개인정보 수집·이용 동의 | ▲ 완료 | 수집 항목·목적·**보관 기간(D-19 잠정 "1년")** 표기 + 처리방침 새 창 링크. 미동의 시 제출 거부 |
+| REQ-F-044 | 스팸 방지 | ▲ 완료 | honeypot(화면 밖 배치) + 빈도 제한 + 서버 검증. **차단 사실 미노출**(③이 ①과 픽셀 단위로 같음을 테스트로 고정) |
+| REQ-F-045 | 스튜디오 알림 | ▲ 완료 | `apps/inquiry/services._notify_body` → `mailer_outbox` → `send_outbox` → **Mailpit 수신 확인**(§4 #14). 수신 주소는 `INQUIRY_NOTIFY_TO` |
+| REQ-F-046 | 전송 결과 안내 · 중복 제출 방지 | ▲ 완료 | 1회용 `submit_token`(서명 값, 24시간) + `inquiry_inquiry.submit_token` UNIQUE. **재제출·새로고침 시 저장 1건·알림 1건** |
+| REQ-F-050 | 처리방침 화면 | ▲ 완료(1차 정의) | `templates/pages/privacy.html` + `content/privacy.yml` — **목차 11항목 전부 소제목으로 존재**, 미확정 항목은 `[TBD]` 표시(1차 수용 기준) |
+| REQ-F-051 | 처리방침 입력 항목 정의 | ▲ 완료(제작 몫) | `content/privacy.yml` 이 곧 **고객이 채울 입력 항목 목록**이다(항목·표 칸 단위) |
+| REQ-F-052 | 위탁·외부 처리 목록 | ▲ 완료(제작 몫) | 기술 설계 §7.1 → `content/privacy.yml` 6항 위탁 표 3행으로 반영 |
+| REQ-F-053 | 시행일·개정 이력 | ▲ 완료(구조) | 헤더 시행일(확정 시 렌더) + 11항 개정 이력 표 |
+| REQ-F-060 | 404 화면 | ▲ 완료 | `templates/errors/404.html` — 실제 404 + `noindex` + 헤더/푸터 유지 + 텍스트 링크 2종 |
+| REQ-F-061 | SNS 링크 | 부분 | 푸터 — 계정 미확정(T-H)이라 섹션 미노출 |
+| REQ-F-062·063 | 분석 도구 · 대체 수단 | 미착수 | `ANALYTICS_ID` 자리만 있음. 오픈 이후 설치 가능(Should) |
+| REQ-F-064 | 콘텐츠 데이터 분리 | 완료(1차 정의) | `content/*.yml` + `seed_content`. ▲ 오시는 길 7행·지도 3키·보관 기간 라벨까지 같은 경로로 확장 |
+| REQ-F-065 | 공용 오류 화면 (Could) | ▲ 완료 | `templates/errors/500.html` — 404 템플릿 재사용, **동적 데이터 비의존**(렌더 테스트로 고정) |
+
+### 2.2 비기능 요구사항
+
+| REQ ID | 요구사항 | 상태 | 구현 위치 |
+|---|---|---|---|
+| REQ-N-001·002 | 반응형 4구간 | 부분 | 각 페이지 CSS 에 `min-width` 4구간 작성. **실측(360/768/1280px)은 미수행** — 브라우저 실행 환경 없음(§6 #1) |
+| REQ-N-004·005·007·015 | 성능·Lighthouse | 부분 | 폰트 self-host·해시·brotli·`immutable` 확인. **측정은 작업 11** |
+| REQ-N-006·008·009 | 접근성 | ▲ 부분 | skip link · `main[tabindex=-1]` · h1 1개 · 랜드마크 · 44px 하한 · `label[for]` · `aria-describedby` · `aria-invalid` · **오류 요약 `role="alert"` + 항목 링크** · 결과 블록 `role="status"` + 포커스 이동 · **색 외 아이콘·텍스트 병기**. 자동 점검 도구 실행은 작업 13 |
+| REQ-N-010~016 | SEO | ▲ 완료(값 제외) | `templates/partials/meta.html`(title·description·canonical·OG) · `apps/core/sitemaps.py`(색인 4화면) · `views.robots_txt`(Disallow 0건) · `jsonld_localbusiness.html`. **도메인은 `SITE_BASE_URL` 교체만으로 전환된다**(§4 #12) |
+| REQ-N-017·022 | HTTPS · 메일 발신 인증 | 미착수 | 운영 nginx·도메인 확정 후(§13) |
+| REQ-N-018 | 비밀 정보 분리 | 완료 | `.env` 커밋 제외 확인, 운영 이미지 레이어 비밀 문자열 0건(1단계 확인 유지) |
+| REQ-N-019 | 폼 악용 방지 **단일 구현** | ▲ 완료 | `apps/core/ratelimit.py`(10분 5회 / 1일 20회, 차단 지속·`Retry-After` 계산, **사용량 알림 3임계 + 1시간 합산**) · honeypot · 서버 검증 |
+| REQ-N-020 | 개인정보 최소 수집 | ▲ 완료 | 저장 항목 3개 + `source_ip_hash`(**원본 IP 미저장**). 로그에 이름·전화·본문 미기록(테스트로 고정) |
+| REQ-N-023 | `[TBD]` 노출 금지 · 오픈 판정 | ▲ 완료(장치) | `/`·`/instructors`·`/location` 렌더 HTML 에 `TBD` **0건**(테스트). `/privacy` 는 1차 수용 기준상 `[TBD]` 를 보이며, **그 상태의 운영 배포는 `manage.py check_release` 가 종료 코드 1 로 막는다**(§3.2) |
+| REQ-N-027 | 한국어 | 완료 | `LANGUAGE_CODE=ko-kr` · `<html lang="ko">` |
+| REQ-N-028 | JS 비활성 시 정보 화면 동작 | ▲ 완료 | 전 화면이 **서버 렌더 HTML 단독으로 완성**된다. 모바일 메뉴·처리방침 목차·강사 경력 접기 모두 `<details>` 기반이라 JS 없이 동작. **curl(=JS 0) 로 전 화면 본문·링크 확인**(§4 #5) |
+| REQ-N-029 | `<noscript>` 대체 안내 | ▲ 완료 | 전역 `partials/noscript.html` + **지도 영역·폼 전용 `<noscript>` 2곳** |
+| REQ-N-030 | JS 없는 폼 제출 (Could) | ▲ **완료** | 서버 렌더 POST 가 표준 경로다. **curl 로 6종 응답을 전부 재현**했다(§4 #6~#11) — JS 경로와 서버 경로를 이중 구현하지 않았다 |
+| REQ-N-031 | 헬스 엔드포인트·헬스체크 | 완료 | `/healthz` · compose 헬스체크 · `unless-stopped` |
+| REQ-N-034 | 세 환경 동일 compose | 완료 | `compose.yaml` + override 1개 + 환경 변수 |
+| REQ-N-036 | 기본값 거부 권한 레이어 | 완료 | `apps/core/access.py` — ▲ 1차 공개 4경로 등록, 미등록 경로는 거부 |
+| REQ-N-037 | 알림 메일 체계 | ▲ 완료(1차 1종) | `apps/mailer/*` + `kind=inquiry_notify`·`rate_limit_alert`. 발송 로그·재시도·실패 기록 포함 |
+| REQ-N-024 | 지도 화면 캡처 금지 | ▲ 완료 | 대체 영역은 CSS `repeating-linear-gradient` 격자다. **이미지 파일 0건** |
+| REQ-N-032·033·038·039·040 | 백업·배포/롤백·파기·스테이징 | 미착수 | 작업 12 |
 
 ---
 
 ## 3. 화면별 구현 현황 (SCR ID ↔ 페이지 파일)
 
-| SCR ID | 화면 | 상태 | 구현 파일 | 디자인 명세와 차이 (사유) |
-|---|---|---|---|---|
-| — (공통) | 헤더·푸터·고정 바·스킵 링크 | **완료** | `templates/base.html` · `partials/{header,footer,fixed_bar,skip_link,noscript,meta,jsonld_localbusiness}.html` | 없음. CMP-005 는 디자인 시스템 정본대로 **`<details>` 기반**이고 `aria-expanded` 를 수동 부착하지 않았다 |
-| SCR-001 | 메인 | **부분(뼈대)** | `templates/pages/home.html` · `static/css/pages/home.css` · `apps/core/views.home` | ① 7섹션 구조·조건부 렌더 구현. ② **Hero 문구·강점·수업 유형·강사 데이터가 미수령이라 실제 렌더는 "최소 구성"보다 적은 4섹션**(Hero·위치 요약·문의 안내·전환)이다 — 페이지 디자인 §2.3 의 "미수령 시 섹션 미렌더" 규칙을 그대로 따른 결과다(§6 #1) |
-| SCR-008 | 404 | **완료** | `templates/errors/404.html` | 실제 404 + `noindex` |
-| SCR-009 | 공용 오류·점검 | **부분** | `templates/errors/500.html` · `deploy/nginx/maintenance.html` | 앱 다운 상태에서의 nginx `error_page` 동작 확인은 작업 12 |
-| SCR-002 · 003 · 006 | 강사 소개 · 오시는 길 · 처리방침 | **미착수** | — | 작업 5·6·7·9. 현재 `/instructors`·`/location`·`/privacy` 는 **404**이며 공개 경로표(`apps/core/access.py`)에 주석으로 자리를 남겨 두었다 |
+| SCR ID | 화면 | URL | 상태 | 구현 파일 | 디자인 명세와 차이 (사유) |
+|---|---|---|---|---|---|
+| — (공통) | 헤더·푸터·고정 바·스킵 링크·메타 | — | 완료 | `templates/base.html` · `partials/*` | ▲ `<link rel="icon">`(ico)·`apple-touch-icon` 추가. `og:image` 는 **래스터 미보유라 태그를 빼고 빌드**(§7) |
+| SCR-001 | 메인 | `/` | 부분(뼈대) | `pages/home.html` | 문구·데이터 미수령으로 현재 4섹션만 렌더(v0.1과 동일) |
+| SCR-002 | 요가 강사 소개 | `/instructors` | ▲ **완료(데이터 대기)** | `pages/instructors.html` · `css/pages/instructors.css` | 강사 0명이라 **현재는 CMP-026 빈 상태**만 보인다. 1·2·3·12명 레이아웃은 테스트로 검증했다. 경력 접기는 **항목 4개 이상**을 기준으로 접는다(디자인의 "3줄 초과"를 렌더 줄 수 대신 항목 수로 근사 — §6 #3) |
+| SCR-003 | 오시는 길 + 문의 폼 | `/location`(`#contact`) | ▲ **완료(값 대기)** | `pages/location.html` · `css/pages/location.css` · `css/components/form.css` · `js/map.js` · `js/form.js` | 지도 임베드 URL·주소·전화가 `[TBD]` 라 **지도 버튼·정보 행·길찾기·주소 복사·전화 링크가 전부 미노출**이다(설계대로). 고정 바는 **S3 미노출**, 헤더 주 CTA 는 **H3 미노출** — 목업의 기본 상태와 같다 |
+| SCR-006 | 개인정보 처리방침 | `/privacy` | ▲ **완료(본문 대기)** | `pages/privacy.html` · `css/pages/privacy.css` · `content/privacy.yml` | 이 화면에만 있는 패턴 2가지 구현 — ⓐ `≥1024px` 좌 240px sticky 목차 + 우 720px 본문 ⓑ `<768px` 표 → 카드 전환(`data-label`). **JS 없이 동작**(`<details>`) |
+| SCR-008 | 404 | 없는 경로 | ▲ 완료 | `errors/404.html` · `css/pages/error.css` | 대형 "404" 장식(`aria-hidden`) + 버튼 2 + 텍스트 링크 2 + 전화 콜아웃(전화 확정 시) |
+| SCR-009 | 공용 오류 | 5xx | ▲ 완료 | `errors/500.html` | 404 템플릿 재사용, `alert-triangle` 80px 로 심볼만 교체. 동적 데이터 비의존 |
+
+### 3.1 문의 폼 응답 형태 — 설계 §9.6 표와 구현 대조 (P5 기대값)
+
+| # | 상황 | 상태 코드 | 본문 | DB 저장 | 아웃박스 | 서버 기록 | 확인 방법 |
+|---|---|---|---|---|---|---|---|
+| ① | 정상 접수 | **200** | 성공 결과 블록(폼 교체) · `role="status"` · 포커스 이동 | **1건** | **1건**(`inquiry_notify`) | `INFO inquiry.created ref=<uuid>` | 자동 테스트 + curl(§4 #6) |
+| ② | 서버 검증 실패 | **200** | 오류 요약(`role="alert"`) + 항목별 `aria-invalid`, **입력값 보존·토큰 유지** | 0건 | 0건 | `INFO inquiry.invalid fields=[name,phone,consent]` | 자동 테스트 + curl(§4 #8) |
+| ③ | honeypot | **200** | **①과 동일 화면** | 0건 | 0건 | `WARNING inquiry.blocked reason=honeypot ip_hash=…` | 자동 테스트(동일성 비교) + curl(§4 #9) |
+| ④ | 빈도 제한 초과 | **429** | 실패(일반) + `Retry-After` | 0건 | 0건(임계 초과 시 `rate_limit_alert` 1건) | `WARNING inquiry.blocked reason=rate_limit ip_hash=… scope=form` | 자동 테스트 + curl(§4 #10, `Retry-After: 95` 관측) |
+| ⑤ | 토큰 재사용·만료 | **200** | **①과 동일 화면** | 0건(추가 없음) | 0건 | `INFO inquiry.duplicate token_state=used\|expired ref=…` | 자동 테스트 + curl(§4 #7) |
+| ⑥ | 서버 오류 | **500** | `errors/500.html`, 스택 트레이스 미노출 | 0건(롤백) | 0건(롤백) | `ERROR` + 트레이스(개인정보 없음) | 자동 테스트(예외 주입) |
+
+- **설계와 다른 점 0건.** 구현이 표를 벗어난 곳은 없다.
+- ③·⑤가 ①과 구분되는 유일한 증거는 **저장·발송 건수와 `key=value` 로그**다(설계 §9.6 · qa R2 #4). 로그 조회는 `docker compose … logs app`.
+- ④의 차단 지속: 10분 창 초과 → 창 잔여 시간 / 1일 초과 → 익일 00:00(Asia/Seoul), 둘 다면 늦은 쪽. `core_ratelimitcounter` 에는 **한도를 넘긴 창의 행에만** `blocked_until` 이 기록된다.
+
+### 3.2 REQ-N-023 ①(운영 배포 시 `[TBD]` 0건)과 REQ-F-050(1차에 `[TBD]` 표시)의 충돌 처리 — **판단 근거**
+
+| 항목 | 내용 |
+|---|---|
+| 충돌 | REQ-F-050 1차 수용 기준은 `/privacy` 에서 **"미확정 항목은 `[TBD]`로 보인다"** 를 요구하고, 페이지 디자인 §5.3 도 같다. 반면 REQ-N-023 ①은 **운영 배포 시점** `[TBD]` 0건을 요구한다 |
+| 해석 | 두 기준의 **시점이 다르다**. REQ-N-023 ①의 판정 시점은 "운영 배포 시점"(P7)이고, REQ-F-050 은 1차 구현 시점의 화면 요건이다. 따라서 **지금 `/privacy` 에 `[TBD]` 가 보이는 것은 요구사항 충족**이다 |
+| 장치 | 그대로 두면 오픈 시점에 새어 나갈 수 있으므로 **`manage.py check_release`** 를 만들었다. `content/privacy.yml` 에 `status: pending` 이 하나라도 남으면 **종료 코드 1** 로 끝난다. `manage.py check`(운영·스테이징)에서는 같은 사실을 `content.W001` 경고로 낸다 |
+| 왜 시스템 점검 Error 가 아닌가 | `migrate`·`collectstatic` 등 일반 명령이 함께 막혀 **배포 중간 단계에서 불투명하게 실패**한다. 배포 0단계에서 명시적으로 부르는 편이 devops 에게 낫다 |
+| devops 에게 요청 | `deploy.sh` 0단계(사전 점검)에 **`python manage.py check_release`** 를 넣는다. 스테이징은 `--warn-only`. 작업 12에서 우리가 작성할 스크립트에 반영 예정 |
 
 ---
 
 ## 4. 로컬 빌드 · 실행 확인 (2026-09-13)
 
 > **환경**: Windows 11 + Docker Desktop. `docker --version` = **24.0.2**, `docker compose version` = **v2.19.1**.
-> 모든 명령은 `developer/site/` 에서 실행했다. 아래는 **실제로 실행한 명령과 그 출력 요지**다.
+> 모든 명령은 `developer/site/` 에서 실행했다. 아래는 **이번 범위에서 실제로 실행한 명령과 출력 요지**다(1단계 28건은 v0.1 §4 참조).
 
-| # | 항목 | 명령 | 결과 요약 |
+| # | 항목 | 명령 | 결과 |
 |---|---|---|---|
-| 1 | 이미지 빌드(dev) | `docker compose -f compose.yaml -f compose.local.yaml build app` | **성공.** `python:3.13-slim` + `postgresql-client` + supercronic(sha1 검증) + pip 5개 |
-| 2 | pg_dump 동봉 확인 | `docker compose … run --rm --no-deps app pg_dump --version` | **`pg_dump (PostgreSQL) 17.11`** — 설계 §2.7 의 "클라이언트 17" 충족 |
-| 3 | 마이그레이션 생성 | `docker compose … run --rm app python manage.py makemigrations accounts content core mailer` | accounts(User)·content(3)·core(2)·mailer(1) **초기 마이그레이션 4개 생성** |
-| 4 | 마이그레이션 적용 | `docker compose … run --rm app python manage.py migrate --noinput` | **19개 마이그레이션 적용 OK** (커스텀 사용자 모델이 첫 마이그레이션에 포함) |
-| 5 | 시드 적재 | `docker compose … run --rm app python manage.py seed_content` | `seed_content 완료 created=11 updated=0 dry_run=False` |
-| 6 | 전체 기동 | `docker compose -f compose.yaml -f compose.local.yaml up -d` | **app·db·mail·scheduler·proxy 5개 컨테이너 기동.** `.env` 의 `COMPOSE_PROFILES=proxy` 로 **플래그 없이 프록시까지** 떴다(qa R2 #1) |
-| 7 | 상태 확인 | `docker compose … ps` | **5개 전부 `healthy`** (app / db / mail / proxy / scheduler) |
-| 8 | 앱 직접 응답 | `curl http://127.0.0.1:8000/` · `/healthz` | `200` · `200` |
-| 9 | 프록시 경유 응답 | `curl http://127.0.0.1:8080/` | `200` (본문 크기 앱 직접과 동일) |
-| 10 | 404 | `curl -o /dev/null -w %{http_code} …/no-such-page` (앱·nginx 양쪽) | **404 / 404** — `proxy_intercept_errors off` 동작 확인 |
-| 11 | 후행 슬래시 | `curl …/location/` | `301 → /location` (설계 §6.1) |
-| 12 | robots·sitemap | `curl …/robots.txt` · `/sitemap.xml` | `Disallow:` 0건 + `Sitemap:` 1줄 / `<loc>http://localhost:8000/</loc>`(= `SITE_BASE_URL` 기준) |
-| 13 | 보안 헤더 | `curl -I …/` | `Content-Security-Policy: default-src 'self' …` · `Permissions-Policy` · `X-Content-Type-Options: nosniff` · `Referrer-Policy` |
-| 14 | HTML 압축(주체 = nginx) | `curl -I -H 'Accept-Encoding: gzip' …:8080/` | `Content-Encoding: gzip` (앱 직접 `:8000` 은 비압축 — 설계 §12.3 #4 그대로) |
-| 15 | 정적 자산 | `curl` 9개 경로(css·js·woff2·svg) | **전부 200** |
-| 16 | 스케줄러 동작 | `docker compose … logs scheduler` | `job.finished job=send_outbox status=success detail=sent=0 failed=0 scanned=0` 이 **1분 주기로** 기록 |
-| 17 | 작업 실행 기록 | `psql -c "select job,status,detail from core_jobrunlog …"` | `send_outbox / success` 행 누적 확인 (시각은 Asia/Seoul) |
-| 18 | 메일 경로 전체 | `manage.py shell -c "enqueue(...)"` → `manage.py send_outbox` → Mailpit API | `send_outbox sent=1 failed=0`, **Mailpit 수신함에 1통 도착** 확인 |
-| 19 | 자동 테스트 | `manage.py test` (`config.settings.test`) | **Ran 9 tests … OK** |
-| 20 | 린트·포맷 | `ruff check .` / `ruff format .` | `All checks passed!` / 30파일 포맷 적용 |
-| 21 | 운영 이미지 빌드 | `docker compose -f compose.yaml -f compose.prod.yaml build app` | **성공.** `collectstatic` = **207개 복사 / 299개 후처리**, 이미지 태그 `yogapass-app:0.1.0-dev` + 라벨 `org.yogapass.keep=release` |
-| 22 | 운영 이미지 내용 | `docker run --rm … ls -a /app` | **`qa/`·`tests/`·`.env` 없음** (설계 §10.6 ② 구조적 제외) |
-| 23 | 이미지 비밀 정보 검색 | `docker run --rm … grep -rl '<로컬 DB 비밀번호>' /app` | **0건** (M-4 패턴) |
-| 24 | 운영 미리보기 기동 | `ENV_FILE=.env.prodcheck docker compose -f compose.yaml -f compose.prod.yaml -p yogapass-prodcheck up -d` | app·db·scheduler 기동, **app healthy**, DB 포트 **비게시**, `mail` **0건**(qa R2 #2 판정 지점) |
-| 25 | 운영 미리보기 응답 | `curl http://127.0.0.1:8001/` · `/healthz` · `/nope` | `200` · `200` · `404` (gunicorn) |
-| 26 | 정적 파이프라인 | `curl -I -H 'Accept-Encoding: br' …/static/css/tokens.<hash>.css` | **해시 파일명** + `Cache-Control: max-age=315360000, public, immutable` + `Content-Encoding: br` |
-| 27 | 운영 설정 자체 점검 | `manage.py check --deploy` (production 설정) | **경고 2건만** — `security.W005`(`includeSubDomains` 미설정) · `security.W021`(`preload` 미설정). **설계 §9.5 가 의도적으로 끈 항목**이며 다른 경고·오류는 0건 |
-| 28 | 미리보기 정리 | `docker compose … -p yogapass-prodcheck down -v` · `rm .env.prodcheck` | 볼륨·네트워크 제거, 임시 env 파일 삭제 |
+| 1 | 마이그레이션 생성 | `… exec app python manage.py makemigrations inquiry` | `apps/inquiry/migrations/0001_initial.py` · `+ Create model Inquiry` |
+| 2 | 마이그레이션 적용 | `… exec app python manage.py migrate --noinput` | `Applying inquiry.0001_initial... OK` |
+| 3 | 시드 재적재 | `… exec app python manage.py seed_content` | `created=9 updated=11` (오시는 길·지도·보관 기간 키 9개 추가) |
+| 4 | 화면 상태 코드(앱) | `curl -o /dev/null -w %{http_code}` × 5 | `/` 200 · `/instructors` 200 · `/location` 200 · `/privacy` 200 · `/nope` **404** |
+| 5 | 화면 상태 코드(nginx 경유) | 같은 5경로 `:8080` | **동일**(200·200·200·200·404) — `proxy_intercept_errors off` 유지 |
+| 6 | **폼 ① 정상 접수** | `curl -X POST /location` (CSRF+토큰 동봉) | `status=200` + "문의가 접수되었습니다." |
+| 7 | **폼 ⑤ 토큰 재사용** | 같은 토큰으로 재전송 | `status=200` + 성공 화면, **DB 증가 없음** |
+| 8 | **폼 ② 검증 실패** | 이름 공백·전화 `010-12`·동의 없음 | `status=200` + "입력 내용을 확인해 주세요" |
+| 9 | **폼 ③ honeypot** | `company_ref=http://spam.example` | `status=200` + 성공 화면, **DB·아웃박스 증가 없음** |
+| 10 | **폼 ④ 빈도 제한** | 같은 출처로 연속 제출(창 5회 초과) | `try1 200 / try2·3·4 **429**` + `Retry-After: 95` + "문의를 접수하지 못했습니다." |
+| 11 | DB 건수 대조 | `psql -c "select count(*) from inquiry_inquiry" …` | 저장 2건(① + 제한 전 1건) / `mailer_outbox` `inquiry_notify` 2건 / `core_ratelimitcounter` `form`·`form_day` 각 1행 |
+| 12 | **UTF-8 왕복** | 퍼센트 인코딩 UTF-8 본문 POST → `psql` | `name=테스트 · message=수강료 문의` — 정상 저장 |
+| 13 | **nginx 경유 제출** | `:8080` 으로 ① 반복 | `status=200` + 성공 화면 (`TRUSTED_PROXY_COUNT` 경로 동작) |
+| 14 | **알림 메일 도달** | `… exec app python manage.py send_outbox` → Mailpit API | `send_outbox sent=1 failed=0`, 수신함에 **`[문의 접수] 강남 요가패스`** 도착(본문에 접수 일시·이름·연락처·문의 내용) |
+| 15 | 텍스트 압축 | `curl -I -H 'Accept-Encoding: gzip' :8080/{instructors,location,privacy}` | 3화면 모두 `Content-Encoding: gzip` (앱 직접 `:8000` 은 비압축 — 설계 §12.3 그대로) |
+| 16 | 새 정적 자산 | `curl` 10개 경로(css 5·js 2·img 2·icon 1) | **전부 200** |
+| 17 | 템플릿 주석 누출 점검 | `curl … | grep "{#"` | **0건**(아래 §6 #2 에 원인·조치) |
+| 18 | 린트·포맷 | `ruff check .` / `ruff format --check .` | `All checks passed!` / `64 files already formatted` |
+| 19 | 자동 테스트 | `manage.py test`(`config.settings.test`) | **Ran 48 tests … OK** |
+| 20 | 운영 이미지 빌드 | `docker compose -f compose.yaml -f compose.prod.yaml build app` | **성공** (`collectstatic` 포함, 태그 `yogapass-app:0.1.0-dev`) |
+| 21 | 운영 미리보기 기동 | prod 이미지 + gunicorn, `:8001` | 4화면 **200** · `/nope` **404** · `/healthz` **200** |
+| 22 | 운영 정적 파이프라인 | `curl -I -H 'Accept-Encoding: br' /static/css/components/form.<hash>.css` | `200` + `Cache-Control: max-age=315360000, public, immutable` + `Content-Encoding: br` |
+| 23 | 운영 설정 점검 | `manage.py check --deploy` (미리보기 컨테이너) | **오류 0건**. 경고는 `content.W001`(처리방침 미확정 — 의도) + HTTPS 관련 4건(`W004`·`W008`·`W012`·`W016` — **http 미리보기라 SSL 옵션을 끈 탓**이며 운영 `.env` 에서는 해제된다) |
+| 24 | **배포 사전 점검** | `manage.py check_release` | `check_release FAILED pending=11 …` + **종료 코드 1** (의도된 동작) · `--warn-only` 는 0 |
+| 25 | 파비콘·OG 래스터 | 아래 §7 (TKT-DSN-002) | `favicon.ico`(32+48) · `icon-192.png` · `icon-512.png` · `apple-touch-icon.png` 생성. **`og-image.png` 는 보류** |
+| 26 | 이미지 내용 | `docker run --rm --entrypoint sh yogapass-app:0.1.0-dev -c "ls /app"` | `qa/`·`tests/`·`.env` 없음(구조적 제외 유지) |
+| 27 | 정리 | 미리보기 컨테이너 중지 · 임시 env 파일 삭제 · 검증용 DB 행 삭제 | 로컬 DB 에 검증 데이터 0건 |
 
 **확인하지 않은 것(중요)**
 
 | 항목 | 사유 |
 |---|---|
-| Lighthouse 4지표 측정 | 측정 조건(M-1: 모바일 프리셋·3회 중앙값)을 만족할 브라우저 실행 환경이 이 작업 환경에 없다. **작업 11에서 수행**하고 결과를 이 문서에 추가한다 |
-| 실제 뷰포트(360/768/1280px) 렌더 확인 | 위와 동일. CSS 구간은 작성했으나 **눈으로 확인하지 않았다** |
-| Safari·iOS 실기기 | 설계 §10.5 대로 P5 구간. 관측 신호(`html[data-vk-fallback]`)만 구현했다 |
-| 백업·배포·롤백 스크립트 | 작업 12 범위. `deploy/crontab` 에도 **구현이 끝난 작업만** 등록했고 나머지는 주석으로 예약했다 |
+| Lighthouse 4지표 측정 | 측정 조건(M-1)을 만족할 브라우저 실행 환경이 없다. **작업 11** |
+| 실제 뷰포트 렌더(360/768/1024/1280px)·가로 스크롤·요소 겹침 | 위와 동일. CSS 구간은 작성했으나 **눈으로 확인하지 않았다** |
+| 브라우저에서의 JS 동작(카운터·blur 검증·전송 중·지도 로드·주소 복사 토스트) | **코드 경로만 작성**했고 브라우저 실행 확인은 못 했다. 서버 경로(JS 없음)는 curl 로 전부 확인했다 |
+| W3C HTML 검사 · 축 기반 접근성 자동 점검 | 도구 미설치. 작업 13·P5 |
+| Safari·iOS 실기기 | 설계 §10.5 대로 P5 구간 |
+| 지도 실제 임베드·길찾기 동작 | 지도 서비스·URL 미확정(T-E). 값이 오면 코드 변경 없이 동작한다 |
 
 ---
 
 ## 5. 자체 테스트
 
-| 항목 | 방법 | 결과 |
+| 파일 | 건수 | 내용 |
 |---|---|---|
-| 주요 페이지 렌더링 | `curl` + 자동 테스트 | `/` 200 · `/healthz` 200 · 없는 경로 404 · `/location/` 301 — **통과** |
-| 공통 레이아웃 규칙 | 자동 테스트 `tests/test_smoke.py` | **h1 1개 · `<main id="main" tabindex="-1">` · skip link 존재 · 렌더 HTML 에 `TBD` 0건** — 통과 |
-| CTA 상태 판정(G-6·G-7) | 자동 테스트 (H1/H2/H3 × S1/S2/S3 4조합) | 통과. 전화 미확정 시 **좌측 버튼 미렌더 + 우측 전폭**, 자기 참조 화면은 **바 미노출** |
-| 식별자 규칙(§5.5) | 자동 테스트 | `YP-XXXX-XXXX` 형식 + **1,000건 생성 중복 0건** (I·L·O·U 제외 문자 집합) |
-| 보안 헤더 | 자동 테스트 + `curl -I` | CSP·nosniff 통과 |
-| 메일 경로 | 실제 발송 → Mailpit | 통과(§4 #18) |
-| 반응형 (360/768/1280) | — | **미확인** (§4 "확인하지 않은 것") |
-| 콘솔 에러 | — | **미확인** (브라우저 미실행) |
-| 린트 | `ruff check .` | 통과 |
+| `tests/test_smoke.py` | 9 | URL·상태 코드·공통 레이아웃·CTA 상태(H1~H3/S1~S3)·식별자 규칙·보안 헤더 |
+| ▲ `tests/test_pages.py` | 19 | 화면 공통 규칙(h1 1개·랜드마크·canonical·OG·sitemap·robots·**템플릿 주석 누출 0**) · SCR-002 인원 경계값 · 경력 접기 · SCR-006 목차 11항목·표 라벨·`<details>` · 404·500 · 전화 확정 전후 렌더 · **배포 사전 점검** |
+| ▲ `tests/test_inquiry.py` | 20 | **응답 형태 6종 전건** + 경계값 + 아웃박스 본문 + 사용량 알림 + honeypot 화면 동일성 + 필수 표시 3중 + 동의 문구 + `<noscript>` + 지도 버튼 조건부 렌더 |
+| **합계** | **48** | `manage.py test` **전건 통과** |
+
+- 린트: `ruff check .` 통과(규칙 `E,F,W,I,UP,B,DJ,S`).
+- 정적 자산 크기(참고): 페이지 CSS brotli 합계 **약 12KB**, 폰트 선언 `fonts.css` brotli **10.3KB**, JS 합계 **13KB(비압축, 4파일)**. 최종 측정은 작업 11.
 
 ---
 
@@ -152,33 +206,53 @@ updated: 2026-09-13
 
 | # | 내용 | 영향 | 계획 |
 |---|---|---|---|
-| 1 | **메인 화면에 넣을 문구·데이터가 대부분 `[TBD]`** (Hero 헤드라인/서브카피 T-G, 강점 3~4 T-G, 강사 T-C, 수업 유형 T-D, 주소·전화·운영시간 T-E) | 현재 SCR-001 은 **4섹션만 렌더**된다. 화면 골격·조건부 렌더는 검증 가능하지만 **디자인 검토(P4-④)에서 "실제로 보이는 화면"이 목업과 달라 보인다** | 값이 오면 `content/*.yml` 수정 + `seed_content` 1회로 반영된다(코드 변경 없음). **문구를 지어내지 않았다**(CLAUDE.md §8). 수령 일정은 pmo 추적 항목 |
-| 2 | **폰트 폴백 메트릭(`size-adjust`·`ascent-override`·`descent-override`)이 잠정값** | 웹폰트 로드 전후 레이아웃 이동(CLS)이 남을 수 있다 | 작업 11에서 360/768/1280px 실측 → 1% 단위 조정 → **designer 1회 확인**. 측정표를 이 문서에 첨부한다(페이지 디자인 D-7) |
-| 3 | `requirements.txt` 가 **버전 고정까지만**이고 해시 고정(`--require-hashes`)은 아직 아니다 | 공급망 무결성 검증이 한 단계 약하다 | 작업 12에서 `requirements.lock` 추가 |
-| 4 | 실제 브라우저 렌더·Lighthouse·실기기 확인 미수행 | 반응형·성능·접근성 **판정 불가** 상태 | 작업 10·11 + P5 |
-| 5 | `backup` compose 프로필은 정의만 되어 있고 **동작하지 않는다**(`manage.py run_backup` 미구현) | `.env.example` 기본값을 `COMPOSE_PROFILES=proxy` 로 두었다(설계 v0.3 §3.2.1 에 사유 기재) | 작업 12 완료 시 `proxy,backup` 으로 바꾼다 |
-| 6 | **운영 의존성이 5개 → 6개**로 늘었다(PyYAML) | 설계 §2.1 ⑤(의존성 최소)의 근거가 약간 약해진다 | 시드 파일 형식(YAML)을 설계가 이미 확정했으므로 채택했고 **§2.7 표에 반영**했다. JSON 전환 시 제거 가능 |
-| 7 | `deploy/nginx/yogapass-prod.conf.sample` · `yogapass-stg.conf.sample` 미작성 | devops 가 배포 계획서를 쓸 때 필요한 입력 | 작업 12. **`local.conf` 가 같은 지시어 집합의 선행본**이라 옮겨 쓰면 된다 |
+| 1 | 브라우저 실행 확인(반응형·JS 동작·Lighthouse)이 **전부 미수행** | 반응형·성능·클라이언트 상호작용 **판정 불가** | 작업 11 + P5. 이번 보고서에서 "완료"로 적지 않았다 |
+| 2 | ▲ **(수정 완료)** Django 템플릿의 여러 줄 `{# … #}` 주석이 **HTML 로 그대로 출력되고 있었다**(1단계부터 전 화면) | 렌더 HTML 에 내부 주석·설계 근거가 노출. 유효성·용량·정보 노출 문제 | 전 템플릿을 `{% comment %}` 로 교체하고 **재발 방지 테스트**(`test_no_page_leaks_template_comments`)를 넣었다. README §9 에도 적었다 |
+| 3 | ▲ 강사 경력 접기 기준을 디자인의 **"3줄 초과"** 대신 **"항목 4개 이상"** 으로 구현 | 실제 줄 수는 카드 폭·글자 길이에 따라 달라진다 | 줄 수 판정은 JS 실측이 필요해 **JS 비활성에서 동작하지 않는다**. 디자인 검토에서 designer 확인을 받는다 |
+| 4 | ▲ 앵커 칩·처리방침 목차의 **현재 위치(`aria-current`) 표시 미구현** | 디자인 명세의 선택 항목(§4.1·§5.4 "JS, 선택") | 스크롤 스파이 JS 가 필요하다. 작업 11 이후 여유가 있으면 추가 |
+| 5 | ▲ CMP-029 "맨 위로"(Could) 미구현 | 긴 문서(`/privacy`) 편의 저하 | Could 항목. 작업 11 이후 판단 |
+| 6 | ▲ **`og-image.png` 미생성** — OG 이미지 태그가 빠진 채 빌드된다 | 링크 공유 시 대표 이미지 없음 | §7 참조. Pretendard 설치 환경이 필요하다 |
+| 7 | ▲ `submit_token` 만료(24시간)는 **저장 없이 성공 화면**을 돌려준다(설계 §9.6 ⑤ 그대로) | 폼을 24시간 이상 열어 둔 이용자의 제출이 조용히 버려진다 | 설계가 정한 동작이라 그대로 구현했다. **만료 시간을 늘릴지 / ⑤를 재렌더로 바꿀지**는 설계 개정 사항으로 qa·planner 의견을 받고 싶다(§8) |
+| 8 | 폰트 폴백 메트릭 잠정값 · `requirements.lock` 미도입 · nginx 운영 샘플 미작성 | v0.1 #2·#3·#7 그대로 | 작업 11·12 |
+| 9 | 지도·주소·전화·강사·처리방침 본문이 전부 `[TBD]` | **현재 화면 대부분이 "값 없음" 상태로 보인다** — 디자인 검토 시 목업과 달라 보인다 | 코드 변경 없이 `content/*.yml` 수정(+`seed_content`)으로 반영된다. 수령 일정은 pmo 추적(T-C·T-E·T-F·T-G) |
 
 ---
 
-## 7. 검증팀 전달 사항
+## 7. TKT-DSN-002 (파비콘·OG 래스터) 처리 결과
 
-- **실행 방법**: `developer/site/README.md` (설치 → 기동 → 자주 쓰는 명령 → 운영 빌드 미리보기 순)
-- **지금 검증할 수 있는 것**: 환경 구성(REQ-N-034) · 기동/헬스체크(REQ-N-031) · 404 실제 상태 코드(REQ-F-060) · robots/sitemap · 보안 헤더 · 비밀 정보 분리(REQ-N-018) · 콘텐츠 시드 반영 절차(REQ-F-021·064) · **판정용 로그 형식**(설계 §9.6 — `key=value`)
-- **아직 검증할 수 없는 것**: 문의 폼 6종 응답(작업 7) · 메일 알림 본문(작업 8) · 처리방침·오시는 길(작업 6·9) · 백업/배포/롤백(작업 12) · **검증 지원 도구 ①~⑪ 전부(작업 13)**
-- **테스트 데이터·계정**: 시드 데이터는 `content/*.yml` 이며 **강사·수업 유형은 0건**(실데이터 미수령). 관리자 계정은 `manage.py createsuperuser` 로 각자 만든다 — **저장소에 계정 값을 두지 않는다**
-- **주의**: `QA_TOOLS_ENABLED` 는 기본 `0`이고, `1` + `DJANGO_ENV=production` 조합은 **기동을 거부**한다(확인 완료: 설정 모듈에서 `ImproperlyConfigured`)
+| 산출물 | 결과 | 크기 |
+|---|---|---|
+| `favicon.ico` (32+48 멀티사이즈) | ✅ 생성 | 13.9KB |
+| `icon-192.png` | ✅ 생성 | 3.1KB |
+| `icon-512.png` | ✅ 생성 | 8.8KB |
+| `apple-touch-icon.png` (180) | ✅ 생성 | 3.0KB |
+| `og-image.png` (1200×630) | ❌ **보류** | — |
+
+- 변환은 **일회용 컨테이너**에서 했다(틀·프로젝트에 도구를 설치하지 않았다):
+  `docker run --rm -v …:/in -v …:/out alpine:3.20 sh -c "apk add --no-cache rsvg-convert imagemagick && rsvg-convert -w 192 -h 192 /in/icon-master-512.svg -o /out/icon-192.png … && magick /tmp/f32.png /tmp/f48.png /out/favicon.ico"`
+- 산출물 위치: `developer/site/static/img/`. `base.html` 에 `<link rel="icon" …ico>` · `<link rel="apple-touch-icon" …>` 를 추가했다.
+- **`og-image.png` 보류 사유**: 원본 `og-image.svg` 는 `font-family: Pretendard` 로 조판돼 있고, 우리가 가진 Pretendard 는 **`unicode-range` 분할 woff2 서브셋**뿐이라 fontconfig 가 로드하지 못한다. 폴백 폰트로 구우면 글자 폭이 달라져 **좌우 96px 여백을 넘을 수 있다**(티켓이 경고한 바로 그 상황)고 판단했고, 육안 확인 수단도 없다. 티켓의 방침 ②대로 **placeholder 를 만들지 않고 `og:image` 계열 태그를 빼고 빌드**했다. 파일이 `static/img/og-image.png` 에 놓이면 **코드 변경 없이** 태그 5줄(`og:image`·width·height·alt·`twitter:card`)이 붙는다(`apps/core/context_processors._og_image`).
+- **designer 에게 알릴 사항 1건(결함)**: `design/assets/favicon.svg` 는 **XML 로 파싱되지 않는다.** 6행 주석 안의 `--color-primary` 가 XML 주석 규칙(연속 하이픈 금지)을 어긴다. 브라우저는 `image/svg+xml` 을 XML 로 파싱하므로 **파비콘이 표시되지 않는다.** 우리 사본(`static/img/favicon.svg`)은 문구를 고쳐 해소했고 변환도 그 사본으로 했다. **원본 수정은 designer 소관**이라 티켓 처리 결과에 적었다.
 
 ---
 
-## 8. 발행·처리한 티켓
+## 8. 검증팀 전달 사항
+
+- **실행 방법**: `developer/site/README.md` (설치 → 기동 → 자주 쓰는 명령 → 화면·콘텐츠 표 → 운영 빌드 미리보기)
+- **지금 검증할 수 있는 것**: 1차 6화면 전부 · **문의 폼 응답 형태 6종**(§3.1 이 기대값) · SEO(메타·canonical·sitemap·robots·JSON-LD) · 접근성 마크업(랜드마크·라벨·오류 요약·포커스 이동·색 외 병기) · **JS 비활성 동작**(브라우저 JS 끄기 또는 curl) · 콘텐츠 시드 반영 절차 · 빈도 제한과 복귀(`QA_CLOCK_OFFSET_SECONDS`)
+- **아직 검증할 수 없는 것**: 성능·Lighthouse(작업 11) · 백업/배포/롤백(작업 12) · **검증 지원 도구 ①~⑪ 전부**(작업 13) · 지도 실제 동작(T-E)
+- **판정용 로그 조회**: `docker compose -f compose.yaml -f compose.local.yaml logs app` — `inquiry.created` / `inquiry.invalid` / `inquiry.blocked reason=…` / `inquiry.duplicate token_state=…`
+- **빈도 제한 조정**: `.env` 의 `RATE_LIMIT_FORM_WINDOW_MAX`·`RATE_LIMIT_FORM_DAY_MAX` 로 낮춘다. 사용량 알림 임계는 `QA_TOOLS_ENABLED=1` 일 때만 `QA_RATE_LIMIT_ALERT_*` 로 낮아진다
+- **의견을 받고 싶은 것 2건**: ⓐ §6 #7(토큰 만료 시 조용한 성공) 처리 방침 ⓑ §6 #3(경력 접기 기준을 항목 수로 근사)
+
+---
+
+## 9. 발행·처리한 티켓
 
 | ID | 내용 | 상태 |
 |---|---|---|
-| — | 이번 작업에서 발행한 티켓 없음 | — |
-
-> 설계 v0.3 §16 Q-10(REQ-N-039 증거 초안 10-14 제공) 티켓은 **qa·devops 양측 동의를 R2 에서 받았으므로 오케스트레이터 경유로 발행 예정**이다(이번 작업 범위 밖).
+| TKT-DSN-002 | 파비콘·OG 래스터 변환 요청 | **부분 처리** — 래스터 4종 생성, `og-image.png` 보류(사유 기재) + `favicon.svg` XML 오류 1건 회신 (§7) |
+| — | 이번 작업에서 신규 발행한 티켓 없음 | — |
 
 ---
 
@@ -186,4 +260,5 @@ updated: 2026-09-13
 
 | 버전 | 일자 | 작성자 | 내용 | 관련 리뷰/CR |
 |---|---|---|---|---|
-| 0.1 | 2026-09-13 | developer | 최초 작성(초안) — 구현 1단계(작업 1~3 + SCR-001 뼈대) 결과와 **실행 명령 28건의 확인 결과** 기록. 미확인 항목(Lighthouse·실뷰포트·실기기·백업/배포)을 명시적으로 분리 | `shared/reviews/P4a_tech-design_devops_r2.md`, `shared/reviews/P4a_tech-design_qa_r2.md` |
+| 0.2 | 2026-09-13 | developer | **구현 2단계** — 1차 6화면 완성(SCR-002·003·006 신규, 008·009 디자인 반영) · **문의 폼과 응답 형태 6종**(§3.1) · 빈도 제한·사용량 알림 · SEO/접근성/`<noscript>` 마감 · 파비콘 래스터 4종(TKT-DSN-002) · **템플릿 주석 누출 결함 수정** · 자동 테스트 9 → 48건 | TKT-DSN-002 |
+| 0.1 | 2026-09-13 | developer | 최초 작성(초안) — 구현 1단계(작업 1~3 + SCR-001 뼈대)와 실행 명령 28건의 확인 결과 | `shared/reviews/P4a_tech-design_devops_r2.md`, `shared/reviews/P4a_tech-design_qa_r2.md` |

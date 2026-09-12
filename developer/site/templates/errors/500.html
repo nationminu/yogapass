@@ -1,15 +1,24 @@
-{% extends "base.html" %}
-{# SCR-009 공용 오류 화면 — 전용 화면이며 폼 화면이 아니다. noindex. #}
+{% extends "base.html" %}{% load static icons %}
+{% comment %} SCR-009 공용 오류 화면 — SCR-008 템플릿을 재사용하고 문구·심볼만 바꾼다(페이지 디자인 §7).
+   ⚠ DB 장애 상태에서도 렌더되어야 하므로 **동적 데이터에 의존하지 않는다**.
+     전화 링크·헤더 주 CTA 처럼 데이터가 필요한 요소는 값이 없으면 그대로 빠진다.
+     스택 트레이스·내부 경로·버전을 화면에 출력하지 않는다. {% endcomment %}
+{% block page_css %}<link rel="stylesheet" href="{% static 'css/pages/error.css' %}">{% endblock %}
 {% block content %}
-  <section class="sec">
-    <div class="wrap" style="text-align:center">
-      <h1>일시적인 오류가 발생했습니다</h1>
-      <p class="muted" style="margin-top:var(--space-4)">
-        잠시 후 다시 시도해 주세요. 문제가 계속되면 문의해 주세요.
-      </p>
-      <div class="cta-row" style="justify-content:center">
-        <a class="btn btn-lg btn-p" href="/">홈으로 가기</a>
+  <section class="sec errpage">
+    <div class="wrap">
+      <p class="err-mark err-mark-icon" aria-hidden="true">{% icon "alert-triangle" "err-icon" %}</p>
+      <h1>일시적으로 문제가 발생했습니다</h1>
+      <p class="lead">잠시 후 다시 시도해 주세요. 급하신 경우 전화로 문의해 주세요.</p>
+      <div class="cta-row">
+        <a class="btn btn-lg btn-p" href="/">홈으로</a>
       </div>
+      {% if has_phone %}
+        <div class="callout callout-sec">
+          {% icon "info" %}
+          <span>전화 문의 <a href="{% tel_href site_phone %}">{{ site_phone }}</a></span>
+        </div>
+      {% endif %}
     </div>
   </section>
 {% endblock %}

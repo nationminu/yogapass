@@ -11,16 +11,15 @@ import re
 # 1차 공개 경로 (정규식, 경로 전체 일치)
 PUBLIC_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"^/$"),
+    re.compile(r"^/instructors$"),
+    re.compile(r"^/location$"),
+    re.compile(r"^/privacy$"),
     re.compile(r"^/healthz$"),
     re.compile(r"^/robots\.txt$"),
     re.compile(r"^/sitemap\.xml$"),
     re.compile(r"^/favicon\.ico$"),
     re.compile(r"^/static/.*$"),
     re.compile(r"^/media/.*$"),
-    # 이후 작업에서 열리는 화면 (작업 5~9)
-    # re.compile(r"^/instructors$"),
-    # re.compile(r"^/location$"),
-    # re.compile(r"^/privacy$"),
 ]
 
 

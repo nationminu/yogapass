@@ -52,3 +52,11 @@ def nav_items(current_path: str) -> list[dict]:
         is_current = base == current_path and "#" not in url
         items.append({"label": label, "url": url, "is_current": is_current})
     return items
+
+
+def all_instructors() -> list[Instructor]:
+    """SCR-002 전체 목록 — 비활성 강사는 공개 목록에서 제외한다(REQ-F-020)."""
+    try:
+        return list(Instructor.objects.filter(is_active=True))
+    except DatabaseError:
+        return []

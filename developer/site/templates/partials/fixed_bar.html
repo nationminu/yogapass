@@ -1,6 +1,6 @@
 {% load icons %}
-{# CMP-007 Bottom Fixed Bar — 노출 구간 <1280px 는 CSS 가 제어한다.
-   S3(자기 참조 + 대표 전화 미확정)에서는 요소 자체를 렌더하지 않는다. #}
+{% comment %} CMP-007 Bottom Fixed Bar — 노출 구간 <1280px 는 CSS 가 제어한다.
+   S3(자기 참조 + 대표 전화 미확정)에서는 요소 자체를 렌더하지 않는다. {% endcomment %}
 {% if cta.show_bar %}
 <div class="barwrap">
   <div class="bar{% if not cta.bar_two_up %} bar-full{% endif %}">

@@ -1,0 +1,70 @@
+{% extends "base.html" %}{% load static icons %}
+{% comment %} SCR-002 요가 강사 소개 (페이지 디자인 §3)
+   · 인원 0·1·2·3·12명에서 빈 칸이 생기지 않는다 — 열 수를 인원에 맞춘다(§3.2).
+   · 사진은 1차에 0장이다. 이니셜 아바타는 장식이므로 aria-hidden 이고 대체 텍스트를 주지 않는다
+     (카드 안에 이름이 텍스트로 있다 — REQ-F-022). 인물 스톡 사진을 쓰지 않는다. {% endcomment %}
+{% block page_css %}<link rel="stylesheet" href="{% static 'css/pages/instructors.css' %}">{% endblock %}
+
+{% block content %}
+  <div class="wrap">
+    <div class="pagehead">
+      <h1>요가 강사 소개</h1>
+      <p class="lead">요가패스에서 수업을 진행하는 강사를 소개합니다.</p>
+    </div>
+  </div>
+
+  <section class="sec">
+    <div class="wrap">
+      {% if instructors %}
+        <ul class="grid {{ grid_class }} card-list">
+          {% for person in instructors %}
+            <li>
+              <article class="card card--instructor">
+                <div class="avatar" aria-hidden="true">{{ person.initial }}</div>
+                <div class="card-body">
+                  <h2 class="card-name">{{ person.name }}</h2>
+                  {% if person.classes %}
+                    <p class="role">{{ person.classes|join:" · " }}</p>
+                  {% endif %}
+                  {% if person.headline %}<p class="headline">{{ person.headline }}</p>{% endif %}
+                  {% if person.credentials %}
+                    <ul class="career">
+                      {% for line in person.credentials|slice:":3" %}<li>{{ line }}</li>{% endfor %}
+                    </ul>
+                    {% if person.credentials|length > 3 %}
+                      {% comment %} 경력이 길면 접는다(페이지 디자인 §3.1). <details> 라서 JS 없이 동작하고
+                         펼침 상태는 브라우저가 aria-expanded 로 노출한다 — 수동 부착하지 않는다. {% endcomment %}
+                      <details class="more">
+                        <summary><span class="more-open">더 보기</span><span class="more-close">접기</span></summary>
+                        <ul class="career">
+                          {% for line in person.credentials|slice:"3:" %}<li>{{ line }}</li>{% endfor %}
+                        </ul>
+                      </details>
+                    {% endif %}
+                  {% endif %}
+                  {% if person.bio %}<p class="bio">{{ person.bio }}</p>{% endif %}
+                </div>
+              </article>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        {% include "components/empty_state.html" with empty_icon="list" empty_title="강사 소개는 공개되면 안내드립니다." empty_body="자세한 내용은 전화로 문의해 주세요." %}
+      {% endif %}
+    </div>
+  </section>
+
+  {# 하단 전환 블록 (CMP-025) — 1차 문구 #}
+  <section class="band">
+    <div class="wrap">
+      <h2>마음에 드는 수업이 있으신가요?</h2>
+      <p>궁금한 점을 남겨주시면 강사와 일정을 안내해 드립니다.</p>
+      <div class="cta-row">
+        <a class="btn btn-lg btn-p" href="{{ cta.contact_url }}">문의하기</a>
+        {% if has_phone %}
+          <a class="btn btn-lg btn-s" href="{% tel_href site_phone %}">{% icon "phone" %}전화 문의</a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+{% endblock %}

@@ -14,6 +14,32 @@
 
 ---
 
+
+## 2026-09-13 · P4 · 구현 2단계 (나머지 화면 + 문의 폼)
+- 요청: 오케스트레이터가 구현 2단계를 지시했다(설계 §11.1 작업 4~9 수준). ① 나머지 1차 화면 — SCR-002 강사 소개 / SCR-003 오시는 길(지도 클릭 투 로드) / SCR-006 처리방침 / SCR-008 404 / SCR-009 오류 ② **문의 폼** — 설계 §9.6 응답 형태 6행 × 5열을 그대로 구현 ③ JS 비활성 대응 ④ SEO·메타 ⑤ 접근성 ⑥ 화면별 예외·상태. 더불어 TKT-DSN-002(파비콘·OG 래스터) 처리. PM 방침은 "최대한 빨리".
+- 수행:
+  - **먼저 읽었다**: 설계 §5.1·§5.3·§6·§9.1~9.6·§11.1, 요구사항 REQ-F-020~065·REQ-N-019·020·023·028~030, 화면정의서 SCR-002·003·006·008·009, 페이지 디자인 §3~§7, 디자인 시스템 CMP-015~030, 목업 3종. **수치·문구는 목업과 명세에서 그대로 옮겼고 토큰 값은 건드리지 않았다.**
+  - **문의 폼(작업 7·8)** — 새 앱 `apps/inquiry`(모델·폼·서비스)와 `apps/core/ratelimit.py` 를 만들었다. 설계 §9.6 표를 **모듈 docstring 에 그대로 붙여 놓고** 그 순서대로 분기를 짰다(빈도 제한 → honeypot → 서버 검증 → 토큰 → 저장). 판정의 근거가 되는 로그는 `key=value` 로 고정했다(qa R2 #4).
+    - 중복 제출 방지는 **서명된 1회용 토큰 + `inquiry_inquiry.submit_token` UNIQUE** 로 했다. 세션에 얹지 않은 이유는 JS 없이도, 쿠키 차단 상태에서도 같은 경로로 동작해야 하기 때문이다.
+    - 저장과 아웃박스 INSERT 를 **한 트랜잭션**에 넣어 ⑥(서버 오류)에서 둘 다 롤백되는 것을 예외 주입 테스트로 고정했다.
+    - 빈도 제한 차단 지속·`Retry-After` 는 §5.3 계산식대로 만들고, **`clock.now()` 를 쓰므로 `QA_CLOCK_OFFSET_SECONDS` 로 "429 → 대기 → 200 복귀" 를 테스트에서 재현**했다.
+    - 한도를 넘긴 창의 행에만 `blocked_until` 을 남기도록 고쳤다(처음에는 두 행 모두에 썼다가, qa 가 표를 보고 어느 창이 걸렸는지 판단할 수 없어 바꿨다).
+  - **SCR-003** — 지도는 클릭 투 로드이고 대체 영역 높이(272/320/400px)를 iframe 과 같게 고정했다. **임베드 URL 이 미확정(T-E)이면 버튼 자체를 렌더하지 않는다** — 눌러도 아무 일이 없는 버튼을 두지 않으려는 것이고, 화면에 오류도 내지 않는다(페이지 디자인 §4.5). 정보 7행은 확정된 행만 렌더하고 전부 없으면 빈 상태로 대체한다.
+  - **SCR-006** — 본문을 DB 에 넣지 않고 `content/privacy.yml` 을 화면이 직접 읽게 했다(설계 §6.2). 1차 테이블 목록에 없는 테이블을 늘리지 않으려는 것이고, 본문은 "문서 한 벌"이라 파일이 곧 단일 원본이면 충분하다. 표는 로더에서 (라벨, 값) 쌍으로 펼쳐 `<768px` 카드 전환에 쓰는 `data-label` 을 템플릿 인덱스 비교 없이 만들었다.
+  - **REQ-N-023 ① 과 REQ-F-050 의 충돌**을 판단했다. 두 기준은 **시점이 다르다**(오픈 시점 / 1차 구현 시점)고 보고 `/privacy` 에 `[TBD]` 를 남겼다. 대신 **`manage.py check_release`** 를 만들어 미확정 본문이 남으면 종료 코드 1 로 배포를 막는다. 처음에는 시스템 점검 Error 로 했다가, `migrate`·`collectstatic` 까지 함께 막혀 배포 중간에 불투명하게 실패하므로 **경고 + 전용 명령**으로 바꿨다.
+  - **결함 1건을 발견해 고쳤다** — Django 의 `{# … #}` 는 한 줄 전용인데 1단계부터 여러 줄로 쓰여 **주석이 전 화면 HTML 로 그대로 출력되고 있었다.** 전 템플릿을 `{% comment %}` 로 바꾸고 재발 방지 테스트를 넣었다. 같은 성격으로 `static/img/favicon.svg` 가 주석 안의 `--` 때문에 **XML 파싱 실패**(파비콘 미표시)라는 것도 확인해 사본을 고쳤다. 원본(`design/assets/favicon.svg`)은 designer 소관이라 티켓 회신에 적었다.
+  - **TKT-DSN-002** — 래스터 4종(`favicon.ico` 32+48 · `icon-192` · `icon-512` · `apple-touch-icon`)을 **일회용 alpine 컨테이너**(rsvg-convert·imagemagick)로 내보냈다. 틀·프로젝트에 변환 도구를 설치하지 않았다. `og-image.png` 은 **보류**했다 — 원본이 Pretendard 로 조판돼 있는데 우리가 가진 것은 `unicode-range` 분할 woff2 서브셋뿐이라 폰트를 로드할 수 없고, 폴백으로 구우면 티켓이 경고한 여백 초과가 날 수 있으며 육안 확인 수단도 없다. 티켓 방침 ②대로 **placeholder 없이 `og:image` 태그를 빼고 빌드**하고, 파일이 놓이면 코드 변경 없이 태그가 붙도록 했다.
+  - **실행 확인 27건**을 남겼다(개발 보고서 §4). 화면 5경로 × (앱·nginx) 상태 코드, **폼 6종 응답을 curl 로 재현**(이것이 곧 REQ-N-030 = JS 없는 제출의 증거다), UTF-8 왕복, 알림 메일 Mailpit 도달, 운영 이미지 빌드·gunicorn 기동·해시/brotli/immutable, `check --deploy`, `check_release` 종료 코드. **브라우저가 필요한 확인(반응형 실측·JS 동작·Lighthouse)은 하지 못했고 "미확인"으로 적었다.**
+  - 자동 테스트를 9건 → **48건**으로 늘렸다(폼 6종 전건 포함). `ruff check` 통과.
+- 산출물:
+  - `developer/site/` — `apps/inquiry/`(신규) · `apps/core/ratelimit.py`(신규) · `apps/content/privacy.py`·`checks.py`·`management/commands/check_release.py`(신규) · `templates/pages/{instructors,location,privacy}.html`(신규) · `templates/components/`(신규 3) · `templates/errors/{404,500}.html`(개정) · `static/css/components/form.css`·`static/css/pages/{instructors,location,privacy,error}.css`(신규) · `static/js/{form,map}.js`(신규) · 아이콘 8종 · 래스터 4종 · `content/privacy.yml`·`site.yml`(확장) · `tests/test_pages.py`·`test_inquiry.py`(신규)
+  - `developer/04_dev-report.md` **v0.2**
+  - `developer/site/README.md` 갱신(화면·콘텐츠 표, `check_release`, 템플릿 주석·SVG 주석 주의)
+- 티켓·리뷰: **TKT-DSN-002 처리 결과 기입**(부분 처리 — 래스터 4종 완료 / `og-image.png` 보류 사유 / `favicon.svg` XML 오류 회신). 신규 발행 없음
+- 이슈·다음 할 일:
+  - 작업 11(성능·폴백 메트릭 실측·Lighthouse) → 작업 12(운영 compose·배포/롤백·`run_backup`·nginx 샘플) → 작업 13(검증 지원 도구 ①~⑪) 순으로 이어간다.
+  - **의견이 필요한 2건**: ⓐ `submit_token` 만료(24시간) 시 저장 없이 성공 화면을 주는 설계 §9.6 ⑤ 의 동작 — 실제 이용자의 제출이 조용히 버려질 수 있다 ⓑ 강사 경력 접기 기준을 "3줄 초과" 대신 "항목 4개 이상"으로 근사한 것(줄 수 판정은 JS 실측이 필요해 JS 비활성에서 깨진다).
+  - 화면 대부분이 `[TBD]` 상태로 보인다(T-C·T-E·T-F·T-G). 디자인 검토 때 목업과 달라 보이는 것은 값 미수령 탓이며 코드 변경 없이 `content/*.yml` + `seed_content` 로 반영된다.
 ## 2026-09-13 · P4 · 반영 + 구현 (기술 설계 v0.3 · 구현 1단계)
 - 요청: 오케스트레이터가 두 가지를 함께 지시했다. ① R2 리뷰 2건(devops 조건부 승인 Should 3·Could 2 / qa 조건부 승인 Should 5·Could 2, **신규 Must 0건**)의 Should 반영 → 설계 v0.3 ② **구현 1단계 착수**(§11.1 작업 1~3: 스캐폴딩·compose·공통 레이아웃, 가능하면 SCR-001 뼈대). 두 팀 모두 R3를 요구하지 않아 반영 직후 구현에 들어갔다.
 - 수행:

@@ -1,7 +1,7 @@
 {% extends "base.html" %}{% load static icons %}
-{# SCR-001 메인 (페이지 디자인 §2)
+{% comment %} SCR-001 메인 (페이지 디자인 §2)
    · 섹션 2·3·4 는 데이터가 없으면 **섹션 태그 자체를 렌더하지 않는다**(빈 카드·자리표시자 금지).
-   · 값이 미확정인 행은 렌더하지 않는다(REQ-N-023). #}
+   · 값이 미확정인 행은 렌더하지 않는다(REQ-N-023). {% endcomment %}
 {% block page_css %}<link rel="stylesheet" href="{% static 'css/pages/home.css' %}">{% endblock %}
 
 {% block content %}

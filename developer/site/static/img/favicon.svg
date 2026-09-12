@@ -3,7 +3,7 @@
   <!--
     favicon.svg — 강남 요가패스 (designer 자체 제작, 2026-09-12)
     · 원본: assets/logo-yogapass-mark.svg (임시 로고 · Placeholder)
-    · 배경 투명. 색은 --color-primary #0B4F9E 고정값으로 굽는다(파비콘은 CSS 변수를 참조할 수 없다).
+    · 배경 투명. 색은 `color-primary` 토큰 #0B4F9E 고정값으로 굽는다(파비콘은 CSS 변수를 참조할 수 없다).
     · 다크 모드 탭 배경(#202124 계열)에서 7.99:1이 나오지 않으므로
       prefers-color-scheme: dark 에서 #FFFFFF 로 전환한다.
     · 16px 렌더 시 stroke = 4.5 × (16/48) = 1.5px → 획이 사라지지 않는다.

@@ -1,0 +1,66 @@
+{% extends "base.html" %}{% load static icons %}
+{% comment %} SCR-006 개인정보 처리방침 (페이지 디자인 §5)
+   · 본문 단일 원본은 content/privacy.yml 이다(기술 설계 §6.2).
+   · 이 화면에만 있는 패턴 2가지 — ⓐ ≥1024px 좌측 240px sticky 목차 + 우측 720px 본문 2단
+     ⓑ <768px 표 → 카드 전환(가로 스크롤 금지). 목차는 JS 없이 동작한다.
+   · 고객 확정 전 항목은 [TBD: 고객 확인 필요 — T-F] 로 보인다(REQ-F-050 1차 수용 기준).
+     미확정 상태로 운영 배포하면 manage.py check_release 가 막는다(REQ-N-023 ①). {% endcomment %}
+{% block page_css %}<link rel="stylesheet" href="{% static 'css/pages/privacy.css' %}">{% endblock %}
+
+{% block content %}
+  <div class="wrap">
+    <div class="pagehead">
+      <h1>개인정보 처리방침</h1>
+      {% if document.effective_date %}
+        <p class="date">시행일 {{ document.effective_date }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="doc">
+    <div class="wrap doc-grid">
+      {# CMP-028 TOC — <1024px 는 <details> 접이식, ≥1024px 는 좌측 sticky #}
+      <nav class="toc" aria-label="목차">
+        <details class="toc-d" open>
+          <summary>목차{% icon "chevron-down" "toc-caret" %}</summary>
+          <ol class="toc-list">
+            {% for item in document.toc %}
+              <li><a href="#{{ item.id }}">{{ item.title }}</a></li>
+            {% endfor %}
+          </ol>
+        </details>
+      </nav>
+
+      <div class="prose">
+        {% for section in document.sections %}
+          <h2 id="{{ section.id }}">{{ forloop.counter }}. {{ section.title }}</h2>
+          {% for block in section.body %}
+            {% if block.type == "p" %}
+              <p>{{ block.text }}</p>
+            {% elif block.type == "ul" %}
+              <ul>{% for line in block.items %}<li>{{ line }}</li>{% endfor %}</ul>
+            {% elif block.type == "table" %}
+              <div class="tbl-wrap">
+                <table class="tbl">
+                  {% if block.caption %}<caption>{{ block.caption }}</caption>{% endif %}
+                  <thead>
+                    <tr>{% for column in block.columns %}<th scope="col">{{ column }}</th>{% endfor %}</tr>
+                  </thead>
+                  <tbody>
+                    {% for row in block.labeled_rows %}
+                      <tr>
+                        {% for cell in row %}<td data-label="{{ cell.label }}">{{ cell.value }}</td>{% endfor %}
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% empty %}
+          {% include "components/empty_state.html" with empty_icon="list" empty_title="개인정보 처리방침은 확정되면 게시됩니다." empty_body="문의는 아래 연락처를 이용해 주세요." %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endblock %}

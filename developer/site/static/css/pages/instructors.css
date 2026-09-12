@@ -1,0 +1,39 @@
+/* SCR-002 요가 강사 소개 (페이지 디자인 §3) */
+
+.card-list { list-style: none; margin: 0; padding: 0; }
+
+/* 인원 수별 레이아웃 — 빈 칸 방치 금지(§3.2) */
+.g-1c { max-width: 420px; margin-inline: auto; }
+.g-2c { grid-template-columns: 1fr; }
+@media (min-width: 768px) {
+  .g-2c { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1280px) {
+  .g-1c { max-width: 480px; }
+  .g-2c { max-width: 800px; margin-inline: auto; }
+}
+
+.card--instructor .card-name { font-size: var(--fs-h3); line-height: var(--lh-h3); }
+.card--instructor .role {
+  margin-top: 4px; font-size: var(--fs-body-sm);
+  color: var(--color-primary); font-weight: var(--fw-bold);
+}
+.card--instructor .headline { margin-top: var(--space-2); font-size: var(--fs-body-sm); color: var(--color-ink); }
+.card--instructor .career {
+  margin-top: 10px; padding-left: 18px; font-size: var(--fs-body-sm); color: var(--color-muted);
+}
+.card--instructor .career li { margin-top: 4px; }
+.card--instructor .bio { margin-top: 10px; font-size: var(--fs-body-sm); color: var(--color-muted); }
+
+/* 경력 접기·펼치기 — JS 없이 동작한다(<details>). 펼침 상태는 브라우저가 알린다 */
+.more { margin-top: 6px; }
+.more > summary {
+  display: inline-flex; align-items: center; min-height: var(--touch-min);
+  color: var(--color-primary); font-size: var(--fs-body-sm); font-weight: var(--fw-bold);
+  cursor: pointer; list-style: none;
+}
+.more > summary::-webkit-details-marker { display: none; }
+.more .more-close { display: none; }
+.more[open] .more-open { display: none; }
+.more[open] .more-close { display: inline; }
+.more .career { margin-top: 0; }

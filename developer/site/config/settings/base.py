@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "apps.core",
     "apps.accounts",
     "apps.content",
+    "apps.inquiry",
     "apps.mailer",
 ]
 

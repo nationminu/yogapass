@@ -1,0 +1,17 @@
+/* SCR-008 404 · SCR-009 공용 오류 (페이지 디자인 §6·§7) */
+
+.errpage { border-bottom: 0; text-align: center; }
+.errpage .wrap { max-width: 560px; }
+.errpage .err-mark {
+  font-size: 64px; line-height: 1; font-weight: var(--fw-bold);
+  color: var(--color-border-strong); margin-bottom: var(--space-5);
+}
+.errpage .err-mark-icon { color: var(--color-warning); }
+.errpage .err-icon { width: 80px; height: 80px; }
+.errpage .lead { margin-top: var(--space-4); font-size: var(--fs-lead); color: var(--color-muted); }
+.errpage .cta-row { justify-content: center; margin-top: var(--space-6); }
+.errpage .err-links { display: flex; gap: var(--space-5); justify-content: center; margin-top: var(--space-5); }
+.errpage .err-links a { min-height: var(--touch-min); display: inline-flex; align-items: center; }
+.errpage .callout { margin-top: var(--space-7); text-align: left; }
+@media (min-width: 768px)  { .errpage .err-mark { font-size: 80px; } }
+@media (min-width: 1280px) { .errpage .err-mark { font-size: 96px; } }

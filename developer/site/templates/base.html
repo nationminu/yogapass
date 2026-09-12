@@ -20,8 +20,11 @@
   {% block page_css %}{% endblock %}
 
   <link rel="icon" href="{% static 'img/favicon.svg' %}" type="image/svg+xml">
+  <link rel="icon" href="{% static 'img/favicon.ico' %}" sizes="32x32">
+  <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
   <script defer src="{% static 'js/viewport.js' %}"></script>
   <script defer src="{% static 'js/menu.js' %}"></script>
+  {% block page_js %}{% endblock %}
 </head>
 <body{% if page_id %} data-page="{{ page_id }}"{% endif %}>
   {% include "partials/skip_link.html" %}

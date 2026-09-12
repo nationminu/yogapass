@@ -49,3 +49,6 @@
   .barwrap { position: static; }
   .hdr { position: static; }
 }
+
+/* 섹션 제목 기본 간격 (목업 .sec h2 margin-bottom 20px) */
+.sec > .wrap > h2 { margin-bottom: var(--space-5); }

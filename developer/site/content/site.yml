@@ -47,3 +47,41 @@ settings:
     value: null
     is_published: false
     note: "[TBD: T-G] 강점 3~4 항목(제목·설명·아이콘). 확정 전에는 섹션을 렌더하지 않는다"
+
+  # ---- 오시는 길(SCR-003) 전용 값 — 미확정 행은 화면에서 렌더하지 않는다(REQ-N-023) ----
+  subway:
+    value: null
+    is_published: false
+    note: "[TBD: T-E] 가까운 역·출구·도보 시간"
+  bus:
+    value: null
+    is_published: false
+    note: "[TBD: T-E] 정류장명·노선"
+  parking:
+    value: null
+    is_published: false
+    note: "[TBD: T-E] 주차 가능 여부·요금"
+  closed_days:
+    value: null
+    is_published: false
+    note: "[TBD: T-E] 휴무일"
+  location_notice:
+    value: "건물 입구와 층 안내는 방문 전 전화로 확인해 주세요."
+    is_published: true
+    note: "[TBD: T-E] 건물·층 확정 시 실제 안내 문구로 교체"
+  map_service_name:
+    value: null
+    is_published: false
+    note: "[TBD: T-E] 지도 서비스명 — 미확정이면 '지도 불러오기' 버튼을 렌더하지 않는다"
+  map_embed_url:
+    value: null
+    is_published: false
+    note: "[TBD: T-E] 지도 임베드 URL(클릭 투 로드 시 iframe src). 값이 없으면 대체 영역만 유지한다"
+  map_directions_url:
+    value: null
+    is_published: false
+    note: "[TBD: T-E] 외부 길찾기 URL(좌표 또는 장소 ID 필요 — REQ-F-031)"
+  retention_inquiry_label:
+    value: null
+    is_published: false
+    note: "[TBD: T-F] 동의 문구에 표시할 문의 내역 보관 기간 (예: 1년). 미확정이면 '확정 후 안내' 로 표기한다"

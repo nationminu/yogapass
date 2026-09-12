@@ -1,0 +1,10 @@
+{% load icons %}
+{# CMP-026 Empty State — "준비 중" 을 쓰지 않는다(디자인 시스템 CMP-026 문구 규칙) #}
+<div class="empty" role="status">
+  {% icon empty_icon|default:"info" "empty-icon" %}
+  <p class="empty-title">{{ empty_title }}</p>
+  {% if empty_body %}<p class="empty-body">{{ empty_body }}</p>{% endif %}
+  {% if has_phone %}
+    <a class="btn btn-s" href="{% tel_href site_phone %}">{% icon "phone" %}전화 문의</a>
+  {% endif %}
+</div>

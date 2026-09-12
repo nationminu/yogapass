@@ -1,0 +1,32 @@
+{% load icons %}
+{% comment %} CMP-018 Form Field — 라벨 → 설명 → 입력 → 오류 문구.
+   필수 표시 3중: *(색) + "(필수)" 텍스트 + required 속성 (색만으로 전달 금지).
+   호출 예: {% include "components/form_field.html" with name="name" label="이름"
+             errors=form.errors.name value=form.data.name maxlength=name_max %} {% endcomment %}
+<div class="field">
+  <label for="f-{{ name }}">
+    {{ label }} <span class="req" aria-hidden="true">*</span> <span class="req-text">(필수)</span>
+  </label>
+  {% if hint %}<p class="hint" id="hint-{{ name }}">{{ hint }}</p>{% endif %}
+  {% if field_type == "textarea" %}
+    <textarea class="inp{% if errors %} err{% endif %}" id="f-{{ name }}" name="{{ name }}"
+              rows="6" maxlength="{{ maxlength }}" required placeholder="{{ placeholder }}"
+              data-counter="counter-{{ name }}"
+              {% if errors %}aria-invalid="true"{% endif %}
+              aria-describedby="{% if hint %}hint-{{ name }} {% endif %}counter-{{ name }}{% if errors %} err-{{ name }}{% endif %}">{{ value|default:"" }}</textarea>
+    <p class="counter" id="counter-{{ name }}" aria-live="polite" data-max="{{ maxlength }}">
+      <span data-count>{{ value|length }}</span> / {{ maxlength }}
+    </p>
+  {% else %}
+    <input class="inp{% if errors %} err{% endif %}" id="f-{{ name }}" name="{{ name }}"
+           type="{{ field_type|default:'text' }}" maxlength="{{ maxlength }}" required
+           value="{{ value|default:'' }}" placeholder="{{ placeholder }}"
+           {% if autocomplete %}autocomplete="{{ autocomplete }}"{% endif %}
+           {% if inputmode %}inputmode="{{ inputmode }}"{% endif %}
+           {% if errors %}aria-invalid="true"{% endif %}
+           {% if hint or errors %}aria-describedby="{% if hint %}hint-{{ name }}{% endif %}{% if errors %} err-{{ name }}{% endif %}"{% endif %}>
+  {% endif %}
+  {% if errors %}
+    <p class="errmsg" id="err-{{ name }}">{% icon "alert-circle" %}{{ errors.0 }}</p>
+  {% endif %}
+</div>

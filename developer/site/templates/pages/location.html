@@ -1,0 +1,172 @@
+{% extends "base.html" %}{% load static icons %}
+{% comment %} SCR-003 오시는 길 + 문의 폼 (페이지 디자인 §4)
+   · 지도는 클릭 투 로드다. 대체 영역 높이 = 로드 후 iframe 높이(272/320/400px) → CLS 0.
+     지도 화면 캡처를 쓰지 않는다(REQ-N-024). 임베드 URL 미확정이면 버튼을 렌더하지 않고
+     화면에 오류도 노출하지 않는다(페이지 디자인 §4.5).
+   · 값이 미확정인 정보 행은 렌더하지 않는다. 전부 없으면 CMP-026 빈 상태로 대체한다.
+   · 폼 응답 형태 6종은 기술 설계 §9.6 표가 원본이다(P5 판정 기준). {% endcomment %}
+{% block page_css %}<link rel="stylesheet" href="{% static 'css/components/form.css' %}">
+  <link rel="stylesheet" href="{% static 'css/pages/location.css' %}">{% endblock %}
+{% block page_js %}<script defer src="{% static 'js/map.js' %}"></script>
+  <script defer src="{% static 'js/form.js' %}"></script>{% endblock %}
+
+{% block content %}
+  {% include "partials/jsonld_localbusiness.html" %}
+
+  <div class="wrap">
+    <div class="pagehead">
+      <h1>오시는 길</h1>
+      <p class="lead">강남 요가패스를 찾아오시는 방법을 안내합니다.</p>
+      <nav class="chips" aria-label="페이지 내 이동">
+        <a class="chip" href="#map">지도·오시는 길</a>
+        <a class="chip" href="#contact">문의하기</a>
+      </nav>
+    </div>
+  </div>
+
+  {# ---------------------------------------------- 지도 · 위치 정보 #}
+  <section class="sec" id="map">
+    <div class="wrap">
+      <h2 tabindex="-1" id="map-title">지도·오시는 길</h2>
+      <div class="two">
+        <div>
+          <div class="map" id="map-frame"{% if map_embed_url %} data-map-src="{{ map_embed_url }}" data-map-title="{{ site_name }} 위치 지도"{% endif %}>
+            {% if map_embed_url %}
+              <button type="button" class="btn btn-p" data-map-load>{% icon "map-pin" %}지도 불러오기</button>
+            {% endif %}
+          </div>
+          {% if map_embed_url and map_service_name %}
+            <p class="maptip">지도를 불러오면 {{ map_service_name }}으로 연결됩니다.</p>
+          {% endif %}
+          {% if map_directions_url %}
+            <p class="map-actions">
+              <a class="btn btn-s" href="{{ map_directions_url }}" target="_blank" rel="noopener noreferrer">{% icon "navigation" %}길찾기 (새 창 열림)</a>
+            </p>
+          {% endif %}
+          <noscript>
+            <div class="callout callout-sec">
+              {% icon "info" %}
+              <span>지도를 보려면 브라우저의 자바스크립트가 필요합니다. 아래 주소·교통 정보를 참고해 주세요.{% if has_phone %} 전화 문의: <a href="{% tel_href site_phone %}">{{ site_phone }}</a>{% endif %}</span>
+            </div>
+          </noscript>
+        </div>
+
+        <div>
+          {% if info_rows %}
+            <dl class="info-dl">
+              {% for row in info_rows %}
+                <div>
+                  <dt>{{ row.label }}</dt>
+                  <dd>{% if row.key == "phone" %}<a href="{% tel_href row.value %}">{{ row.value }}</a>{% else %}{{ row.value }}{% endif %}</dd>
+                </div>
+              {% endfor %}
+            </dl>
+            <div class="info-actions">
+              {% if site.address %}
+                <button type="button" class="btn btn-sm btn-s" data-copy="{{ site.address }}">{% icon "copy" %}주소 복사</button>
+              {% endif %}
+              {% if has_phone %}
+                <a class="btn btn-sm btn-s" href="{% tel_href site_phone %}">{% icon "phone" %}전화 걸기</a>
+              {% endif %}
+            </div>
+          {% else %}
+            {% include "components/empty_state.html" with empty_icon="map-pin" empty_title="위치 정보는 확정되면 안내드립니다." empty_body="방문 전 연락 방법은 아래 문의하기를 이용해 주세요." %}
+          {% endif %}
+        </div>
+      </div>
+
+      {% if site.location_notice %}
+        <div class="callout callout-sec">{% icon "info" %}<span>{{ site.location_notice }}</span></div>
+      {% endif %}
+    </div>
+  </section>
+
+  {# ---------------------------------------------- 문의 폼 #}
+  <section class="sec sec-contact" id="contact">
+    <div class="wrap">
+      <div class="form">
+        <h2 tabindex="-1" id="contact-title">문의하기</h2>
+        <p class="muted form-lead">수강료, 개인 레슨 등 궁금한 점을 남겨주시면 확인 후 연락드립니다.</p>
+
+        {% if result_state == "success" %}
+          {# ①③⑤ — 접수 결과 블록(CMP-020 성공). 폼을 교체한다 #}
+          <div class="result ok" id="contact-result" role="status" tabindex="-1" autofocus>
+            {% icon "check-circle" %}
+            <div>
+              <h3>문의가 접수되었습니다.</h3>
+              <p>확인 후 남겨주신 연락처로 연락드리겠습니다.<br>{% if has_phone %}급하신 경우 <a href="{% tel_href site_phone %}">{{ site_phone }}</a>으로 전화 주세요.{% else %}급하신 경우 전화로도 문의하실 수 있습니다.{% endif %}</p>
+              <a class="btn btn-sm btn-s" href="/location#contact">다시 문의하기</a>
+            </div>
+          </div>
+        {% else %}
+          {% if result_state == "failed" %}
+            {# ④ — 실패(일반). 사유를 구분해 알리지 않는다(REQ-F-044) #}
+            <div class="result ng" id="contact-result" role="alert" tabindex="-1" autofocus>
+              {% icon "alert-circle" %}
+              <div>
+                <h3>문의를 접수하지 못했습니다.</h3>
+                <p>잠시 후 다시 시도해 주세요. 입력하신 내용은 그대로 남아 있습니다.</p>
+                {% if has_phone %}
+                  <a class="btn btn-sm btn-s" href="{% tel_href site_phone %}">{% icon "phone" %}전화로 문의하기</a>
+                {% endif %}
+              </div>
+            </div>
+          {% elif form.errors %}
+            {# ② — 오류 요약(CMP-019). 항목 링크로 해당 필드에 이동한다 #}
+            <div class="summary" id="contact-errors" role="alert" tabindex="-1" autofocus>
+              <h3>입력 내용을 확인해 주세요</h3>
+              <ul>
+                {% for item in form.error_items %}
+                  <li><a href="#{{ item.anchor }}">{{ item.message }}</a></li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          <form method="post" action="/location#contact" novalidate id="contact-form">
+            {% csrf_token %}
+            <input type="hidden" name="{{ token_field }}" value="{{ submit_token }}">
+
+            {% include "components/form_field.html" with name="name" label="이름" field_type="text" maxlength=name_max placeholder="이름을 입력해 주세요" autocomplete="name" errors=form.errors.name value=form.data.name %}
+            {% include "components/form_field.html" with name="phone" label="휴대폰 번호" field_type="tel" maxlength=20 placeholder="010-0000-0000" autocomplete="tel" inputmode="tel" hint="예: 010-1234-5678" errors=form.errors.phone value=form.data.phone %}
+            {% include "components/form_field.html" with name="message" label="문의 내용" field_type="textarea" maxlength=message_max placeholder="궁금한 점을 적어 주세요" errors=form.errors.message value=form.data.message %}
+
+            {# 동의 (CMP-017) — 행 전체가 클릭 영역이고 min-height 44px #}
+            <div class="agree{% if form.errors.consent %} agree-err{% endif %}">
+              <input type="checkbox" id="f-consent" name="consent" required{% if form.data.consent %} checked{% endif %}{% if form.errors.consent %} aria-invalid="true" aria-describedby="err-consent"{% endif %}>
+              <label for="f-consent">
+                <strong>개인정보 수집·이용에 동의합니다. <span class="req" aria-hidden="true">*</span> <span class="req-text">(필수)</span></strong>
+                <span class="agree-detail">수집 항목: 이름, 휴대폰 번호, 문의 내용 / 목적: 문의 답변 / 보관 기간: {{ retention_label }}</span>
+              </label>
+            </div>
+            {% if form.errors.consent %}
+              <p class="errmsg" id="err-consent">{% icon "alert-circle" %}{{ form.errors.consent.0 }}</p>
+            {% endif %}
+            <p class="agree-link">
+              <a class="link" href="/privacy" target="_blank" rel="noopener noreferrer">개인정보 처리방침 보기 (새 창 열림){% icon "external-link" %}</a>
+            </p>
+
+            {# honeypot — display:none 이 아니라 화면 밖 배치 (REQ-N-019) #}
+            <div class="hp" aria-hidden="true">
+              <label for="f-{{ honeypot_field }}">이 항목은 비워 두세요</label>
+              <input type="text" id="f-{{ honeypot_field }}" name="{{ honeypot_field }}" tabindex="-1" autocomplete="off" value="">
+            </div>
+
+            <div class="submit-row">
+              <button type="submit" class="btn btn-lg btn-p" data-submit>문의 남기기</button>
+            </div>
+          </form>
+        {% endif %}
+
+        <p class="muted form-foot">빠른 답변이 필요하시면 전화로 문의해 주세요.{% if has_phone %} <a href="{% tel_href site_phone %}">{{ site_phone }}</a>{% endif %}</p>
+
+        <noscript>
+          <div class="callout callout-sec">
+            {% icon "info" %}
+            <span>브라우저의 자바스크립트가 꺼져 있어도 이 문의 폼은 그대로 제출됩니다. 글자 수 표시와 전송 중 표시만 나타나지 않습니다.{% if has_phone %} 전화 문의: <a href="{% tel_href site_phone %}">{{ site_phone }}</a>{% endif %}</span>
+          </div>
+        </noscript>
+      </div>
+    </div>
+  </section>
+{% endblock %}

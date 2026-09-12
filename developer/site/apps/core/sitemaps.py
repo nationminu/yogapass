@@ -21,15 +21,19 @@ class _BaseUrlSite:
 class StaticViewSitemap(Sitemap):
     changefreq = "monthly"
 
+    #: 색인 대상 공개 화면만 넣는다. 404·오류·healthz 는 넣지 않는다(REQ-N-013).
+    PATHS = ["/", "/instructors", "/location", "/privacy"]
+
     def items(self) -> list[str]:
-        # 작업 5~9 에서 화면이 열릴 때마다 이 목록에 추가한다.
-        return ["/"]
+        return list(self.PATHS)
 
     def location(self, item: str) -> str:
         return item
 
     def priority(self, item: str) -> float:
-        return 1.0 if item == "/" else 0.7
+        if item == "/":
+            return 1.0
+        return 0.5 if item == "/privacy" else 0.7
 
     def get_urls(self, page=1, site=None, protocol=None):
         parts = urlsplit(settings.SITE_BASE_URL)

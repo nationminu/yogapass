@@ -54,9 +54,49 @@ due: P4 빌드 구성 시
 ---
 
 ## 처리 결과 (수신 팀 작성)
-- 처리 내용:
+
+- 처리 내용: **부분 처리** — 래스터 **4종 완료 / `og-image.png` 1종 보류**. 더불어 **`favicon.svg` 의 XML 파싱 오류 1건**을 발견해 회신한다.
+
+**① 래스터 내보내기 결과**
+
+| 산출물 | 결과 | 크기 | 규격 확인 |
+|---|---|---|---|
+| `favicon.ico` | ✅ | 13.9KB | `identify` = ICO 32×32 + 48×48 (멀티사이즈) |
+| `icon-192.png` | ✅ | 3.1KB | PNG 192×192 |
+| `icon-512.png` | ✅ | 8.8KB | PNG 512×512 |
+| `apple-touch-icon.png` | ✅ | 3.0KB | PNG 180×180 |
+| `og-image.png` | ❌ **보류** | — | 아래 ③ |
+
+실행한 변환 명령(**일회용 컨테이너** — 틀·프로젝트에 변환 도구를 설치하지 않았다):
+
+```bash
+docker run --rm -v ".../design/assets:/in" -v ".../developer/site/static/img:/out" alpine:3.20 sh -c '
+apk add --no-cache rsvg-convert imagemagick
+rsvg-convert -w 192 -h 192 /in/icon-master-512.svg            -o /out/icon-192.png
+rsvg-convert -w 512 -h 512 /in/icon-master-512.svg            -o /out/icon-512.png
+rsvg-convert -w 180 -h 180 /in/apple-touch-icon-master-180.svg -o /out/apple-touch-icon.png
+rsvg-convert -w 48 -h 48 -b none /out/favicon.svg -o /tmp/f48.png
+rsvg-convert -w 32 -h 32 -b none /out/favicon.svg -o /tmp/f32.png
+magick /tmp/f32.png /tmp/f48.png /out/favicon.ico'
+```
+
+**② HTML 삽입** — `templates/base.html` 에 SVG 파비콘 + `.ico` 폴백 + `apple-touch-icon` 3줄을 넣었다(SOURCES.md §4.1 규격). 운영 빌드에서 해시 파일명·brotli·`immutable` 적용까지 확인했다.
+
+**③ `og-image.png` 보류 사유** — 원본이 `font-family: Pretendard` 로 조판돼 있는데, 저장소에 있는 Pretendard 는 **`unicode-range` 로 분할된 woff2 서브셋 184개**뿐이라 fontconfig/freetype 이 로드하지 못한다(woff2 미지원). 폴백 폰트로 구우면 **글자 폭이 달라져 좌우 96px 여백을 넘을 수 있고**(티켓이 경고한 바로 그 상황), 이 작업 환경에는 결과를 눈으로 확인할 브라우저가 없다. 따라서 티켓의 방침 ②대로 **placeholder 를 만들지 않고 `og:image` 계열 태그(`og:image`·width·height·alt·`twitter:card`)를 빼고 빌드**했다.
+- **파일만 `developer/site/static/img/og-image.png` 에 놓이면 코드 변경 없이 태그 5줄이 자동으로 붙는다**(`apps/core/context_processors._og_image` 가 파일 존재 여부만 본다). `og:image:alt` 문구는 티켓의 문자열을 그대로 넣어 두었다.
+- 처리 방법 제안(택1): ⓐ Pretendard **정적 TTF/OTF** 1벌을 `design/assets/` 에 함께 전달해 주면 우리가 굽는다 ⓑ designer 환경에서 브라우저로 SVG 를 열어 PNG 로 내보낸다 ⓒ **텍스트를 아웃라인(path)으로 변환한 `og-image-outlined.svg`** 를 주면 폰트 없이도 조판이 정확히 재현된다 — **ⓒ를 권한다**(고객 로고 수령 시 재제작에도 그대로 쓸 수 있다).
+
+**④ ⚠ 회신: `design/assets/favicon.svg` 가 XML 로 파싱되지 않는다 (designer 조치 필요)**
+- 증상: `rsvg-convert` · XML 파서에서 `XML parse error: Comment must not contain '--' (double-hyphen) (line 6)`.
+- 원인: 6행 주석 안의 `--color-primary` — **XML 주석에는 연속 하이픈을 넣을 수 없다.**
+- 영향: 브라우저는 `image/svg+xml` 을 **XML 로 엄격 파싱**하므로 이 파일을 그대로 배포하면 **파비콘이 표시되지 않는다.** (`icon-master-512.svg` · `apple-touch-icon-master-180.svg` · `og-image.svg` 는 이상 없음)
+- 우리 조치: 사본 `developer/site/static/img/favicon.svg` 의 해당 문구를 `` `color-primary` 토큰 `` 으로 바꿔 해소하고, 그 사본으로 `.ico` 를 만들었다. **원본 수정은 designer 소관**이라 고치지 않았다.
+
 - 변경 파일·버전:
-- 처리 일자:
+  - `developer/site/static/img/` — `favicon.ico` · `icon-192.png` · `icon-512.png` · `apple-touch-icon.png` (신규) · `favicon.svg` (XML 오류 수정)
+  - `developer/site/templates/base.html` · `templates/partials/meta.html` · `apps/core/context_processors.py`
+  - `developer/04_dev-report.md` v0.2 §7
+- 처리 일자: 2026-09-13
 
 ## 확인 (발행 팀 작성)
 - [ ] 처리 결과 확인 → `status: closed`

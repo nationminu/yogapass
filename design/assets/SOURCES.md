@@ -2,7 +2,7 @@
 
 > 이 문서는 `design/assets/`와 `design/mockups/`에 쓰인 **모든** 폰트·이미지·아이콘·그래픽의 출처와 라이선스를 기록한다.
 > 상업적 사용이 허용되지 않는 자산은 어떤 경우에도 쓰지 않는다 (`CLAUDE.md` §8).
-> **updated: 2026-09-12 · 단계: P3 상세 디자인 (version 0.2)**
+> **updated: 2026-09-12 · 단계: P3 (G3a 승인 후속 — 파비콘·OG 제작) (version 0.3)**
 
 ---
 
@@ -12,6 +12,10 @@
 |---|---|---|---|---|
 | `logo-yogapass-mark.svg` | 로고 심볼 (48×48) | **designer 자체 제작** (2026-09-12, 원본 도형: 원 + 호 + 직선) | 본 프로젝트 산출물 — 고객 귀속 | **임시(Placeholder)** |
 | `logo-yogapass-horizontal.svg` | 로고 가로형 (236×48) | **designer 자체 제작** (2026-09-12) | 본 프로젝트 산출물 — 고객 귀속 | **임시(Placeholder)** |
+| `favicon.svg` | 파비콘 (48 viewBox · 크기 무제한) | **designer 자체 제작** (2026-09-12, 심볼 파생) | 본 프로젝트 산출물 — 고객 귀속 | **임시(Placeholder) · 그대로 배포 가능** |
+| `icon-master-512.svg` | PNG 파비콘 마스터 (512×512, 흰 배경) | **designer 자체 제작** (2026-09-12, 심볼 파생) | 본 프로젝트 산출물 — 고객 귀속 | **임시(Placeholder) · 래스터 내보내기 필요** |
+| `apple-touch-icon-master-180.svg` | iOS 홈 화면 아이콘 마스터 (180×180, 흰 배경) | **designer 자체 제작** (2026-09-12, 심볼 파생) | 본 프로젝트 산출물 — 고객 귀속 | **임시(Placeholder) · 래스터 내보내기 필요** |
+| `og-image.svg` | OG·트위터 카드 대표 이미지 (1200×630) | **designer 자체 제작** (2026-09-12, 심볼 + 텍스트 + CSS 격자 그래픽) | 본 프로젝트 산출물 — 고객 귀속 | **임시(Placeholder) · 래스터 내보내기 필요** |
 | `../mockups/concept-a.html` 내 인라인 SVG | 심볼·아이콘 3종(위치·말풍선·사람) | **designer 자체 제작** (24×24 그리드, stroke 2px 직접 작도) | 본 프로젝트 산출물 | 임시 |
 | `../mockups/concept-b.html` 내 인라인 SVG | 동일 3종(stroke 1.8px 변형) | **designer 자체 제작** | 본 프로젝트 산출물 | 임시 |
 | `../mockups/concept-c.html` 내 인라인 SVG | 심볼 | **designer 자체 제작** | 본 프로젝트 산출물 | 임시 |
@@ -19,6 +23,23 @@
 | `../mockups/scr-002.html` 내 인라인 SVG | 심볼 + 아이콘 3종 | **designer 자체 제작** | 본 프로젝트 산출물 | 임시 |
 | `../mockups/scr-003.html` 내 인라인 SVG | 심볼 + 아이콘 6종(위치·길찾기·복사·전화·정보·오류) | **designer 자체 제작** | 본 프로젝트 산출물 | 임시 |
 | `../mockups/scr-008.html` 내 인라인 SVG | 심볼 + 아이콘 2종(전화·경고) | **designer 자체 제작** | 본 프로젝트 산출물 | 임시 |
+| `../mockups/scr-006.html` 내 인라인 SVG **(v0.3 신규 등록 — G3a 지적 반영)** | 심볼 4개소 + 아이콘 7종 8개소(정보·메뉴×2·목차 chevron-down·chevron-up·맨 위로 arrow-up·말풍선·전화×2) = **`<svg>` 요소 13개소** | **designer 자체 제작** (24px 그리드, stroke 2px 직접 작도 — Lucide 파일을 복사하지 않았다) | 본 프로젝트 산출물 | 임시(P4에서 Lucide 공식 SVG로 교체) |
+
+**목업별 인라인 SVG 실측 개수 (2026-09-12 측정 · 등록 누락 0건 확인)**
+
+| 파일 | `<svg>` 요소 수 | 등록 |
+|---|---|---|
+| `concept-a.html` | 9 | v0.1 |
+| `concept-b.html` | 9 | v0.1 |
+| `concept-c.html` | 6 | v0.1 |
+| `scr-001.html` | 45 | v0.2 |
+| `scr-002.html` | 5 | v0.2 |
+| `scr-003.html` | **18** | v0.2 |
+| `scr-006.html` | **13** | **v0.3 (신규)** |
+| `scr-008.html` | 8 | v0.2 |
+| **합계** | **113** | — |
+
+> **G3a 게이트 지적 "`scr-006.html` 인라인 SVG 18개소 미등록"에 대한 확인 결과**: 미등록 파일이 `scr-006.html`이라는 지적은 맞다(v0.2 표에 행이 없었다). 다만 **18개소는 이미 등록된 `scr-003.html`의 개수**이고, `scr-006.html`의 실측치는 **13개소**다. 위 실측표로 두 값을 함께 남겨 재확인이 필요 없게 했다. 이 표의 8개 파일이 `design/mockups/`의 전체이며, **이제 미등록 파일은 0건**이다.
 
 - **외부에서 가져온 파일은 현재 0건이다.** 목업은 웹폰트·외부 이미지·외부 스크립트를 일절 로드하지 않는다(브라우저에서 바로 열리고, 오프라인에서도 동일하게 보인다).
 - **사진 0장.** 사진이 들어갈 자리는 목업에 점선 라벨("사진 예정 자리")로 표시했다.
@@ -76,9 +97,82 @@
 | 스튜디오 사진 | **[TBD: 고객 제공 필요]** — 조달 방침(고객 촬영 / 전문 촬영 / 스톡) 미회신(계획서 Q11). 수령 전까지 그래픽 패널로 대체한다 |
 | 강사 인물 사진 | **[TBD: 고객 제공 필요]** — 미제공 시 **이니셜 플레이스홀더**를 쓴다. **인물 스톡 사진 대체는 금지**(화면정의서 SCR-002 §3) |
 | 지도 이미지 | **사용하지 않는다.** 메인에는 지도를 넣지 않고(REQ-F-030 ⓑ), **지도 서비스 화면 캡처는 금지**(REQ-N-024) |
-| OG 이미지 · 파비콘 | 미제작. 임시 로고 기반으로 **P4 착수 전 designer가 제작**하고 고객 로고 수령 시 재제작한다. 규격: OG 1200×630 / `favicon.ico`(32·48) / `icon-192.png` / `icon-512.png` / `apple-touch-icon.png`(180) |
+| OG 이미지 · 파비콘 | **v0.3에서 SVG 원본 4종 제작 완료** (§4.1). PNG·ICO 래스터는 P4 빌드에서 내보낸다. 고객 로고 수령 시 재제작 |
 
 - 스톡 이미지를 쓰게 될 경우의 준수 사항(미리 고정): **상업적 사용 + 웹 배포 허용 라이선스만** 사용하고, 라이선스 유형·출처 URL·다운로드 일자·사용 화면을 이 문서 §4에 행으로 추가한다. 인물이 식별되는 사진은 모델 릴리스 확인 전까지 쓰지 않는다.
+
+---
+
+## 4.1 파비콘 · OG 이미지 (v0.3 신규 · G3a 승인 후속)
+
+디자인 시스템 §6.3이 "G3 승인 직후 2작업일 이내"로 확정한 납기 항목이다. **임시 로고(심볼)에서 파생**했고 외부 자산을 쓰지 않았다.
+
+**제작한 원본 (SVG · `design/assets/`)**
+
+| 파일 | 규격 | 배경 | 용도 |
+|---|---|---|---|
+| `favicon.svg` | 48 viewBox (크기 무제한) | 투명 | 브라우저 탭 아이콘. `prefers-color-scheme: dark`에서 심볼이 `#FFFFFF`로 전환된다 |
+| `icon-master-512.svg` | 512×512 | `#FFFFFF` | `icon-512.png` · `icon-192.png` 내보내기 마스터 |
+| `apple-touch-icon-master-180.svg` | 180×180 | `#FFFFFF` | `apple-touch-icon.png` 내보내기 마스터 |
+| `og-image.svg` | 1200×630 | `#F0F5FB` 틴트 | `og-image.png` 내보내기 마스터 |
+
+**내보내야 할 래스터 산출물 (P4 빌드 — designer 환경에 래스터 변환 도구가 없어 SVG 원본까지만 제작했다)**
+
+| 산출물 | 크기 | 원본 | 비고 |
+|---|---|---|---|
+| `favicon.ico` | 32 + 48 멀티사이즈 | `favicon.svg` | 구형 브라우저·북마크용. **최신 Chrome·Edge·Firefox·Safari 17+는 `favicon.svg`만으로 동작**하므로 `.ico`는 폴백이다 |
+| `icon-192.png` | 192×192 | `icon-master-512.svg` | 웹 매니페스트 `purpose: "any"` |
+| `icon-512.png` | 512×512 | `icon-master-512.svg` | 웹 매니페스트 `purpose: "any"` |
+| `apple-touch-icon.png` | 180×180 | `apple-touch-icon-master-180.svg` | iOS 홈 화면. 모서리 둥글리기를 넣지 않는다(iOS가 마스킹) |
+| `og-image.png` | 1200×630 · **300KB 이하** | `og-image.svg` | 디자인 시스템 §6.2 용량 상한 |
+
+**변환 명령 예 (둘 중 하나 · P4에서 실행하고 결과를 이 표에 기록한다)**
+
+```bash
+# sharp-cli (Node)
+npx sharp-cli -i design/assets/icon-master-512.svg            -o icon-512.png        resize 512 512
+npx sharp-cli -i design/assets/icon-master-512.svg            -o icon-192.png        resize 192 192
+npx sharp-cli -i design/assets/apple-touch-icon-master-180.svg -o apple-touch-icon.png resize 180 180
+npx sharp-cli -i design/assets/og-image.svg                   -o og-image.png        resize 1200 630
+npx png-to-ico icon-32.png icon-48.png > favicon.ico          # 32·48 PNG를 먼저 내보낸 뒤 묶는다
+
+# ImageMagick
+magick -background none design/assets/favicon.svg -define icon:auto-resize=48,32 favicon.ico
+```
+
+> ⚠ `og-image.png` 래스터화 시 **Pretendard(SIL OFL 1.1)가 설치·지정된 환경**에서 실행한다. 폴백 폰트로 굽히면 조판(자간·글자 폭)이 디자인과 달라진다. 변환 후 **실제 글자 폭이 좌측 96px / 우측 96px 여백 안에 들어가는지 1회 눈으로 확인**한다.
+
+**HTML 삽입 규격 (developer 전달)**
+
+```html
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="32x32">      <!-- 폴백 -->
+<link rel="apple-touch-icon" href="/apple-touch-icon.png"><!-- 180×180 -->
+<meta property="og:image" content="https://{도메인}/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="강남 요가패스 로고와 '강남 요가 스튜디오' 문구가 있는 대표 이미지">
+```
+
+- **`og:image:alt`는 필수**다(디자인 시스템 §4.3 "의미 있음" 분류).
+- 래스터 산출물이 P4 빌드 시점까지 준비되지 않으면 **placeholder 파일을 만들지 말고 해당 `<link>`·`og:image` 태그를 빼고 빌드**한다(디자인 시스템 §6.3 ②). 단 `favicon.svg`는 지금 상태로 배포 가능하므로 **최소한 SVG 파비콘은 항상 넣는다.**
+
+**대비·접근성 확인값**
+
+| 대상 | 전경 | 배경 | 대비 | 판정 |
+|---|---|---|---|---|
+| OG 헤드라인 "강남 요가패스" | `#16263A` | `#F0F5FB` | **13.96:1** | 통과 |
+| OG 워드마크 "YOGAPASS" | `#0A2540` | `#F0F5FB` | **14.17:1** | 통과 |
+| OG 서브카피 "강남 요가 스튜디오" | `#5A6B7D` | `#F0F5FB` | **5.00:1** | 통과 |
+| OG 심볼·좌측 바 | `#0B4F9E` | `#F0F5FB` | **7.30:1** | 통과 |
+| 파비콘 심볼 (라이트) | `#0B4F9E` | 흰 탭 배경 | **7.99:1** | 통과 |
+| 파비콘 심볼 (다크) | `#FFFFFF` | `#202124` 계열 탭 배경 | **15.0:1 이상** | 통과 |
+
+- OG 이미지에는 **주소·전화·강사·요금·`[TBD]` 값을 넣지 않았다**(REQ-N-023). 문안은 확정된 브랜드 표기 2개(`YOGAPASS`, `강남 요가패스`)와 일반 서술 1개(`강남 요가 스튜디오`)뿐이다.
+
+### 고객 로고 수령 시 교체 절차 (1줄 요약)
+
+> **`logo-yogapass-mark.svg`의 도형만 고객 원본(아웃라인 path)으로 갈아끼우고 위 4개 SVG의 `<g>` 심볼 블록을 같은 path로 교체 → 래스터 5종 재내보내기 → 이 문서 §1·§4.1 표의 "상태"를 `확정`으로 갱신 → `--color-primary` 계열 4개가 바뀌면 디자인 시스템 §4.1 대비표 재계산(0.5작업일, D-1)** — 이 순서를 CR로 처리한다.
 
 ---
 
@@ -101,4 +195,5 @@
 | 버전 | 일자 | 작성자 | 내용 |
 |---|---|---|---|
 | 0.1 | 2026-09-12 | designer | 최초 작성 — 임시 로고 2종 등록, 폰트·아이콘 후보와 라이선스 정리, 사진 미확보 [TBD] 목록화 |
+| 0.3 | 2026-09-12 | designer | **G3a 승인 후속** — ① **파비콘·OG SVG 원본 4종 제작·등록**(`favicon.svg`·`icon-master-512.svg`·`apple-touch-icon-master-180.svg`·`og-image.svg`) + §4.1 신설(래스터 내보내기 규격·변환 명령·HTML 삽입 규격·대비 6건·`og:image:alt`) ② **G3a 지적 처리 — `scr-006.html` 인라인 SVG 등록**(실측 13개소) + **목업 8파일 전량 `<svg>` 실측표(합계 113)** 추가로 미등록 0건 확인, 지적문의 "18개소"는 `scr-003.html` 값임을 병기 ③ **고객 로고 수령 시 교체 절차 1줄 확정** ④ §4 파비콘·OG 행 갱신 (근거: G3a 게이트 지적 · 디자인 시스템 §6.3) |
 | 0.2 | 2026-09-12 | designer | P3 상세 디자인 반영 — **폰트 Pretendard 단일 채택**(SIL OFL 1.1, self-host 요건 명시) · **아이콘 Lucide 채택**(ISC, 1차 16종 목록 + 고지 방식) · 1차 목업 4종(scr-001·002·003·008)의 인라인 SVG 등록 · 파비콘·OG 규격 확정 · 확정 팔레트 대비 측정표 위치 참조 추가 |

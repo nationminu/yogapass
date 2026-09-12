@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" role="img" aria-labelledby="ypfav">
+  <title id="ypfav">강남 요가패스</title>
+  <!--
+    favicon.svg — 강남 요가패스 (designer 자체 제작, 2026-09-12)
+    · 원본: assets/logo-yogapass-mark.svg (임시 로고 · Placeholder)
+    · 배경 투명. 색은 --color-primary #0B4F9E 고정값으로 굽는다(파비콘은 CSS 변수를 참조할 수 없다).
+    · 다크 모드 탭 배경(#202124 계열)에서 7.99:1이 나오지 않으므로
+      prefers-color-scheme: dark 에서 #FFFFFF 로 전환한다.
+    · 16px 렌더 시 stroke = 4.5 × (16/48) = 1.5px → 획이 사라지지 않는다.
+    · [TBD: 고객 로고 원본 수령(V-2, 09-17 예정) 시 교체]
+  -->
+  <style>
+    .mk { fill: none; stroke: #0B4F9E; stroke-width: 4.5; stroke-linecap: round; }
+    .dot { fill: #0B4F9E; }
+    @media (prefers-color-scheme: dark) {
+      .mk { stroke: #FFFFFF; }
+      .dot { fill: #FFFFFF; }
+    }
+  </style>
+  <g class="mk">
+    <path d="M7.5 33.5a16.5 16.5 0 0 1 33 0"/>
+    <path d="M6 40.5h36"/>
+  </g>
+  <circle class="dot" cx="24" cy="12" r="5.5"/>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" width="180" height="180" role="img" aria-labelledby="ypapple">
+  <title id="ypapple">강남 요가패스</title>
+  <!--
+    apple-touch-icon-master-180.svg — iOS 홈 화면 아이콘 마스터 (designer 자체 제작, 2026-09-12)
+    · 내보내기 대상: apple-touch-icon.png (180×180)
+    · 배경 #FFFFFF 불투명 필수 — iOS는 투명 픽셀을 검게 합성한다.
+    · 모서리 둥글리기를 넣지 않는다 — iOS가 자체적으로 마스킹한다(이중 라운딩 방지).
+    · 심볼 상자 116px 중앙 정렬(여백 32px = 17.8%). 배율 116/48 = 2.41667, stroke 4.5 × 2.41667 ≈ 10.9
+    · [TBD: 고객 로고 원본 수령 시 교체]
+  -->
+  <rect width="180" height="180" fill="#FFFFFF"/>
+  <g transform="translate(32,32) scale(2.41667)">
+    <g fill="none" stroke="#0B4F9E" stroke-width="4.5" stroke-linecap="round">
+      <path d="M7.5 33.5a16.5 16.5 0 0 1 33 0"/>
+      <path d="M6 40.5h36"/>
+    </g>
+    <circle cx="24" cy="12" r="5.5" fill="#0B4F9E"/>
+  </g>
+</svg>

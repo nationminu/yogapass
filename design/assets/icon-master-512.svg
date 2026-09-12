@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-labelledby="ypicon">
+  <title id="ypicon">강남 요가패스</title>
+  <!--
+    icon-master-512.svg — PNG 파비콘 마스터 (designer 자체 제작, 2026-09-12)
+    · 내보내기 대상: icon-512.png (512×512) · icon-192.png (192×192)
+    · 배경: #FFFFFF 불투명 (PWA 아이콘은 투명 배경을 쓰면 OS 런처에서 검게 보인다)
+    · 심볼 배치: 512 × 0.625 = 320px 상자를 중앙 정렬 → 좌우 여백 96px(18.75%)
+      Android maskable 안전 영역(중앙 80% 원형) 안에 심볼 전체가 들어간다.
+    · 심볼 좌표계 48 → 320 배율 6.6667, stroke 4.5 × 6.6667 = 30
+    · [TBD: 고객 로고 원본 수령 시 교체]
+  -->
+  <rect width="512" height="512" fill="#FFFFFF"/>
+  <g transform="translate(96,96) scale(6.66667)">
+    <g fill="none" stroke="#0B4F9E" stroke-width="4.5" stroke-linecap="round">
+      <path d="M7.5 33.5a16.5 16.5 0 0 1 33 0"/>
+      <path d="M6 40.5h36"/>
+    </g>
+    <circle cx="24" cy="12" r="5.5" fill="#0B4F9E"/>
+  </g>
+</svg>

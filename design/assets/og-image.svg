@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-labelledby="ypogt ypogd">
+  <title id="ypogt">강남 요가패스</title>
+  <desc id="ypogd">강남 요가패스 로고와 "강남 요가 스튜디오" 문구가 있는 대표 이미지</desc>
+  <!--
+    og-image.svg — Open Graph / 트위터 카드 대표 이미지 (designer 자체 제작, 2026-09-12)
+    · 규격 1200×630 (1.91:1) · 내보내기 대상: og-image.png (≤300KB · 디자인 시스템 §6.2)
+    · 사진 없이 성립하는 구성(고객 사진 미수령 전제 — 시스템 §6.3)
+    · 텍스트는 확정된 브랜드 표기만 쓴다. 주소·전화·강사·요금 등 [TBD] 값은 넣지 않는다(REQ-N-023).
+    · 대비: #16263A/#F0F5FB 13.96:1 · #0A2540/#F0F5FB 14.17:1 · #5A6B7D/#F0F5FB 5.00:1 (전부 4.5:1 이상)
+    · og:image:alt = "강남 요가패스 로고와 '강남 요가 스튜디오' 문구가 있는 대표 이미지"
+    · PNG 래스터화 시 Pretendard(SIL OFL 1.1)가 설치·지정되어야 조판이 일치한다.
+    · [TBD: 고객 로고 원본 수령 시 재제작]
+  -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0 L0 0 0 40" fill="none" stroke="#0B4F9E" stroke-opacity="0.10" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- 배경: primary-subtle 틴트 -->
+  <rect width="1200" height="630" fill="#F0F5FB"/>
+  <!-- 장식 라인 격자 (우측 영역 한정 · 텍스트 영역과 겹치지 않는다) -->
+  <rect x="740" y="0" width="460" height="630" fill="url(#grid)"/>
+  <!-- 좌측 브랜드 바 -->
+  <rect x="0" y="0" width="12" height="630" fill="#0B4F9E"/>
+
+  <!-- 로고 심볼 (120px 상자) + 워드마크 -->
+  <g transform="translate(96,120) scale(2.5)">
+    <g fill="none" stroke="#0B4F9E" stroke-width="4.5" stroke-linecap="round">
+      <path d="M7.5 33.5a16.5 16.5 0 0 1 33 0"/>
+      <path d="M6 40.5h36"/>
+    </g>
+    <circle cx="24" cy="12" r="5.5" fill="#0B4F9E"/>
+  </g>
+  <text x="244" y="204"
+        font-family="Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif"
+        font-size="56" font-weight="700" letter-spacing="2" fill="#0A2540">YOGAPASS</text>
+
+  <!-- 헤드라인 -->
+  <text x="96" y="392"
+        font-family="Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif"
+        font-size="92" font-weight="700" letter-spacing="-1.4" fill="#16263A">강남 요가패스</text>
+
+  <!-- 서브카피 -->
+  <text x="96" y="456"
+        font-family="Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif"
+        font-size="36" font-weight="400" fill="#5A6B7D">강남 요가 스튜디오</text>
+
+  <!-- 하단 구분선 -->
+  <rect x="96" y="520" width="1008" height="1" fill="#DDE4EC"/>
+</svg>

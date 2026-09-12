@@ -3,8 +3,8 @@ doc_id: PLN-IA
 title: 정보구조 (IA)
 phase: P2
 owner: planner
-version: 0.7
-status: in-review
+version: 1.0
+status: approved
 reviewers: [designer, developer, qa]
 inputs: [planning/02_requirements.md, pm/01_project-plan.md, pm/requests/CR-001_membership-and-booking.md, interviews/2026-09-12_booking-rules.md, shared/reviews/CR-001_impact_planner.md, shared/reviews/CR-001_impact_designer.md, shared/reviews/CR-001_impact_developer_r2.md, shared/reviews/P2-CR001_planning-docs_designer_r1.md, shared/reviews/P2-CR001_planning-docs_developer_r1.md, shared/reviews/P2-CR001_planning-docs_qa_r1.md, shared/reviews/P2-CR001_planning-docs_designer_r2.md, shared/reviews/P2-CR001_planning-docs_developer_r2.md, shared/reviews/P2-CR001_planning-docs_qa_r2.md, pm/gates/G1_plan.md]
 updated: 2026-09-12

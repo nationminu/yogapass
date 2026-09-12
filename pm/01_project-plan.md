@@ -4,7 +4,7 @@ title: 프로젝트 계획서
 phase: P1
 owner: pmo
 version: 2.0
-status: in-review
+status: approved
 reviewers: [planner, developer]
 inputs:
   - pm/requests/CR-000_initial-request.md

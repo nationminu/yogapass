@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 236 48" width="236" height="48" role="img" aria-labelledby="ypht">
+  <title id="ypht">요가패스</title>
+  <!--
+    YOGAPASS 임시 가로형 로고 (designer 자체 제작, 2026-09-12)
+    - 워드마크는 SVG <text>로 조판되어 있어 뷰어 폰트에 따라 자간이 달라질 수 있다.
+      최종본은 폰트 수령·확정 후 아웃라인(path)으로 변환한다.
+    - [TBD: 고객 로고 원본(V-2, 09-17 예정) 수령 시 교체한다]
+  -->
+  <g fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round">
+    <path d="M7.5 33.5a16.5 16.5 0 0 1 33 0"/>
+    <path d="M6 40.5h36"/>
+  </g>
+  <circle cx="24" cy="12" r="5.5" fill="currentColor"/>
+  <text x="60" y="26" font-family="Pretendard, 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif"
+        font-size="21" font-weight="700" letter-spacing="1.6" fill="currentColor">YOGAPASS</text>
+  <text x="61" y="41" font-family="Pretendard, 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif"
+        font-size="10.5" font-weight="500" letter-spacing="2.4" fill="currentColor" opacity="0.72">강남 요가 스튜디오</text>
+</svg>

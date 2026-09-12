@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>시안 B — 고요한 호흡 · 강남 요가패스 컨셉 목업</title>
+<!--
+  design/mockups/concept-b.html · P3 컨셉 시안 B (v0.1 · 2026-09-12 · designer)
+  - 컨셉 비교용 목업이다. 최종 화면 명세(03_page-design.md)가 아니다.
+  - 외부 의존 없음(웹폰트·이미지·스크립트 미로드). 제목용 명조는 시스템 명조(바탕/Batang)로 대체 렌더된다.
+    실제 폰트는 Nanum Myeongjo(OFL 1.1) + Pretendard(OFL 1.1)를 P4에서 self-host 한다.
+  - 모든 텍스트·수치는 예시이며 [TBD]는 고객 확인 대상이다.
+-->
+<style>
+/* ===== 목업 크롬(비교용 UI) — 사이트 디자인 아님 ===== */
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:#EEF1F5;color:#16263A;
+  font-family:Pretendard,"Pretendard Variable",-apple-system,"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif;}
+.mk-meta{background:#183048;color:#fff;padding:20px 24px}
+.mk-meta h1{margin:0 0 4px;font-size:20px;letter-spacing:-.01em}
+.mk-meta p{margin:4px 0 0;font-size:13px;line-height:1.7;color:#CBD9E6;max-width:1100px}
+.mk-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.mk-chip{display:flex;align-items:center;gap:8px;background:#264259;border:1px solid #3B5C78;border-radius:6px;padding:6px 10px;font-size:12px}
+.mk-sw{width:20px;height:20px;border-radius:4px;border:1px solid rgba(255,255,255,.35);flex:none}
+.mk-label{max-width:1280px;margin:28px auto 10px;padding:0 16px;font-size:14px;font-weight:700;color:#33445A}
+.mk-label span{display:block;font-weight:500;color:#5A6B7D;margin-top:3px;font-size:12.5px;line-height:1.6}
+.mk-scroll{overflow-x:auto;padding:0 16px 4px}
+.mk-frame{width:1280px;margin:0 auto;background:#fff;border:1px solid #C9D3DF;border-radius:6px;overflow:hidden}
+.mk-phones{max-width:1280px;margin:0 auto;padding:0 16px;display:flex;gap:24px;flex-wrap:wrap}
+.mk-phone{width:360px;height:700px;overflow:auto;background:#fff;border:1px solid #C9D3DF;border-radius:6px;position:relative}
+.mk-note{max-width:1280px;margin:26px auto 60px;padding:16px;background:#fff;border:1px solid #C9D3DF;border-radius:6px;font-size:13px;line-height:1.8;color:#33445A}
+.mk-note b{color:#16263A}
+.mk-note ul{margin:8px 0 0;padding-left:18px}
+
+/* ===== 시안 B 토큰 — "고요한 호흡" ===== */
+.B{
+  --blue-900:#183048;   /* 13.50:1 */
+  --blue-700:#0F5E8C;   /*  7.00:1  주 브랜드 */
+  --blue-800:#0B4A6E;   /* hover */
+  --ink:#183048;        /* 13.50:1  제목 */
+  --body:#3C4A57;       /*  9.10:1  본문 */
+  --muted:#61707E;      /*  5.09:1  보조 텍스트 */
+  --sage:#2F7A6B;       /*  5.10:1  보조 강조 */
+  --line:#E3EAF2;       /* 장식 구분선 */
+  --line-str:#7E8FA3;   /*  3.31:1  입력 테두리·UI 경계 */
+  --tint:#EAF2FB; --surf:#F7FAFD;
+  --ok-fg:#1B6E3C; --ok-bg:#E7F4EC;
+  --off-fg:#4F5B6B; --off-bg:#EEF1F5;
+  --warn-fg:#8A5200; --err-fg:#B3261E;
+  --r:20px; --sh:0 10px 28px rgba(24,48,72,.08);
+  color:var(--body);font-size:17px;line-height:1.85;
+}
+.B a{color:var(--blue-700)}
+.B .wrap{max-width:1140px;margin:0 auto;padding:0 40px}
+.B h1,.B h2,.B h3{margin:0;color:var(--ink);line-height:1.4;font-weight:700}
+.B h1,.B h2{font-family:"Nanum Myeongjo","Gowun Batang",Batang,"Times New Roman",serif;font-weight:700;letter-spacing:-.005em}
+
+/* 헤더 */
+.B .hdr{position:sticky;top:0;background:rgba(255,255,255,.92);border-bottom:1px solid var(--line);z-index:5;backdrop-filter:blur(6px)}
+.B .hdr .wrap{display:flex;align-items:center;gap:28px;height:76px}
+.B .logo{display:flex;align-items:center;gap:10px;color:var(--blue-700);font-weight:700;font-size:19px;letter-spacing:.1em;font-family:Pretendard,sans-serif}
+.B .logo svg{width:30px;height:30px;flex:none}
+.B .logo small{display:block;font-size:10px;letter-spacing:.18em;font-weight:500;color:var(--muted)}
+.B .gnb{display:flex;gap:6px;margin-left:auto}
+.B .gnb a{display:block;padding:10px 14px;border-radius:999px;font-size:15px;font-weight:500;color:var(--body);text-decoration:none}
+.B .gnb a[aria-current]{color:var(--blue-700);font-weight:700;background:var(--tint)}
+.B .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 28px;
+  border-radius:999px;font-size:16px;font-weight:700;text-decoration:none;border:1px solid transparent;cursor:default;font-family:Pretendard,sans-serif}
+.B .btn-p{background:var(--blue-700);color:#fff;box-shadow:0 6px 16px rgba(15,94,140,.24)}
+.B .btn-s{background:#fff;color:var(--blue-700);border-color:var(--line-str)}
+.B .btn-sm{min-height:44px;padding:0 18px;font-size:14.5px}
+
+/* 히어로 */
+.B .hero{background:radial-gradient(120% 90% at 50% 0%,var(--tint) 0%,#fff 62%);text-align:center;position:relative;overflow:hidden}
+.B .hero .wrap{padding-top:112px;padding-bottom:104px;position:relative;z-index:1}
+.B .arch{position:absolute;left:50%;top:56px;transform:translateX(-50%);width:520px;height:520px;
+  border-radius:999px 999px 0 0;border:1px solid rgba(15,94,140,.18);background:rgba(255,255,255,.5)}
+.B .eyebrow{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.16em;color:var(--sage);margin-bottom:22px}
+.B .hero h1{font-size:52px;line-height:1.35}
+.B .hero p{font-size:18px;color:var(--muted);margin:22px auto 34px;max-width:34em}
+.B .cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.B .hours{margin-top:26px;font-size:14px;color:var(--muted)}
+.B .art{max-width:900px;margin:0 auto;height:280px;border-radius:var(--r);background:#fff;box-shadow:var(--sh);
+  border:1px solid var(--line);display:flex;align-items:center;justify-content:center;position:relative}
+.B .art svg{width:130px;height:130px;color:var(--blue-700);opacity:.55}
+.B .art .ph{position:absolute;left:16px;bottom:14px;font-size:12px;color:var(--muted);background:var(--surf);border:1px dashed var(--line-str);border-radius:999px;padding:5px 12px}
+
+/* 섹션 */
+.B section.sec{padding:104px 0}
+.B section.sec.alt{background:var(--surf)}
+.B .sec-h{text-align:center;margin-bottom:48px}
+.B .sec-h h2{font-size:36px}
+.B .sec-h p{margin:12px 0 0;color:var(--muted);font-size:16px}
+.B .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.B .grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
+.B .card{border-radius:var(--r);background:#fff;padding:32px 26px;box-shadow:var(--sh);border:1px solid rgba(227,234,242,.9);text-align:center}
+.B .card h3{font-size:18px;margin-bottom:10px;font-family:Pretendard,sans-serif}
+.B .card p{margin:0;font-size:14.5px;color:var(--muted);line-height:1.8}
+.B .ico{width:56px;height:56px;border-radius:999px;background:var(--tint);display:flex;align-items:center;justify-content:center;
+  margin:0 auto 18px;color:var(--blue-700)}
+.B .ico svg{width:26px;height:26px}
+.B .tag{display:inline-block;font-size:11.5px;font-weight:700;color:var(--sage);background:#E9F3F0;border-radius:999px;padding:3px 12px;margin-bottom:12px;letter-spacing:.08em}
+.B .notice{margin-top:32px;text-align:center;padding:22px;border-radius:var(--r);background:var(--tint);font-size:15px;color:var(--body)}
+.B .tbd{color:var(--warn-fg);font-weight:700;font-size:13px}
+
+/* 푸터 */
+.B .ftr{background:var(--blue-900);color:#D8E3EE;padding:56px 0;font-size:14px;line-height:1.9}
+.B .ftr .wrap{display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap}
+.B .ftr a{color:#D8E3EE}
+
+/* ===== 2차 기능 화면 ===== */
+.B .page-h{padding:48px 0 24px;text-align:center}
+.B .page-h h1{font-size:38px}
+.B .page-h p{margin:12px 0 0;color:var(--muted)}
+.B .two{display:grid;grid-template-columns:560px 1fr;gap:32px;padding:24px 0 72px;align-items:start}
+.B .panel{border-radius:var(--r);background:#fff;box-shadow:var(--sh);border:1px solid var(--line);padding:24px}
+.B .rules{border-radius:var(--r);background:var(--tint);padding:20px 24px;margin-bottom:20px;font-size:14.5px}
+.B .rules b{display:block;margin-bottom:8px}
+.B .rules ul{margin:0;padding-left:18px}
+.B .mnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.B .mnav strong{font-size:20px;font-family:"Nanum Myeongjo",Batang,serif}
+.B .mnav button{min-width:44px;min-height:44px;border:1px solid var(--line-str);background:#fff;border-radius:999px;font-size:14px;color:var(--body);cursor:default}
+.B .mnav button[disabled]{color:#9AA7B6;border-color:var(--line)}
+.B .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.B .cal .dow{text-align:center;font-size:13px;font-weight:700;color:var(--muted);padding:6px 0}
+.B .cell{min-height:72px;border:1px solid var(--line);border-radius:14px;padding:6px;background:#fff;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.B .cell .d{font-size:15px;font-weight:700;color:var(--ink)}
+.B .cell .s{font-size:12.5px;font-weight:700;border-radius:999px;padding:1px 8px}
+.B .cell.avail{border-color:#9FCBB1;background:var(--ok-bg)}
+.B .cell.avail .s{color:var(--ok-fg)}
+.B .cell.full{background:var(--off-bg);background-image:repeating-linear-gradient(135deg,transparent 0 5px,rgba(79,91,107,.20) 5px 6px)}
+.B .cell.full .d{text-decoration:line-through}
+.B .cell.full .s{color:var(--off-fg)}
+.B .cell.off .s{color:var(--muted)}
+.B .cell.today{border:2px solid var(--blue-700)}
+.B .cell.today .s{color:var(--blue-700)}
+.B .cell.past{background:#FAFBFC}
+.B .cell.past .d{font-weight:500;color:#98A4B3}
+.B .legend{margin-top:14px;font-size:13px;color:var(--muted)}
+.B .slot{border-radius:var(--r);background:#fff;box-shadow:var(--sh);border:1px solid var(--line);
+  padding:18px 22px;margin-bottom:14px;display:flex;gap:16px;align-items:center}
+.B .slot .t{font-size:21px;font-weight:700;font-variant-numeric:tabular-nums;min-width:74px;color:var(--ink);font-family:Pretendard,sans-serif}
+.B .slot .m{flex:1}
+.B .slot .m b{display:block;font-size:15px;color:var(--ink)}
+.B .slot .m span{font-size:13.5px;color:var(--muted)}
+.B .badge{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px}
+.B .b-ok{color:var(--ok-fg);background:var(--ok-bg);border:1px solid #9FCBB1}
+.B .b-off{color:var(--off-fg);background:var(--off-bg);border:1px solid #C3CCD8}
+
+/* 모바일 프레임 내부 */
+.B.m{font-size:15.5px}
+.B.m .wrap{padding:0 20px}
+.B.m .hdr .wrap{height:56px;gap:12px}
+.B.m .gnb{display:none}
+.B.m .hero .wrap{padding:40px 20px 44px}
+.B.m .arch{width:320px;height:320px;top:24px}
+.B.m .hero h1{font-size:30px}
+.B.m .hero p{font-size:15.5px;margin:16px 0 22px}
+.B.m .btn{width:100%}
+.B.m .art{height:160px;margin-top:26px}
+.B.m .art svg{width:80px;height:80px}
+.B.m section.sec{padding:40px 0}
+.B.m .sec-h{margin-bottom:24px}
+.B.m .sec-h h2{font-size:24px}
+.B.m .grid5,.B.m .grid3{grid-template-columns:1fr}
+.B.m .two{display:block;padding:12px 0 24px}
+.B.m .page-h{padding:22px 0 12px}
+.B.m .page-h h1{font-size:26px}
+.B.m .calwrap{padding:0 12px}   /* 캘린더 전용 좌우 패딩 12px → 셀 폭 ≈46.3px */
+.B.m .cell{min-height:56px;padding:2px;gap:2px;border-radius:10px}
+.B.m .cell .d{font-size:14px}
+.B.m .cell .s{font-size:11.5px;padding:0 4px}
+.B .fixbar{position:sticky;bottom:0;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 14px;
+  background:rgba(255,255,255,.96);border-top:1px solid var(--line-str);z-index:9}
+.B .fixbar a{display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:999px;font-size:15px;font-weight:700;text-decoration:none}
+.B .fixbar .p{background:var(--blue-700);color:#fff}
+.B .fixbar .s{background:#fff;color:var(--blue-700);border:1px solid var(--line-str)}
+</style>
+</head>
+<body>
+
+<div class="mk-meta">
+  <h1>시안 B — “고요한 호흡” (Airy Calm)</h1>
+  <p><b>키워드</b> 여백 · 곡선 · 차분함 &nbsp;|&nbsp; <b>무드</b> 넓은 여백과 아치·둥근 모서리, 명조 헤드라인으로 요가·웰니스의 감성을 만든다. 파랑은 연한 틴트로 넓게 깔고, 진한 파랑은 행동에만 쓴다.</p>
+  <p>⚠ 컨셉 비교용 목업입니다. 최종 화면 명세가 아니며 <b>모든 문구·수치·강사·시간은 예시</b>입니다. <code>[TBD]</code>는 고객 확인 대상입니다. 웹폰트 미로드로 제목은 시스템 명조(바탕)로 대체 렌더됩니다.</p>
+  <div class="mk-chips">
+    <span class="mk-chip"><span class="mk-sw" style="background:#0F5E8C"></span>Primary #0F5E8C · 7.00:1</span>
+    <span class="mk-chip"><span class="mk-sw" style="background:#183048"></span>Ink #183048 · 13.50:1</span>
+    <span class="mk-chip"><span class="mk-sw" style="background:#3C4A57"></span>Body #3C4A57 · 9.10:1</span>
+    <span class="mk-chip"><span class="mk-sw" style="background:#61707E"></span>Muted #61707E · 5.09:1</span>
+    <span class="mk-chip"><span class="mk-sw" style="background:#2F7A6B"></span>Sage #2F7A6B · 5.10:1</span>
+    <span class="mk-chip"><span class="mk-sw" style="background:#7E8FA3"></span>Border #7E8FA3 · 3.31:1</span>
+    <span class="mk-chip"><span class="mk-sw" style="background:#EAF2FB"></span>Tint #EAF2FB</span>
+    <span class="mk-chip"><span class="mk-sw" style="background:#1B6E3C"></span>Success #1B6E3C · 6.28:1</span>
+  </div>
+</div>
+
+<!-- ①  1차 소개형 -->
+<div class="mk-label">① 1차 소개형 대표 섹션 — 메인(SCR-001) 히어로 + 수업 안내 · 1280px
+  <span>중앙 정렬·큰 여백 구성입니다. 사진이 없어도 아치 그래픽과 여백으로 화면이 성립하는지 보십시오.</span></div>
+<div class="mk-scroll"><div class="mk-frame">
+<div class="B">
+
+  <header class="hdr"><div class="wrap">
+    <span class="logo">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"><path d="M7.5 33.5a16.5 16.5 0 0 1 33 0"/><path d="M6 40.5h36"/></g><circle cx="24" cy="12" r="5.5" fill="currentColor"/></svg>
+      <span>YOGAPASS<small>강남 요가 스튜디오</small></span>
+    </span>
+    <nav class="gnb"><a href="#" aria-current="page">메인</a><a href="#">요가 강사 소개</a><a href="#">오시는 길</a><a href="#">문의하기</a></nav>
+    <a class="btn btn-p btn-sm" href="#">문의하기</a>
+  </div></header>
+
+  <div class="hero">
+    <div class="arch" aria-hidden="true"></div>
+    <div class="wrap">
+      <span class="eyebrow">강남 요가 스튜디오</span>
+      <h1>오늘, 강남에서<br>요가를 시작합니다</h1>
+      <p>처음이어도 괜찮습니다. 궁금한 점을 남겨주시면 스튜디오에서 안내해 드립니다.</p>
+      <div class="cta">
+        <a class="btn btn-p" href="#">문의하기</a>
+        <a class="btn btn-s" href="#">전화로 문의하기</a>
+      </div>
+      <p class="hours">운영시간 <span class="tbd">[TBD: 고객 확인 필요]</span> · 대표 전화 <span class="tbd">[TBD]</span></p>
+    </div>
+  </div>
+
+  <section class="sec"><div class="wrap">
+    <div class="art">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M7.5 33.5a16.5 16.5 0 0 1 33 0"/><path d="M6 40.5h36"/></g><circle cx="24" cy="12" r="5.5" fill="currentColor"/></svg>
+      <span class="ph">사진 예정 자리 · 스튜디오 전경 16:9 · 수령 전에는 이 그래픽 패널 유지</span>
+    </div>
+  </div></section>
+
+  <section class="sec alt"><div class="wrap">
+    <div class="sec-h"><h2>요가패스를 선택하는 이유</h2><p>※ 아래 3개 항목은 초안 예시이며 고객 확인 전입니다.</p></div>
+    <div class="grid3">
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg></div>
+        <h3>강남역에서 가까운 위치</h3><p>이동 시간을 줄여 수업에 집중할 수 있는 거리입니다.<br><span class="tbd">[TBD]</span></p></div>
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/></svg></div>
+        <h3>처음 오시는 분을 위한 방문 상담</h3><p>수업 경험이 없어도 상담으로 시작할 수 있습니다.<br><span class="tbd">[TBD]</span></p></div>
+      <div class="card"><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M20 21a8 8 0 1 0-16 0"/><circle cx="12" cy="8" r="4"/></svg></div>
+        <h3>수업마다 강사가 직접 안내</h3><p>동작과 호흡을 개별적으로 확인해 드립니다.<br><span class="tbd">[TBD]</span></p></div>
+    </div>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <div class="sec-h"><h2>수업 안내</h2><p>수업 유형별 설명은 고객 확인 후 확정됩니다.</p></div>
+    <div class="grid5">
+      <div class="card"><span class="tag">GROUP</span><h3>그룹 요가</h3><p class="tbd">[TBD: 설명 1~2문장]</p></div>
+      <div class="card"><span class="tag">KIDS</span><h3>키즈 요가</h3><p class="tbd">[TBD: 설명 1~2문장]</p></div>
+      <div class="card"><span class="tag">FLYING</span><h3>플라잉 요가</h3><p class="tbd">[TBD: 설명 1~2문장]</p></div>
+      <div class="card"><span class="tag">LOW</span><h3>로우 플라잉</h3><p class="tbd">[TBD: 설명 1~2문장]</p></div>
+      <div class="card"><span class="tag">REFORMER</span><h3>리포머</h3><p class="tbd">[TBD: 설명 1~2문장]</p></div>
+    </div>
+    <p class="notice">월 시간표는 공개되면 안내드립니다. 자세한 일정은 전화로 문의해 주세요.<br><em style="font-size:13px;color:#61707E">(1차 안내 문구 · 2차에는 “이번 달 수업 일정은 레슨 예약에서 확인하실 수 있습니다.”로 교체)</em></p>
+  </div></section>
+
+  <footer class="ftr"><div class="wrap">
+    <div><b>강남 요가패스</b><br>주소 <span class="tbd">[TBD]</span> · 대표 전화 <span class="tbd">[TBD]</span><br>운영시간 <span class="tbd">[TBD]</span></div>
+    <div><a href="#">메인</a> · <a href="#">요가 강사 소개</a> · <a href="#">오시는 길</a> · <a href="#">문의하기</a> · <a href="#">개인정보 처리방침</a></div>
+  </div></footer>
+
+</div>
+</div></div>
+
+<!-- ②  2차 기능 화면 -->
+<div class="mk-label">② 2차 기능 화면 — 레슨 예약 캘린더(SCR-110) + 슬롯 목록(SCR-111) · 1280px 2단
+  <span>곡선·그림자·명조 제목이 데이터 화면에서 어떻게 보이는지 판단하는 지점입니다. 날짜·강사·잔여 수치는 전부 예시입니다.</span></div>
+<div class="mk-scroll"><div class="mk-frame">
+<div class="B">
+
+  <header class="hdr"><div class="wrap">
+    <span class="logo">
+      <svg viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"><path d="M7.5 33.5a16.5 16.5 0 0 1 33 0"/><path d="M6 40.5h36"/></g><circle cx="24" cy="12" r="5.5" fill="currentColor"/></svg>
+      <span>YOGAPASS<small>강남 요가 스튜디오</small></span>
+    </span>
+    <nav class="gnb"><a href="#">메인</a><a href="#">강사 소개</a><a href="#">오시는 길</a><a href="#">상담 예약</a><a href="#" aria-current="page">레슨 예약</a><a href="#">마이페이지</a></nav>
+    <a class="btn btn-p btn-sm" href="#">레슨 예약</a>
+  </div></header>
+
+  <div class="wrap page-h">
+    <h1>레슨 예약</h1>
+    <p>원하시는 날짜를 선택하면 그날의 수업을 보실 수 있습니다.</p>
+  </div>
+
+  <div class="wrap two">
+    <div class="panel">
+      <div class="rules"><b>예약 안내</b>
+        <ul>
+          <li>레슨은 <b>전날까지</b> 예약하실 수 있습니다.</li>
+          <li>수업 시작 <b>3시간</b> 전까지 직접 취소하실 수 있습니다. <em>(관리자 설정값 · 예시)</em></li>
+          <li>동시에 <b>3건</b>까지 예약하실 수 있습니다. <em>(관리자 설정값 · 예시)</em></li>
+        </ul>
+      </div>
+      <div class="mnav"><button>◀ 이전 달</button><strong>2027년 2월</strong><button disabled>다음 달 ▶</button></div>
+      <div class="cal">
+        <div class="dow">일</div><div class="dow">월</div><div class="dow">화</div><div class="dow">수</div><div class="dow">목</div><div class="dow">금</div><div class="dow">토</div>
+        <div class="cell past"><span class="d">31</span></div><div class="cell past"><span class="d">1</span></div><div class="cell past"><span class="d">2</span></div>
+        <div class="cell today"><span class="d">3</span><span class="s">당일</span></div>
+        <div class="cell avail"><span class="d">4</span><span class="s">잔여 6</span></div>
+        <div class="cell avail"><span class="d">5</span><span class="s">잔여 2</span></div>
+        <div class="cell full"><span class="d">6</span><span class="s">마감</span></div>
+        <div class="cell off"><span class="d">7</span><span class="s">휴무</span></div>
+        <div class="cell avail"><span class="d">8</span><span class="s">잔여 9+</span></div>
+        <div class="cell avail"><span class="d">9</span><span class="s">잔여 4</span></div>
+        <div class="cell avail"><span class="d">10</span><span class="s">잔여 1</span></div>
+        <div class="cell full"><span class="d">11</span><span class="s">마감</span></div>
+        <div class="cell avail"><span class="d">12</span><span class="s">잔여 7</span></div>
+        <div class="cell avail"><span class="d">13</span><span class="s">잔여 3</span></div>
+        <div class="cell off"><span class="d">14</span><span class="s">휴무</span></div>
+        <div class="cell avail"><span class="d">15</span><span class="s">잔여 9+</span></div>
+        <div class="cell avail"><span class="d">16</span><span class="s">잔여 5</span></div>
+        <div class="cell avail"><span class="d">17</span><span class="s">잔여 8</span></div>
+        <div class="cell full"><span class="d">18</span><span class="s">마감</span></div>
+        <div class="cell avail"><span class="d">19</span><span class="s">잔여 2</span></div>
+        <div class="cell avail"><span class="d">20</span><span class="s">잔여 6</span></div>
+      </div>
+      <p class="legend">범례: 잔여 n = 예약 가능 · 마감 = 자리 없음 · 휴무 = 수업 없음 · 당일 = 당일 예약 불가</p>
+    </div>
+
+    <div>
+      <h2 style="font-size:22px;margin-bottom:6px">2월 9일 (화) 수업</h2>
+      <p style="margin:0 0 18px;color:#61707E;font-size:14px">오전 3개 · 오후 4개 · 예시 데이터</p>
+      <div class="slot"><span class="t">07:00</span><span class="m"><b>그룹 요가 <span class="badge b-ok">잔여 4</span></b><span>강사 [TBD] · 60분</span></span><a class="btn btn-p btn-sm" href="#">예약</a></div>
+      <div class="slot"><span class="t">09:30</span><span class="m"><b>플라잉 요가 <span class="badge b-ok">잔여 1</span></b><span>강사 [TBD] · 60분</span></span><a class="btn btn-p btn-sm" href="#">예약</a></div>
+      <div class="slot"><span class="t">11:00</span><span class="m"><b>리포머 <span class="badge b-off">마감</span></b><span>강사 [TBD] · 50분</span></span><a class="btn btn-s btn-sm" href="#" aria-disabled="true">마감</a></div>
+      <div class="slot"><span class="t">19:00</span><span class="m"><b>로우 플라잉 <span class="badge b-ok">잔여 2</span></b><span>강사 [TBD] · 60분</span></span><a class="btn btn-p btn-sm" href="#">예약</a></div>
+      <p style="font-size:14px;color:#61707E">원하시는 시간이 없으신가요? 전화로 문의해 주세요. <span class="tbd">[TBD]</span></p>
+    </div>
+  </div>
+
+</div>
+</div></div>
+
+<!-- ③  360px -->
+<div class="mk-label">③ 360px 확인 — 메인 히어로 / 예약 캘린더(하단 고정 바 포함)
+  <span>여백이 큰 컨셉이라 360px에서 첫 화면 안에 CTA가 들어오는지, 캘린더에서 라운드가 셀 여백을 얼마나 잡아먹는지 보십시오.</span></div>
+<div class="mk-phones">
+
+  <div class="mk-phone"><div class="B m">
+    <header class="hdr"><div class="wrap" style="display:flex;align-items:center">
+      <span class="logo" style="font-size:16px"><svg viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"><path d="M7.5 33.5a16.5 16.5 0 0 1 33 0"/><path d="M6 40.5h36"/></g><circle cx="24" cy="12" r="5.5" fill="currentColor"/></svg>YOGAPASS</span>
+      <span style="margin-left:auto;display:flex;gap:8px">
+        <span class="btn btn-s btn-sm" style="min-width:44px;padding:0 10px;width:auto">☎</span>
+        <span class="btn btn-s btn-sm" style="min-width:44px;padding:0 10px;width:auto">≡</span>
+      </span>
+    </div></header>
+    <div class="hero"><div class="arch" aria-hidden="true"></div><div class="wrap">
+      <span class="eyebrow">강남 요가 스튜디오</span>
+      <h1>오늘, 강남에서 요가를 시작합니다</h1>
+      <p>처음이어도 괜찮습니다. 궁금한 점을 남겨주시면 스튜디오에서 안내해 드립니다.</p>
+      <div class="cta"><a class="btn btn-p" href="#">문의하기</a><a class="btn btn-s" href="#">전화로 문의하기</a></div>
+      <div class="art"><svg viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M7.5 33.5a16.5 16.5 0 0 1 33 0"/><path d="M6 40.5h36"/></g><circle cx="24" cy="12" r="5.5" fill="currentColor"/></svg>
+        <span class="ph">사진 예정 자리</span></div>
+    </div></div>
+    <section class="sec alt"><div class="wrap">
+      <div class="sec-h"><h2>수업 안내</h2></div>
+      <div class="grid5">
+        <div class="card"><span class="tag">GROUP</span><h3>그룹 요가</h3><p class="tbd">[TBD: 설명]</p></div>
+        <div class="card"><span class="tag">KIDS</span><h3>키즈 요가</h3><p class="tbd">[TBD: 설명]</p></div>
+      </div>
+      <p class="notice">월 시간표는 공개되면 안내드립니다.</p>
+    </div></section>
+    <div class="fixbar"><a class="s" href="#">☎ 전화 문의</a><a class="p" href="#">문의하기</a></div>
+  </div></div>
+
+  <div class="mk-phone"><div class="B m">
+    <header class="hdr"><div class="wrap" style="display:flex;align-items:center">
+      <span class="logo" style="font-size:16px"><svg viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"><path d="M7.5 33.5a16.5 16.5 0 0 1 33 0"/><path d="M6 40.5h36"/></g><circle cx="24" cy="12" r="5.5" fill="currentColor"/></svg>YOGAPASS</span>
+      <span style="margin-left:auto;display:flex;gap:8px">
+        <span class="btn btn-s btn-sm" style="min-width:44px;padding:0 10px;width:auto">☎</span>
+        <span class="btn btn-s btn-sm" style="min-width:44px;padding:0 10px;width:auto">≡</span>
+      </span>
+    </div></header>
+    <div class="wrap page-h"><h1>레슨 예약</h1><p style="font-size:14px">원하시는 날짜를 선택하면 그날의 수업을 보실 수 있습니다.</p></div>
+    <div class="wrap" style="padding-top:8px"><div class="rules"><b>▸ 예약 안내 (접기·펼치기)</b>
+      <ul><li>레슨은 <b>전날까지</b> 예약 가능</li><li>시작 <b>3시간</b> 전까지 취소 가능 <em>(예시)</em></li></ul></div>
+      <div class="mnav"><button>◀</button><strong>2027년 2월</strong><button disabled>▶</button></div>
+    </div>
+    <div class="calwrap">
+      <div class="cal">
+        <div class="dow">일</div><div class="dow">월</div><div class="dow">화</div><div class="dow">수</div><div class="dow">목</div><div class="dow">금</div><div class="dow">토</div>
+        <div class="cell past"><span class="d">31</span></div><div class="cell past"><span class="d">1</span></div><div class="cell past"><span class="d">2</span></div>
+        <div class="cell today"><span class="d">3</span><span class="s">당일</span></div>
+        <div class="cell avail"><span class="d">4</span><span class="s">잔여 6</span></div>
+        <div class="cell avail"><span class="d">5</span><span class="s">잔여 2</span></div>
+        <div class="cell full"><span class="d">6</span><span class="s">마감</span></div>
+        <div class="cell off"><span class="d">7</span><span class="s">휴무</span></div>
+        <div class="cell avail"><span class="d">8</span><span class="s">잔여 9+</span></div>
+        <div class="cell avail"><span class="d">9</span><span class="s">잔여 4</span></div>
+        <div class="cell avail"><span class="d">10</span><span class="s">잔여 1</span></div>
+        <div class="cell full"><span class="d">11</span><span class="s">마감</span></div>
+        <div class="cell avail"><span class="d">12</span><span class="s">잔여 7</span></div>
+        <div class="cell avail"><span class="d">13</span><span class="s">잔여 3</span></div>
+      </div>
+      <p class="legend" style="font-size:12px">범례: 잔여 n = 예약 가능 · 마감 = 자리 없음 · 휴무 = 수업 없음 · 당일 = 당일 예약 불가</p>
+    </div>
+    <div class="wrap" style="padding-bottom:20px"><p style="font-size:13.5px;color:#61707E">원하시는 시간이 없으신가요? 전화로 문의해 주세요.</p></div>
+    <div class="fixbar" style="grid-template-columns:1fr"><a class="s" href="#">☎ 전화 문의 <em style="font-weight:500;font-size:12px">(자기 참조 → 전폭 1버튼)</em></a></div>
+  </div></div>
+
+</div>
+
+<div class="mk-note">
+  <b>시안 B 읽는 법</b>
+  <ul>
+    <li><b>여백이 콘텐츠를 대신한다.</b> 사진·강사 정보가 아직 없어도 화면이 비어 보이지 않도록 여백·아치·중앙 정렬로 리듬을 만든다.</li>
+    <li><b>명조 헤드라인</b>이 브랜드 인상을 만든다. 다만 본문·데이터는 전부 고딕(Pretendard)이며 명조는 h1·h2·월 표기에만 쓴다.</li>
+    <li><b>기능 화면에서의 비용</b>: 카드마다 그림자·둥근 모서리가 붙어 캘린더 셀·슬롯 카드가 세로로 길어진다. 360px에서 한 화면에 보이는 주 수가 A보다 적다.</li>
+    <li><b>사진이 들어오면 가장 크게 좋아지는 시안</b>이다. 반대로 사진이 계속 없으면 여백 의존도가 높아 “내용이 적다”는 인상을 줄 수 있다.</li>
+    <li><b>관리자 축소 적용</b>: 그림자·radius를 관리자에서만 8px/none으로 낮춘 별도 밀도 세트를 두어야 하므로 토큰이 사실상 2벌이 된다.</li>
+  </ul>
+</div>
+
+</body>
+</html>

@@ -3,8 +3,8 @@ doc_id: DSN-SYSTEM
 title: 디자인 시스템
 phase: P3
 owner: designer
-version: 0.2
-status: in-review
+version: 1.0
+status: approved
 reviewers: [planner, developer]
 inputs: [design/03_design-concept.md, planning/02_requirements.md, planning/02_information-architecture.md, planning/02_storyboard.md, pm/01_project-plan.md, shared/reviews/P3_design-docs_planner_r1.md, shared/reviews/P3_design-docs_developer_r1.md]
 updated: 2026-09-12

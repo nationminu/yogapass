@@ -3,8 +3,8 @@ doc_id: DSN-PAGE
 title: 페이지 디자인 명세 (1차)
 phase: P3
 owner: designer
-version: 0.2
-status: in-review
+version: 1.0
+status: approved
 reviewers: [planner, developer]
 inputs: [planning/02_storyboard.md, planning/02_requirements.md, planning/02_information-architecture.md, design/03_design-system.md, design/03_design-concept.md, shared/reviews/P3_design-docs_planner_r1.md, shared/reviews/P3_design-docs_developer_r1.md]
 updated: 2026-09-12

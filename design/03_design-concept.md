@@ -3,8 +3,8 @@ doc_id: DSN-CONCEPT
 title: 디자인 컨셉 (시안 3안)
 phase: P3
 owner: designer
-version: 0.2
-status: in-review
+version: 1.0
+status: approved
 reviewers: [planner, developer]
 inputs: [planning/02_requirements.md, planning/02_information-architecture.md, planning/02_storyboard.md, planning/02_storyboard-admin.md, pm/01_project-plan.md, pm/requests/CR-000_initial-request.md, interviews/2026-09-12_booking-rules.md, shared/reviews/CR-001_impact_designer.md]
 updated: 2026-09-12

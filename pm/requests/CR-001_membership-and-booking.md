@@ -4,7 +4,7 @@ title: 회원제 예약 시스템 도입 (회원가입·월 스케줄 예약·�
 type: change                 # initial(최초 요청) | change(변경 요청)
 requested_by: 총괄 PM
 received: 2026-09-12
-status: pending-approval      # received | analyzing | pending-approval | approved | rejected | on-hold | done
+status: approved      # received | analyzing | pending-approval | approved | rejected | on-hold | done
 decision_ref:                # ADR-xxx
 related: [interviews/2026-09-12_customer-interview.md, interviews/2026-09-12_summary-and-options.md, interviews/2026-09-12_booking-rules.md, interviews/2026-09-12_infra-constraints.md, shared/reviews/CR-001_impact_planner.md, shared/reviews/CR-001_impact_developer.md, shared/reviews/CR-001_impact_developer_r2.md, shared/reviews/CR-001_impact_designer.md]
 analyzed: 2026-09-12
@@ -467,13 +467,24 @@ planner §5와 같은 결론이다. P2부터는 성립하지 않는다.
 | 30 | 유료 외부 서비스 사용 여부(클라우드 브라우저 테스트 등), Safari·iOS 검증 수단(D-1) | STATUS §2 기존 항목 (유효) |
 
 ## 4. PM 결정
-- 결정:
-- 일자:
+- **결정: 수용** (pmo 권고인 부분 수용안을 기준으로 수용)
+- 일자: 2026-09-12
 - 조건·지시사항:
+  - **D-1 오픈 방식: A 단계 오픈** — 1차 소개형, 2차 회원·예약·관리자
+  - **D-2 1차 인프라 범위: (가) full compose** — 1차부터 운영과 같은 컨테이너 구성으로 만든다. 정적 1차(다)는 채택하지 않는다
+  - **D-3 오픈일: 미확정** — 계획서 v2.0 개정 시 확정한다. pmo 산정 기준 1차 10-26~11-12, 2차 2027-01-05~02-10
+  - **D-4 고객 확인 질문**: 방식·범위 질문(묶음 ①)은 `interviews/2026-09-12_customer-interview.md`(가상 인터뷰)와 PM 지시 16건으로 **대체한다.** 추가 발송하지 않는다.
+    단, **사이트에 그대로 노출되는 실제 값**(도메인, 로고 원본, 강사 정보, 요금·시간표, 주소·전화·운영시간, 개인정보 항목·보호책임자, 사업자 정보, SNS)은 지어낼 수 없으므로 `[TBD: 고객 확인 필요]`로 유지하고 오픈 전까지 확보한다
+  - **D-5 회귀**: P1부터. 계획서 v2.0 전면 개정 후 G1 재승인(`G1-CR-001`)
+  - **D-6 인프라**: 기존 호스팅·docker-compose (리눅스 8코어 16GB), SMTP 발송, 운영자 있음. DB는 PostgreSQL 권고 기준, 확정은 P4 기술 설계
+  - 기타 미결 사항(관리자 디자인 수준·모바일 범위, 유지보수 범위, 개인정보 보관 정책, I-2·I-4 인프라 정보 등)은 계획서 v2.0 작성 과정에서 순차 결정한다
 
 ## 5. 처리 이력
 | 일자 | 내용 | 담당 |
 |---|---|---|
 | 2026-09-12 | 접수 (PM 지시 16건 원문 기록, 인터뷰 문서 3종 연결) | 오케스트레이터 |
+| 2026-09-12 | 영향도 의견 4건 수집 (planner·developer R1·R2·designer) | 오케스트레이터 |
+| 2026-09-12 | 영향도 종합·권고(부분 수용) 작성 | pmo |
+| 2026-09-12 | **PM 결정: 수용** — 단계 오픈(A) + 1차 full compose(가), 오픈일은 계획서 v2.0에서 확정 | 총괄 PM |
 | 2026-09-12 | 영향도 의견 4건 제출 — planner v1.0 / developer v0.1(R1) / **developer R2 v0.1(최신 공수 기준, R1 §2·§2.5·§2.6·§7.1 무효화)** / designer | planner, developer, designer |
 | 2026-09-12 | **영향도 종합·권고 작성** (§2 요청 정리, §3 영향도 분석, §3-1 PM 결정 필요 사항 30건). status `analyzing` → `pending-approval`. pmo 권고: **부분 수용(조건 7건)** | pmo |

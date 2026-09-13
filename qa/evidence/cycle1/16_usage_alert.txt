@@ -1,0 +1,7 @@
+### 사용량 알림 — QA_RATE_LIMIT_ALERT_PER_SOURCE_DAY=1 로 차단 1회 유발
+시도1: HTTP=200
+시도2: HTTP=200
+시도3: HTTP=200
+시도4: HTTP=200
+시도5: HTTP=429
+시도6: HTTP=429

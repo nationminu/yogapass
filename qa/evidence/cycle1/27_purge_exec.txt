@@ -1,0 +1,13 @@
+실행 전 건수: 16
+### 실제 파기 실행 (QA_RETENTION_MINUTES__INQUIRY=10)
+2026-09-13T16:20:17+0900 WARNING core QA_TOOLS: ON — 이 환경은 인증 뒤에 있어야 합니다
+purge_expired inquiry=8 basis=10분(검증 전용)
+2026-09-13T16:20:18+0900 INFO core.jobs job.finished job=purge_expired status=success detail=inquiry=8 basis=10분(검증 전용) cutoff=2026-09-13T07:10:18.196235+00:00
+실행 후 건수: 8
+### 파기 실패 알림 아웃박스 kind 목록
+      1 (22건)
+      1 -----------------+--------------------+--------+----------+------------------------------------------------------------+------------------------------------------------------------+--------------------------------------+-----------
+      2 backup_failed
+     16 inquiry_notify
+      3 ops_daily
+      1 rate_limit_alert

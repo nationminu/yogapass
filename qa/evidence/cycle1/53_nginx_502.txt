@@ -1,0 +1,7 @@
+### nginx 경유 502 점검 화면 (REQ-F-065 보조 · 설계 §12.3)
+ Container yogapass-app-1  Stopped
+nginx :8080/ = 502
+title= 잠시 점검 중입니다 · 요가패스
+BODY: 잠시 점검 중입니다 · 요가패스 | :root { --ink:#16263A; --muted:#5A6B7D; --primary:#0B4F9E; --subtle:#F0F5FB; --border:#DDE4EC; } | * { box-sizing: border-box; } | body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; | background:var(--subtle); color:var(--ink); padding:24
+ Container yogapass-app-1  Started
+복귀 :8080/ = 200

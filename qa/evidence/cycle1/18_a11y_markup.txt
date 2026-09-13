@@ -1,0 +1,40 @@
+### home
+ skip_link=true main_tabindex=true lang=ko
+ landmarks: header=1 nav=2 main=1 footer=1
+ headings=1,2,2,2,2,2 | h1=1 | 단계건너뜀=0건
+ img=0 alt누락=0 | svg_aria_hidden=3/6
+ 입력요소=0 label미연결=0건 | aria-describedby=0
+ aria-current=2 | noscript=1 | tel링크=0
+ 새창링크=0 rel_noopener=0
+### instructors
+ skip_link=true main_tabindex=true lang=ko
+ landmarks: header=1 nav=2 main=1 footer=1
+ headings=1,2,2,2 | h1=1 | 단계건너뜀=0건
+ img=0 alt누락=0 | svg_aria_hidden=2/4
+ 입력요소=0 label미연결=0건 | aria-describedby=0
+ aria-current=2 | noscript=1 | tel링크=0
+ 새창링크=0 rel_noopener=0
+### location
+ skip_link=true main_tabindex=true lang=ko
+ landmarks: header=1 nav=3 main=1 footer=1
+ headings=1,2,2,2,2 | h1=1 | 단계건너뜀=0건
+ img=0 alt누락=0 | svg_aria_hidden=5/7
+ 입력요소=5 label미연결=0건 | aria-describedby=2
+ aria-current=2 | noscript=3 | tel링크=0
+ 새창링크=1 rel_noopener=1
+### privacy
+ skip_link=true main_tabindex=true lang=ko
+ landmarks: header=1 nav=3 main=1 footer=1
+ headings=1,2,2,2,2,2,2,2,2,2,2,2,2,2 | h1=1 | 단계건너뜀=0건
+ img=0 alt누락=0 | svg_aria_hidden=2/4
+ 입력요소=0 label미연결=0건 | aria-describedby=0
+ aria-current=0 | noscript=1 | tel링크=0
+ 새창링크=0 rel_noopener=0
+### e404_nodebug
+ skip_link=true main_tabindex=true lang=ko
+ landmarks: header=1 nav=2 main=1 footer=1
+ headings=1,2,2 | h1=1 | 단계건너뜀=0건
+ img=0 alt누락=0 | svg_aria_hidden=1/3
+ 입력요소=0 label미연결=0건 | aria-describedby=0
+ aria-current=0 | noscript=1 | tel링크=0
+ 새창링크=0 rel_noopener=0

@@ -1,0 +1,14 @@
+ Container yogapass-prodcheck-db-1  Starting
+ Container yogapass-prodcheck-db-1  Started
+ Container yogapass-prodcheck-db-1  Waiting
+ Container yogapass-prodcheck-db-1  Waiting
+ Container yogapass-prodcheck-db-1  Healthy
+ Container yogapass-prodcheck-db-1  Healthy
+ Container yogapass-prodcheck-app-1  Starting
+ Container yogapass-prodcheck-scheduler-1  Starting
+ Container yogapass-prodcheck-scheduler-1  Started
+ Container yogapass-prodcheck-app-1  Started
+NAME                             IMAGE                    COMMAND                  SERVICE             CREATED             STATUS                             PORTS
+yogapass-prodcheck-app-1         yogapass-app:0.1.0-qa1   "/app/deploy/entrypo…"   app                 33 seconds ago      Up 20 seconds (healthy)            127.0.0.1:8001->8000/tcp
+yogapass-prodcheck-db-1          postgres:17-alpine       "docker-entrypoint.s…"   db                  33 seconds ago      Up 32 seconds (healthy)            5432/tcp
+yogapass-prodcheck-scheduler-1   yogapass-app:0.1.0-qa1   "/app/deploy/entrypo…"   scheduler           33 seconds ago      Up 20 seconds (health: starting)   

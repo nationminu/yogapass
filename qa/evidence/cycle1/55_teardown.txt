@@ -1,0 +1,21 @@
+### 임시 자원 정리
+yp-qa-b
+yp-qa-c
+yp-qa-d
+ Container yogapass-prodcheck-db-1  Removed
+ Volume yogapass-prodcheck_pgdata  Removing
+ Network yogapass-prodcheck_internal  Removing
+ Volume yogapass-prodcheck_pgdata  Removed
+ Network yogapass-prodcheck_internal  Removed
+### 로컬 스택 최종 상태
+NAME                   IMAGE                    COMMAND                  SERVICE             CREATED             STATUS                        PORTS
+yogapass-app-1         yogapass-app             "/usr/local/bin/entr…"   app                 16 minutes ago      Up About a minute (healthy)   127.0.0.1:8000->8000/tcp
+yogapass-db-1          postgres:17-alpine       "docker-entrypoint.s…"   db                  37 minutes ago      Up 27 minutes (healthy)       127.0.0.1:5432->5432/tcp
+yogapass-mail-1        axllent/mailpit:latest   "/mailpit"               mail                37 minutes ago      Up 37 minutes (healthy)       1025/tcp, 1110/tcp, 127.0.0.1:8025->8025/tcp
+yogapass-proxy-1       nginx:alpine             "/docker-entrypoint.…"   proxy               37 minutes ago      Up 37 minutes (healthy)       127.0.0.1:8080->80/tcp
+yogapass-scheduler-1   yogapass-scheduler       "/usr/local/bin/entr…"   scheduler           16 minutes ago      Up 15 minutes (healthy)       
+### 소스 변경 여부 (git status)
+?? developer/site/.deploy-rollback-image
+?? qa/05_test-plan.md
+?? qa/evidence/cycle1/
+?? qa/tools/

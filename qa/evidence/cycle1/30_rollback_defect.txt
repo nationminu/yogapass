@@ -1,0 +1,20 @@
+### rollback.sh 무인자 실행 후 스택 상태 (결함 증거)
+yogapass-app
+app
+db
+mail
+proxy
+scheduler
+### 로컬 스택 복구
+ Container yogapass-db-1  Healthy
+ Container yogapass-scheduler-1  Starting
+ Container yogapass-db-1  Healthy
+ Container yogapass-app-1  Starting
+ Container yogapass-app-1  Started
+ Container yogapass-scheduler-1  Started
+NAME                   IMAGE                    COMMAND                  SERVICE             CREATED             STATUS                             PORTS
+yogapass-app-1         yogapass-app             "/usr/local/bin/entr…"   app                 21 seconds ago      Up 18 seconds (healthy)            127.0.0.1:8000->8000/tcp
+yogapass-db-1          postgres:17-alpine       "docker-entrypoint.s…"   db                  21 minutes ago      Up 11 minutes (healthy)            127.0.0.1:5432->5432/tcp
+yogapass-mail-1        axllent/mailpit:latest   "/mailpit"               mail                21 minutes ago      Up 21 minutes (healthy)            1025/tcp, 1110/tcp, 127.0.0.1:8025->8025/tcp
+yogapass-proxy-1       nginx:alpine             "/docker-entrypoint.…"   proxy               21 minutes ago      Up 21 minutes (healthy)            127.0.0.1:8080->80/tcp
+yogapass-scheduler-1   yogapass-scheduler       "/usr/local/bin/entr…"   scheduler           21 seconds ago      Up 18 seconds (health: starting)   

@@ -1,0 +1,27 @@
+### REQ-N-032 ① 백업 실행
+2026-09-13T16:18:19+0900 INFO core QA_TOOLS: off
+run_backup file=yogapass-local-20260913-1618.dump bytes=85533 elapsed=0.2s rotated=1 label=- free_gb=181.7
+2026-09-13T16:18:19+0900 INFO core.jobs job.finished job=run_backup status=success detail=file=yogapass-local-20260913-1618.dump bytes=85533 elapsed=0.2s rotated=1 label=- free_gb=181.7
+exit=0
+
+### 백업 파일 목록
+total 244
+drwxr-xr-x 1 natio 197610     0 Sep 13 16:18 .
+drwxr-xr-x 1 natio 197610     0 Sep 13 16:09 ..
+-rw-r--r-- 1 natio 197610 68431 Sep 13 10:43 yogapass-local-20260913-1043.label-pre-deploy.dump
+-rw-r--r-- 1 natio 197610 73581 Sep 13 10:55 yogapass-local-20260913-1055.label-pre-restore.dump
+-rw-r--r-- 1 natio 197610 85533 Sep 13 16:18 yogapass-local-20260913-1618.dump
+
+### REQ-N-032 ③ 실패 주입 (QA_FAIL_INJECT=backup)
+2026-09-13T16:18:21+0900 WARNING core QA_TOOLS: ON — 이 환경은 인증 뒤에 있어야 합니다
+2026-09-13T16:18:21+0900 WARNING core.qa QA_FAIL_INJECT: backup 주입됨
+2026-09-13T16:18:21+0900 WARNING core QA_FAIL_INJECT: 기동 시점 주입 대상 = backup
+2026-09-13T16:18:21+0900 INFO core.jobs job.finished job=run_backup status=failed detail=error=QA_FAIL_INJECT=backup 에 의한 의도된 실패 (검증 요건 ⑨ⓑ)
+CommandError: QA_FAIL_INJECT=backup 에 의한 의도된 실패 (검증 요건 ⑨ⓑ)
+exit=0
+
+### 실패 알림 아웃박스
+backup_failed | o*s@yogapass.local | queued | 0        | 2026-09-13T07:18:21.800305+00:00 (KST 2026-09-13 16:18:21) |                                                            | run_backup  |           
+backup_failed | o*s@yogapass.local | sent   | 1        | 2026-09-13T01:43:57.852538+00:00 (KST 2026-09-13 10:43:57) | 2026-09-13T01:44:01.583493+00:00 (KST 2026-09-13 10:44:01) | run_backup  |           
+backup_failed | o*s@yogapass.local | sent   | 1        | 2026-09-13T01:43:33.780405+00:00 (KST 2026-09-13 10:43:33) | 2026-09-13T01:44:01.578092+00:00 (KST 2026-09-13 10:44:01) | run_backup  |           
+(3건)

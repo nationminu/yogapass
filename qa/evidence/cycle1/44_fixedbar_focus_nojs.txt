@@ -1,0 +1,34 @@
+=== A. 하단 고정 바 / 헤더 주 CTA (REQ-F-003 · REQ-N-002 · §3.0) ===
+home 360px | 고정바=있음 h=61 버튼1개 "문의하기" | header.position=sticky bottom=178 | 헤더CTA=문의하기 | body.padding-bottom=77px | aria-current=2
+home 768px | 고정바=있음 h=61 버튼1개 "문의하기" | header.position=sticky bottom=124 | 헤더CTA=문의하기 | body.padding-bottom=77px | aria-current=2
+home 1280px | 고정바=없음 | header.position=sticky bottom=129 | 헤더CTA=문의하기 | body.padding-bottom=0px | aria-current=2
+instructors 360px | 고정바=있음 h=61 버튼1개 "문의하기" | header.position=sticky bottom=140 | 헤더CTA=문의하기 | body.padding-bottom=77px | aria-current=2
+instructors 768px | 고정바=있음 h=61 버튼1개 "문의하기" | header.position=sticky bottom=125 | 헤더CTA=문의하기 | body.padding-bottom=77px | aria-current=2
+instructors 1280px | 고정바=없음 | header.position=sticky bottom=127 | 헤더CTA=문의하기 | body.padding-bottom=0px | aria-current=2
+location 360px | 고정바=없음 | header.position=sticky bottom=141 | 헤더CTA=없음 | body.padding-bottom=76px | aria-current=2
+location 768px | 고정바=없음 | header.position=sticky bottom=126 | 헤더CTA=없음 | body.padding-bottom=76px | aria-current=2
+location 1280px | 고정바=없음 | header.position=sticky bottom=131 | 헤더CTA=없음 | body.padding-bottom=0px | aria-current=2
+privacy 360px | 고정바=있음 h=61 버튼1개 "문의하기" | header.position=sticky bottom=143 | 헤더CTA=문의하기 | body.padding-bottom=77px | aria-current=0
+privacy 768px | 고정바=있음 h=61 버튼1개 "문의하기" | header.position=sticky bottom=127 | 헤더CTA=문의하기 | body.padding-bottom=77px | aria-current=0
+privacy 1280px | 고정바=없음 | header.position=sticky bottom=130 | 헤더CTA=문의하기 | body.padding-bottom=0px | aria-current=0
+e404 360px | 고정바=있음 h=61 버튼1개 "문의하기" | header.position=sticky bottom=140 | 헤더CTA=문의하기 | body.padding-bottom=77px | aria-current=0
+e404 768px | 고정바=있음 h=61 버튼1개 "문의하기" | header.position=sticky bottom=123 | 헤더CTA=문의하기 | body.padding-bottom=77px | aria-current=0
+e404 1280px | 고정바=없음 | header.position=sticky bottom=127 | 헤더CTA=문의하기 | body.padding-bottom=0px | aria-current=0
+
+=== B. 포커스 표시 · 체크박스 라벨 행 · 푸터 링크 (360px /location) ===
+동의 체크박스 라벨 행 = 없음
+푸터 링크 = 홈 328x32 ; 강사 소개 328x32 ; 오시는 길 328x32 ; 문의하기 328x32
+포커스 표시:
+  a outline=solid 3px rgb(11, 79, 158) boxShadow=none
+  a outline=solid 3px rgb(11, 79, 158) boxShadow=none
+  summary outline=solid 3px rgb(11, 79, 158) boxShadow=none
+  a outline=none 3px rgb(22, 38, 58) boxShadow=none
+  a outline=none 3px rgb(22, 38, 58) boxShadow=none
+  a outline=none 3px rgb(11, 79, 158) boxShadow=none
+
+=== C. JavaScript 비활성 (REQ-N-028 · 029) ===
+home | 본문 글자수=351 | 링크=22개 | noscript=1 | 메뉴details=1 | tel링크=0
+instructors | 본문 글자수=357 | 링크=19개 | noscript=1 | 메뉴details=1 | tel링크=0
+location | 본문 글자수=718 | 링크=19개 | noscript=3 | 메뉴details=1 | tel링크=0
+privacy | 본문 글자수=1989 | 링크=29개 | noscript=1 | 메뉴details=2 | tel링크=0
+e404 | 본문 글자수=307 | 링크=22개 | noscript=1 | 메뉴details=1 | tel링크=0

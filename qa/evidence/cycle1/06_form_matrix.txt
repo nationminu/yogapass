@@ -1,0 +1,32 @@
+# 문의 폼 응답 형태 7종 — 대상 http://localhost:8010 (DEBUG=0/config.settings.test, QA_RATE_LIMIT_MODE=off)
+SINCE(UTC)=2026-09-13T07:07:17
+=== 폼① 정상 접수 ===
+HTTP=200
+BODY: 수강료, 개인 레슨 등 궁금한 점을 남겨주시면 확인 후 연락드립니다. | 문의가 접수되었습니다. | 확인 후 남겨주신 연락처로 연락드리겠습니다. | 급하신 경우 전화로도 문의하실 수 있습니다. | 다시 문의하기 | 빠른 답변이 필요하시면 전화로 문의해 주세요. | 브라우저의 자바스크립트가 꺼져 있어도 이 문의 폼은 그대로 제출됩니다. 글자 수 표시와 전송 중 표시만 나타나지 않습니다.
+form_present=false role_status=true role_alert=false aria_invalid=0
+preserved:  | consent_checked=false | message=
+new_token=(none)
+=== 폼② 서버 검증 실패(이름공백+전화형식+동의없음) ===
+HTTP=200
+BODY: 수강료, 개인 레슨 등 궁금한 점을 남겨주시면 확인 후 연락드립니다. | 입력 내용을 확인해 주세요 | 이름을 입력해 주세요. | 휴대폰 번호 형식이 올바르지 않습니다. 예: 010-1234-5678 | 개인정보 수집·이용에 동의해 주세요. | 이름 | *
+form_present=true role_status=true role_alert=true aria_invalid=3
+preserved: name=, phone=010-12 | consent_checked=false | message=TEST-��������
+new_token=IjQ3ZmYyNGVkOG...
+=== 폼③ honeypot ===
+HTTP=200
+BODY: 수강료, 개인 레슨 등 궁금한 점을 남겨주시면 확인 후 연락드립니다. | 문의가 접수되었습니다. | 확인 후 남겨주신 연락처로 연락드리겠습니다. | 급하신 경우 전화로도 문의하실 수 있습니다. | 다시 문의하기 | 빠른 답변이 필요하시면 전화로 문의해 주세요. | 브라우저의 자바스크립트가 꺼져 있어도 이 문의 폼은 그대로 제출됩니다. 글자 수 표시와 전송 중 표시만 나타나지 않습니다.
+form_present=false role_status=true role_alert=false aria_invalid=0
+preserved:  | consent_checked=false | message=
+new_token=(none)
+=== 폼⑦ 토큰 부재 ===
+HTTP=200
+BODY: 수강료, 개인 레슨 등 궁금한 점을 남겨주시면 확인 후 연락드립니다. | 시간이 지나 문의가 접수되지 않았습니다. | 작성하신 내용은 아래에 그대로 남아 있습니다. 내용을 확인하신 뒤 다시 보내 주세요. | 급하신 경우 전화로도 문의하실 수 있습니다. | 이름 | * | (필수)
+form_present=true role_status=true role_alert=true aria_invalid=0
+preserved: name=TEST-��ū����, phone=010-1234-5678 | consent_checked=true | message=TEST-��ū���纻��
+new_token=IjJjMDRkZmEzNW...
+=== 폼⑦ 토큰 변조 ===
+HTTP=200
+BODY: 수강료, 개인 레슨 등 궁금한 점을 남겨주시면 확인 후 연락드립니다. | 시간이 지나 문의가 접수되지 않았습니다. | 작성하신 내용은 아래에 그대로 남아 있습니다. 내용을 확인하신 뒤 다시 보내 주세요. | 급하신 경우 전화로도 문의하실 수 있습니다. | 이름 | * | (필수)
+form_present=true role_status=true role_alert=true aria_invalid=0
+preserved: name=TEST-��ū����, phone=010-1234-5678 | consent_checked=true | message=TEST-��ū��������
+new_token=Ijc0ZTU5MTdkND...

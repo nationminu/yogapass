@@ -1,0 +1,22 @@
+### REQ-N-020 qa_pii_columns
+2026-09-13T16:13:39+0900 WARNING core QA_TOOLS: ON — 이 환경은 인증 뒤에 있어야 합니다
+app     | model   | table           | column         | type          | purpose                                  | retention_days | masked
+--------+---------+-----------------+----------------+---------------+------------------------------------------+----------------+-------
+inquiry | Inquiry | inquiry_inquiry | name           | CharField     | 문의 답변을 위한 문의자 식별                         | 365            | Y     
+inquiry | Inquiry | inquiry_inquiry | phone          | CharField     | 문의 답변 연락                                 | 365            | Y     
+inquiry | Inquiry | inquiry_inquiry | phone_norm     | CharField     | 표기 형식과 무관한 조회·중복 판정(생성 컬럼)               | 365            | Y     
+inquiry | Inquiry | inquiry_inquiry | message        | TextField     | 문의 내용 확인·답변                              | 365            | N     
+inquiry | Inquiry | inquiry_inquiry | consent_at     | DateTimeField | 수집·이용 동의 시각 증빙                           | 365            | N     
+inquiry | Inquiry | inquiry_inquiry | source_ip_hash | CharField     | 악용 방지 — **솔트 해시만 저장하고 원본 IP 는 저장하지 않는다** | 365            | N     
+(6건)
+
+### REQ-N-023 check_release (미확정 [TBD] 잔존 → 종료 코드 1 기대)
+2026-09-13T16:13:41+0900 WARNING core QA_TOOLS: ON — 이 환경은 인증 뒤에 있어야 합니다
+check_release FAILED pending=11 sections=[p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11]
+개인정보 처리방침 본문(content/privacy.yml)을 고객 확정값으로 채우고 status 를 confirmed 로 바꾼 뒤 다시 배포하십시오 (REQ-F-050 · T-F).
+exit=1
+
+### check_release --warn-only
+2026-09-13T16:13:43+0900 WARNING core QA_TOOLS: ON — 이 환경은 인증 뒤에 있어야 합니다
+check_release FAILED pending=11 sections=[p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11] (warn-only)
+exit=0

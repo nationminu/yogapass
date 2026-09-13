@@ -1,0 +1,32 @@
+### 테스트 데이터 정리 (요구사항 §5.3 환경 요건 ⑤)
+-- 삭제 전 --
+8
+-- dry-run --
+2026-09-13T16:37:25+0900 WARNING core QA_TOOLS: ON — 이 환경은 인증 뒤에 있어야 합니다
+inquiry_inquiry          삭제 예정 8건
+mailer_outbox            삭제 예정 8건
+core_ratelimitcounter    삭제 예정 6건
+core_jobrunlog           삭제 예정 1건
+합계 삭제 예정 23건
+실제 삭제하려면 --confirm 을 주십시오.
+-- 실제 삭제 --
+2026-09-13T16:37:28+0900 WARNING core QA_TOOLS: ON — 이 환경은 인증 뒤에 있어야 합니다
+2026-09-13T16:37:28+0900 INFO core.jobs job.finished job=qa_purge_test_data status=success detail=inquiry_inquiry=8 mailer_outbox=8 core_ratelimitcounter=6 core_jobrunlog=1 total=23
+inquiry_inquiry          삭제 8건
+mailer_outbox            삭제 8건
+core_ratelimitcounter    삭제 6건
+core_jobrunlog           삭제 1건
+합계 삭제 23건
+-- 삭제 후 --
+0
+ops_daily        | o*s@yogapass.local | sent   | 1        | 2026-09-12T15:32:22.635770+00:00 (KST 2026-09-13 00:32:22) | 2026-09-12T15:32:24.610707+00:00 (KST 2026-09-13 00:32:24) |                                      |           
+(14건)
+### 최종 테스트 데이터 정리
+2
+2026-09-13T16:40:35+0900 INFO core.jobs job.finished job=qa_purge_test_data status=success detail=inquiry_inquiry=2 mailer_outbox=2 core_ratelimitcounter=2 core_jobrunlog=1 total=7
+inquiry_inquiry          삭제 2건
+mailer_outbox            삭제 2건
+core_ratelimitcounter    삭제 2건
+core_jobrunlog           삭제 1건
+합계 삭제 7건
+최종 inquiry 건수: 0

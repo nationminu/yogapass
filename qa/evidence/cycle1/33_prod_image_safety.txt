@@ -1,0 +1,38 @@
+### 대상 이미지: yogapass-app:0.1.0-qa1 (qa 가 직접 빌드)
+REPOSITORY     TAG         IMAGE ID       CREATED         SIZE
+yogapass-app   0.1.0-qa1   8e00bfeadca7   2 minutes ago   281MB
+
+### 안전장치② 구조적 제외 — qa/ · tests/ · .env 존재 여부
+.
+..
+.deploy-rollback-image
+.dockerignore
+Dockerfile
+apps
+compose.local.yaml
+compose.prod.yaml
+compose.yaml
+config
+content
+deploy
+manage.py
+pyproject.toml
+requirements-dev.txt
+requirements.txt
+static
+staticfiles
+templates
+--- qa/ tests/ .env ---
+ls: cannot access '/app/qa': No such file or directory
+ls: cannot access '/app/tests': No such file or directory
+ls: cannot access '/app/.env': No such file or directory
+--- find qa_*.py ---
+0
+--- find qa_settings.py ---
+0
+
+### 안전장치④ 명령 미등록
+0
+
+### 안전장치⑤ HTTP 노출
+0

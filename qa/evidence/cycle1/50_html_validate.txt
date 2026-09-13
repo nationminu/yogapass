@@ -1,0 +1,11 @@
+"file:/C:/Workspace/workspaces/site-creator/projects/yogapass/qa/evidence/cycle1/html/e404.html":141.3-141.19: error: Duplicate ID “ypht”.
+"file:/C:/Workspace/workspaces/site-creator/projects/yogapass/qa/evidence/cycle1/html/e404.html":47.3-47.19: info warning: The first occurrence of ID “ypht” was here.
+"file:/C:/Workspace/workspaces/site-creator/projects/yogapass/qa/evidence/cycle1/html/home.html":242.3-242.19: error: Duplicate ID “ypht”.
+"file:/C:/Workspace/workspaces/site-creator/projects/yogapass/qa/evidence/cycle1/html/home.html":47.3-47.19: info warning: The first occurrence of ID “ypht” was here.
+"file:/C:/Workspace/workspaces/site-creator/projects/yogapass/qa/evidence/cycle1/html/instructors.html":117.3-117.23: info warning: Section lacks heading. Consider using “h2”-“h6” elements to add identifying headings to all sections, or else use a “div” element instead for any cases where no heading is needed.
+"file:/C:/Workspace/workspaces/site-creator/projects/yogapass/qa/evidence/cycle1/html/instructors.html":197.3-197.19: error: Duplicate ID “ypht”.
+"file:/C:/Workspace/workspaces/site-creator/projects/yogapass/qa/evidence/cycle1/html/instructors.html":47.3-47.19: info warning: The first occurrence of ID “ypht” was here.
+"file:/C:/Workspace/workspaces/site-creator/projects/yogapass/qa/evidence/cycle1/html/location.html":306.3-306.19: error: Duplicate ID “ypht”.
+"file:/C:/Workspace/workspaces/site-creator/projects/yogapass/qa/evidence/cycle1/html/location.html":49.3-49.19: info warning: The first occurrence of ID “ypht” was here.
+"file:/C:/Workspace/workspaces/site-creator/projects/yogapass/qa/evidence/cycle1/html/privacy.html":342.3-342.19: error: Duplicate ID “ypht”.
+"file:/C:/Workspace/workspaces/site-creator/projects/yogapass/qa/evidence/cycle1/html/privacy.html":47.3-47.19: info warning: The first occurrence of ID “ypht” was here.

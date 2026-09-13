@@ -1,0 +1,21 @@
+### REQ-N-038 파기 배치 — 기본 설정(365일) dry-run
+2026-09-13T16:19:53+0900 INFO core QA_TOOLS: off
+삭제 예정 inquiry=0 (기준 365일, cutoff=2025-09-13 07:19:54.327151+00:00)
+2026-09-13T16:19:54+0900 INFO core.jobs job.finished job=purge_expired status=success detail=dry_run inquiry=0 basis=365일
+
+### 보관 기간 10분으로 단축 (QA_RETENTION_MINUTES__INQUIRY=10) dry-run
+2026-09-13T16:19:56+0900 WARNING core QA_TOOLS: ON — 이 환경은 인증 뒤에 있어야 합니다
+삭제 예정 inquiry=8 (기준 10분(검증 전용), cutoff=2026-09-13 07:09:56.969345+00:00)
+2026-09-13T16:19:56+0900 INFO core.jobs job.finished job=purge_expired status=success detail=dry_run inquiry=8 basis=10분(검증 전용)
+
+### 보관 기간 0분(즉시 만료) dry-run
+2026-09-13T16:19:58+0900 WARNING core QA_TOOLS: ON — 이 환경은 인증 뒤에 있어야 합니다
+삭제 예정 inquiry=13 (기준 1분(검증 전용), cutoff=2026-09-13 07:18:59.277998+00:00)
+2026-09-13T16:19:59+0900 INFO core.jobs job.finished job=purge_expired status=success detail=dry_run inquiry=13 basis=1분(검증 전용)
+
+### 파기 실패 주입
+2026-09-13T16:20:01+0900 WARNING core QA_TOOLS: ON — 이 환경은 인증 뒤에 있어야 합니다
+2026-09-13T16:20:01+0900 WARNING core.qa QA_FAIL_INJECT: purge 주입됨
+2026-09-13T16:20:01+0900 WARNING core QA_FAIL_INJECT: 기동 시점 주입 대상 = purge
+2026-09-13T16:20:01+0900 INFO core.jobs job.finished job=purge_expired status=failed detail=error=QA_FAIL_INJECT=purge 에 의한 의도된 실패 (검증 요건 ⑨ⓒ)
+CommandError: QA_FAIL_INJECT=purge 에 의한 의도된 실패 (검증 요건 ⑨ⓒ)

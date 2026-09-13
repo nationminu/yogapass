@@ -1,0 +1,27 @@
+### 일일 운영 요약 (실패 집계 경로 확인)
+2026-09-13T16:20:39+0900 INFO core QA_TOOLS: off
+[점검필요] 요가패스 일일 운영 요약 2026-09-13
+요가패스 일일 운영 요약 (2026-09-13 16:20 KST 기준 최근 24시간)
+환경: local
+
+ⓐ /healthz 폴링 : 성공 69 · 실패 0 (기록 69건)
+ⓑ 응답 회복 전환 : 0회 (재시작·일시 장애 신호)
+ⓒ DB 백업      : 성공 (2026-09-13 16:01 KST)
+   file=yogapass-local-20260913-1601.dump bytes=81409 elapsed=0.2s rotated=1 label=- free_gb=183.0
+ⓓ 메일 실패    : 0건 / 배치 실패 : 2건
+   건너뜀(skipped) : run_backup=2  ← 반복되면 락 경합·설계 문제 신호
+ⓔ 디스크 여유  : 19.4% (180.7GB / 930.7GB)
+ⓕ 빈도 제한 차단 : 2건
+
+점검이 필요한 항목: 배치 실패 2건
+
+※ 이 메일은 매일 같은 시각에 1통 발송됩니다. **오지 않는 날 자체가 이상 신호**입니다.
+
+### /healthz 폴링
+2026-09-13T16:20:41+0900 INFO core QA_TOOLS: off
+ping_health ok
+2026-09-13T16:20:41+0900 INFO core.jobs job.finished job=ping_health status=success detail=url=http://app:8000/healthz status=200 ok=True
+
+### 스케줄러 생존 판정
+2026-09-13T16:20:43+0900 INFO core QA_TOOLS: off
+ok

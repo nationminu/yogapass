@@ -1,0 +1,33 @@
+### 운영 미리보기 초기화
+  Applying inquiry.0001_initial... OK
+  Applying mailer.0001_initial... OK
+  Applying sessions.0001_initial... OK
+	HINT: content/privacy.yml 의 각 항목 본문을 고객 확정값으로 채우고 status 를 confirmed 로 바꾼 뒤 다시 배포하십시오 (REQ-N-023 ① · REQ-F-050 · T-F).
+seed_content 완료 created=20 updated=0 dry_run=False
+### 화면 상태 코드
+/ -> 200
+/instructors -> 200
+/location -> 200
+/privacy -> 200
+/nope -> 404
+/healthz -> 200
+/sitemap.xml -> 200
+/robots.txt -> 200
+### 정적 파이프라인 (해시·brotli·immutable)
+hashed=/static/css/base.3bfcecb92967.css
+HTTP/1.1 200 OK
+Cache-Control: max-age=315360000, public, immutable
+Content-Encoding: br
+### 운영 설정 점검
+2026-09-13T16:25:02+0900 INFO core QA_TOOLS: off
+System check identified some issues:
+
+WARNINGS:
+?: (content.W001) 개인정보 처리방침 본문이 확정되지 않았습니다(미확정 항목: p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11).
+	HINT: content/privacy.yml 의 각 항목 본문을 고객 확정값으로 채우고 status 를 confirmed 로 바꾼 뒤 다시 배포하십시오 (REQ-N-023 ① · REQ-F-050 · T-F).
+?: (security.W004) You have not set a value for the SECURE_HSTS_SECONDS setting. If your entire site is served only over SSL, you may want to consider setting a value and enabling HTTP Strict Transport Security. Be sure to read the documentation first; enabling HSTS carelessly can cause serious, irreversible problems.
+?: (security.W008) Your SECURE_SSL_REDIRECT setting is not set to True. Unless your site should be available over both SSL and non-SSL connections, you may want to either set this setting True or configure a load balancer or reverse-proxy server to redirect all connections to HTTPS.
+?: (security.W012) SESSION_COOKIE_SECURE is not set to True. Using a secure-only session cookie makes it more difficult for network traffic sniffers to hijack user sessions.
+?: (security.W016) You have 'django.middleware.csrf.CsrfViewMiddleware' in your MIDDLEWARE, but you have not set CSRF_COOKIE_SECURE to True. Using a secure-only CSRF cookie makes it more difficult for network traffic sniffers to steal the CSRF token.
+
+System check identified 5 issues (0 silenced).

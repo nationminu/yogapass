@@ -1,0 +1,28 @@
+e404_1.report.json runtimeError: ERRORED_DOCUMENT_REQUEST
+e404_2.report.json runtimeError: ERRORED_DOCUMENT_REQUEST
+e404_3.report.json runtimeError: ERRORED_DOCUMENT_REQUEST
+=== M-1 모바일 프리셋 · 3회 중앙값 (대상: 운영 미리보기 http://localhost:8001) ===
+화면 | 성능 | 접근성 | 권장사항 | SEO | 원값(perf/a11y/bp/seo)
+home | 99 | 100 | 92 | 100 | 99/100/92/100  99/100/92/100  99/100/92/100
+instructors | 100 | 100 | 100 | 100 | 100/100/100/100  100/100/100/100  100/100/100/100
+location | 99 | 100 | 100 | 100 | 99/100/100/100  99/100/100/100  99/100/100/100
+privacy | 99 | 100 | 100 | 100 | 99/100/100/100  99/100/100/100  99/100/100/100
+e404 | - | - | - | - | 
+
+=== 감점 감사 항목 (가중치>0, 3회 중 발생 횟수) ===
+3x home | best-practices | errors-in-console (Browser errors were logged to the console)
+3x home | best-practices | inspector-issues (Issues were logged in the `Issues` panel in Chrome Devtools)
+3x home | performance | first-contentful-paint (First Contentful Paint)
+3x home | performance | speed-index (Speed Index)
+3x home | performance | total-blocking-time (Total Blocking Time)
+3x instructors | performance | first-contentful-paint (First Contentful Paint)
+3x instructors | performance | speed-index (Speed Index)
+2x instructors | performance | total-blocking-time (Total Blocking Time)
+3x location | performance | first-contentful-paint (First Contentful Paint)
+3x location | performance | largest-contentful-paint (Largest Contentful Paint)
+3x location | performance | speed-index (Speed Index)
+2x location | performance | total-blocking-time (Total Blocking Time)
+3x privacy | performance | first-contentful-paint (First Contentful Paint)
+3x privacy | performance | largest-contentful-paint (Largest Contentful Paint)
+3x privacy | performance | speed-index (Speed Index)
+2x privacy | performance | total-blocking-time (Total Blocking Time)

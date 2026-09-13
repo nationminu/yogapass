@@ -1,0 +1,18 @@
+=== A. 하단 고정 바 / 헤더 주 CTA (REQ-F-003 · REQ-N-002 · §3.0) ===
+home 360px | 고정바=있음 h=61 버튼2개 "전화 문의 문의하기" | header.position=sticky bottom=183 | 헤더CTA=,문의하기 | body.padding-bottom=77px | aria-current=2
+home 768px | 고정바=있음 h=61 버튼2개 "전화 문의 문의하기" | header.position=sticky bottom=127 | 헤더CTA=,문의하기 | body.padding-bottom=77px | aria-current=2
+home 1280px | 고정바=없음 | header.position=sticky bottom=130 | 헤더CTA=,문의하기 | body.padding-bottom=0px | aria-current=2
+instructors 360px | 고정바=있음 h=61 버튼2개 "전화 문의 문의하기" | header.position=sticky bottom=142 | 헤더CTA=,문의하기 | body.padding-bottom=77px | aria-current=2
+instructors 768px | 고정바=있음 h=61 버튼2개 "전화 문의 문의하기" | header.position=sticky bottom=127 | 헤더CTA=,문의하기 | body.padding-bottom=77px | aria-current=2
+instructors 1280px | 고정바=없음 | header.position=sticky bottom=133 | 헤더CTA=,문의하기 | body.padding-bottom=0px | aria-current=2
+location 360px | 고정바=있음 h=61 버튼1개 "전화 문의" | header.position=sticky bottom=144 | 헤더CTA=,전화 문의 | body.padding-bottom=77px | aria-current=2
+location 768px | 고정바=있음 h=61 버튼1개 "전화 문의" | header.position=sticky bottom=127 | 헤더CTA=,전화 문의 | body.padding-bottom=77px | aria-current=2
+location 1280px | 고정바=없음 | header.position=sticky bottom=130 | 헤더CTA=,전화 문의 | body.padding-bottom=0px | aria-current=2
+privacy 360px | 고정바=있음 h=61 버튼2개 "전화 문의 문의하기" | header.position=sticky bottom=147 | 헤더CTA=,문의하기 | body.padding-bottom=77px | aria-current=0
+privacy 768px | 고정바=있음 h=61 버튼2개 "전화 문의 문의하기" | header.position=sticky bottom=132 | 헤더CTA=,문의하기 | body.padding-bottom=77px | aria-current=0
+privacy 1280px | 고정바=없음 | header.position=sticky bottom=132 | 헤더CTA=,문의하기 | body.padding-bottom=0px | aria-current=0
+e404 360px | 고정바=있음 h=61 버튼2개 "전화 문의 문의하기" | header.position=sticky bottom=141 | 헤더CTA=,문의하기 | body.padding-bottom=77px | aria-current=0
+e404 768px | 고정바=있음 h=61 버튼2개 "전화 문의 문의하기" | header.position=sticky bottom=125 | 헤더CTA=,문의하기 | body.padding-bottom=77px | aria-current=0
+e404 1280px | 고정바=없음 | header.position=sticky bottom=130 | 헤더CTA=,문의하기 | body.padding-bottom=0px | aria-current=0
+
+=== B. 포커스 표시 · 체크박스 라벨 행 · 푸터 링크 (360px /location) ===

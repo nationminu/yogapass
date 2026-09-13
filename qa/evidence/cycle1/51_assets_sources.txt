@@ -1,0 +1,58 @@
+### REQ-N-024 이미지 라이선스 대조
+-- 빌드 결과물의 이미지 자산 --
+total 104
+drwxr-xr-x 2 app app  4096 Sep 13 01:28 .
+drwxr-xr-x 7 app app  4096 Sep 12 15:08 ..
+-rwxr-xr-x 1 app app  3965 Sep 13 01:28 SOURCES.md
+-rwxr-xr-x 1 app app  3027 Sep 12 20:41 apple-touch-icon.png
+-rwxr-xr-x 1 app app  1072 Sep 12 15:21 apple-touch-icon.svg
+-rwxr-xr-x 1 app app 13942 Sep 12 20:40 favicon.ico
+-rwxr-xr-x 1 app app  1178 Sep 12 20:40 favicon.svg
+-rwxr-xr-x 1 app app  3130 Sep 12 20:41 icon-192.png
+-rwxr-xr-x 1 app app  8811 Sep 12 20:41 icon-512.png
+-rwxr-xr-x 1 app app  1175 Sep 12 15:21 logo-horizontal.svg
+-rwxr-xr-x 1 app app   765 Sep 12 15:21 logo-mark.svg
+-rwxr-xr-x 1 app app  2998 Sep 13 01:25 og-image.TEMP-source.svg
+-rwxr-xr-x 1 app app 30916 Sep 13 01:27 og-image.png
+-rwxr-xr-x 1 app app  2846 Sep 12 15:21 og-image.svg
+-- design/assets/SOURCES.md 존재 --
+total 52
+drwxr-xr-x 1 natio 197610     0 Sep 12 22:50 .
+drwxr-xr-x 1 natio 197610     0 Sep 12 23:02 ..
+-rw-r--r-- 1 natio 197610     0 Sep 11 20:43 .gitkeep
+-rw-r--r-- 1 natio 197610 17656 Sep 12 22:50 SOURCES.md
+-rw-r--r-- 1 natio 197610  1072 Sep 12 22:48 apple-touch-icon-master-180.svg
+-rw-r--r-- 1 natio 197610  1171 Sep 12 22:47 favicon.svg
+-rw-r--r-- 1 natio 197610  1117 Sep 12 22:47 icon-master-512.svg
+-rw-r--r-- 1 natio 197610  1175 Sep 12 19:59 logo-yogapass-horizontal.svg
+-rw-r--r-- 1 natio 197610   765 Sep 12 19:59 logo-yogapass-mark.svg
+-rw-r--r-- 1 natio 197610  2846 Sep 12 22:48 og-image.svg
+-- static/img/SOURCES.md (developer 인계 메모) --
+-rw-r--r-- 1 natio 197610 3965 Sep 13 10:28 developer/site/static/img/SOURCES.md
+-- SOURCES.md 에 기재된 항목 --
+| `logo-yogapass-mark.svg`
+| `logo-yogapass-horizontal.svg`
+| `favicon.svg`
+| `icon-master-512.svg`
+| `apple-touch-icon-master-180.svg`
+| `og-image.svg`
+| `favicon.svg`
+| `icon-master-512.svg`
+| `apple-touch-icon-master-180.svg`
+| `og-image.svg`
+| `favicon.ico`
+| `icon-192.png`
+| `icon-512.png`
+| `apple-touch-icon.png`
+| `og-image.png`
+-- 지도 서비스 캡처 여부(파일 형식) --
+12
+
+### webkit 체크리스트 존재 (기술 설계 §10.5 ③)
+-rw-r--r-- 1 natio 197610 4712 Sep 13 10:38 developer/site/qa/webkit_checklist.md
+# WebKit(Safari · iOS) 실기기 검증 체크리스트 — 제작 제공본
+
+> 기술 설계 §10.5 ③ 산출물. **검증 요건 ⑥(가상 키보드 검증 수단)** 의 제작 측 제공분이다.
+> 기기 확보와 실제 수행은 qa·PM 소관이고, 제작은 ① 관측 신호 ② 자동화 판정 절차 ③ 이 체크리스트를 제공한다.
+>
+> ⚠ **데스크톱 브라우저의 뷰포트 축소로 대체하지 않는다** — 가상 키보드가 재현되지 않아 **거짓 Pass** 가 난다

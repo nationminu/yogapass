@@ -1,0 +1,21 @@
+조합 | 대비 | 기준 | 판정
+본문 ink / surface | 15.30:1 | 4.5:1 | Pass
+본문 ink / surface-alt | 14.51:1 | 4.5:1 | Pass
+muted / surface | 5.48:1 | 4.5:1 | Pass
+muted / surface-alt | 5.19:1 | 4.5:1 | Pass
+primary / surface | 8.00:1 | 4.5:1 | Pass
+primary / primary-subtle | 7.29:1 | 4.5:1 | Pass
+on-navy / navy | 15.54:1 | 4.5:1 | Pass
+on-navy-muted / navy | 9.21:1 | 4.5:1 | Pass
+border-strong / surface (UI 경계 3:1) | 3.31:1 | 3:1 | Pass
+error / error-bg | 5.61:1 | 4.5:1 | Pass
+success / success-bg | 5.55:1 | 4.5:1 | Pass
+warning / warning-bg | 5.66:1 | 4.5:1 | Pass
+neutral / neutral-bg | 6.09:1 | 4.5:1 | Pass
+disabled-fg / disabled-bg | 4.83:1 | 4.5:1 | Pass
+흰 글자 / primary 버튼 | 8.00:1 | 4.5:1 | Pass
+흰 글자 / primary-hover | 10.24:1 | 4.5:1 | Pass
+error / surface | 6.54:1 | 4.5:1 | Pass
+success / surface | 6.28:1 | 4.5:1 | Pass
+
+미달 조합: 0건

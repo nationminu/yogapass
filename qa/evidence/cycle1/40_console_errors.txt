@@ -1,0 +1,35 @@
+=== errors-in-console ===
+[
+ {
+  "source": "security",
+  "description": "Applying inline style violates the following Content Security Policy directive 'style-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-35KBScVH0mcisYaS+jYHDa1tlFGmOrghafQWiYvD7Us='), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present. The action has been blocked.",
+  "sourceLocation": {
+   "type": "source-location",
+   "url": "http://localhost:8001/",
+   "urlProvider": "network",
+   "line": 170,
+   "column": 0
+  }
+ },
+ {
+  "source": "security",
+  "description": "Applying inline style violates the following Content Security Policy directive 'style-src 'self''. Either the 'unsafe-inline' keyword, a hash ('sha256-MmQSP1/U/yrCIchjScgMfs5PqKY4/6UcI9dJcR5WNho='), or a nonce ('nonce-...') is required to enable inline execution. Note that hashes do not apply to event handlers, style attributes and javascript: navigations unless the 'unsafe-hashes' keyword is present. The action has been blocked.",
+  "sourceLocation": {
+   "type": "source-location",
+   "url": "http://localhost:8001/",
+   "urlProvider": "network",
+   "line": 157,
+   "column": 0
+  }
+ }
+]
+=== inspector-issues ===
+[
+ {
+  "issueType": "Content security policy",
+  "subItems": {
+   "type": "subitems",
+   "items": []
+  }
+ }
+]

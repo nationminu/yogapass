@@ -1,0 +1,6 @@
+NAME                   IMAGE                    COMMAND                  SERVICE             CREATED             STATUS                  PORTS
+yogapass-app-1         yogapass-app             "/usr/local/bin/entr…"   app                 5 hours ago         Up 5 hours (healthy)    127.0.0.1:8000->8000/tcp
+yogapass-db-1          postgres:17-alpine       "docker-entrypoint.s…"   db                  5 hours ago         Up 5 hours (healthy)    127.0.0.1:5432->5432/tcp
+yogapass-mail-1        axllent/mailpit:latest   "/mailpit"               mail                16 hours ago        Up 16 hours (healthy)   1025/tcp, 1110/tcp, 127.0.0.1:8025->8025/tcp
+yogapass-proxy-1       nginx:alpine             "/docker-entrypoint.…"   proxy               5 hours ago         Up 5 hours (healthy)    127.0.0.1:8080->80/tcp
+yogapass-scheduler-1   yogapass-scheduler       "/usr/local/bin/entr…"   scheduler           5 hours ago         Up 5 hours (healthy)    

@@ -1,0 +1,94 @@
+########## home ##########
+<html lang="ko">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>요가패스</title>
+<meta name="description" content="강남 요가 스튜디오 요가패스의 위치와 수업 안내, 문의 방법을 안내합니다."
+<link rel="canonical" href="http://localhost:8000/"
+<meta property="og:type" content="website"
+<meta property="og:title" content="요가패스"
+<meta property="og:description" content="강남 요가 스튜디오 요가패스의 위치와 수업 안내, 문의 방법을 안내합니다."
+<meta property="og:url" content="http://localhost:8000/"
+<meta property="og:image" content="http://localhost:8000/static/img/og-image.png"
+<meta property="og:image:width" content="1200"
+<meta property="og:image:height" content="630"
+<meta property="og:image:alt" content="강남 요가패스 로고와 '강남 요가 스튜디오' 문구가 있는 대표 이미지"
+<meta name="twitter:card" content="summary_large_image"
+--- h1 ---
+<h1>요가패스</h1>
+--- h1 count ---
+1
+--- landmarks ---
+header=1 nav=2 main=1 footer=1 
+########## instructors ##########
+<html lang="ko">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>요가 강사 소개 · 요가패스</title>
+<meta name="description" content="요가패스에서 수업을 진행하는 강사와 담당 수업을 소개합니다."
+<link rel="canonical" href="http://localhost:8000/instructors"
+<meta property="og:type" content="website"
+<meta property="og:title" content="요가 강사 소개"
+<meta property="og:description" content="요가패스에서 수업을 진행하는 강사와 담당 수업을 소개합니다."
+<meta property="og:url" content="http://localhost:8000/instructors"
+<meta property="og:image" content="http://localhost:8000/static/img/og-image.png"
+<meta property="og:image:width" content="1200"
+<meta property="og:image:height" content="630"
+<meta property="og:image:alt" content="강남 요가패스 로고와 '강남 요가 스튜디오' 문구가 있는 대표 이미지"
+<meta name="twitter:card" content="summary_large_image"
+--- h1 ---
+<h1>요가 강사 소개</h1>
+--- h1 count ---
+1
+--- landmarks ---
+header=1 nav=2 main=1 footer=1 
+########## location ##########
+<html lang="ko">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>오시는 길 · 요가패스</title>
+<meta name="description" content="강남 요가패스의 위치와 찾아오시는 방법, 문의하기를 안내합니다."
+<link rel="canonical" href="http://localhost:8000/location"
+<meta property="og:type" content="website"
+<meta property="og:title" content="오시는 길"
+<meta property="og:description" content="강남 요가패스의 위치와 찾아오시는 방법, 문의하기를 안내합니다."
+<meta property="og:url" content="http://localhost:8000/location"
+<meta property="og:image" content="http://localhost:8000/static/img/og-image.png"
+<meta property="og:image:width" content="1200"
+<meta property="og:image:height" content="630"
+<meta property="og:image:alt" content="강남 요가패스 로고와 '강남 요가 스튜디오' 문구가 있는 대표 이미지"
+<meta name="twitter:card" content="summary_large_image"
+--- h1 ---
+<h1>오시는 길</h1>
+--- h1 count ---
+1
+--- landmarks ---
+header=1 nav=3 main=1 footer=1 
+########## privacy ##########
+<html lang="ko">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>개인정보 처리방침 · 요가패스</title>
+<meta name="description" content="요가패스가 수집하는 개인정보의 항목과 이용 목적, 보관 기간, 파기 절차를 안내합니다."
+<link rel="canonical" href="http://localhost:8000/privacy"
+<meta property="og:type" content="website"
+<meta property="og:title" content="개인정보 처리방침"
+<meta property="og:description" content="요가패스가 수집하는 개인정보의 항목과 이용 목적, 보관 기간, 파기 절차를 안내합니다."
+<meta property="og:url" content="http://localhost:8000/privacy"
+<meta property="og:image" content="http://localhost:8000/static/img/og-image.png"
+<meta property="og:image:width" content="1200"
+<meta property="og:image:height" content="630"
+<meta property="og:image:alt" content="강남 요가패스 로고와 '강남 요가 스튜디오' 문구가 있는 대표 이미지"
+<meta name="twitter:card" content="summary_large_image"
+--- h1 ---
+<h1>개인정보 처리방침</h1>
+--- h1 count ---
+1
+--- landmarks ---
+header=1 nav=3 main=1 footer=1 
+########## e404 ##########
+<html lang="en">
+<title>Page not found at /nope</title>
+<meta name="robots" content="NONE,NOARCHIVE"
+--- h1 ---
+<h1>Page not found <small>(404)</small></h1>
+--- h1 count ---
+1
+--- landmarks ---
+header=1 nav=0 main=1 footer=1 

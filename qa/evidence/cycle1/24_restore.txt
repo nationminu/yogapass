@@ -1,0 +1,32 @@
+### REQ-N-032 ② 복구 리허설 (로컬)
+ Container yogapass-db-1  Running
+2026-09-13T16:19:04+0900 INFO core QA_TOOLS: off
+run_backup file=yogapass-local-20260913-1619.label-pre-restore.dump bytes=85998 elapsed=0.3s rotated=0 label=pre-restore free_gb=181.7
+2026-09-13T16:19:05+0900 INFO core.jobs job.finished job=run_backup status=success detail=file=yogapass-local-20260913-1619.label-pre-restore.dump bytes=85998 elapsed=0.3s rotated=0 label=pre-restore free_gb=181.7
+[restore] 스케줄러·앱 정지
+ Container yogapass-app-1  Stopping
+ Container yogapass-scheduler-1  Stopping
+ Container yogapass-scheduler-1  Stopped
+ Container yogapass-app-1  Stopped
+[restore] pg_restore 실행 (--clean --if-exists)
+ Container yogapass-db-1  Running
+[restore] 스키마 확인 (migrate --check)
+ Container yogapass-mail-1  Running
+ Container yogapass-db-1  Running
+2026-09-13T16:19:13+0900 INFO core QA_TOOLS: off
+[restore] 앱·스케줄러 기동
+ Container yogapass-mail-1  Running
+ Container yogapass-db-1  Running
+ Container yogapass-scheduler-1  Created
+ Container yogapass-app-1  Created
+ Container yogapass-db-1  Waiting
+ Container yogapass-db-1  Waiting
+ Container yogapass-db-1  Healthy
+ Container yogapass-scheduler-1  Starting
+ Container yogapass-db-1  Healthy
+ Container yogapass-app-1  Starting
+ Container yogapass-scheduler-1  Started
+ Container yogapass-app-1  Started
+[restore] ✓ 복구 완료 · /healthz 200
+[restore]    기록할 값: 복구 파일 · 소요 시간 · pre-restore 덤프 파일명 (P8 운영 가이드에 싣는다)
+RESTORE_EXIT=0

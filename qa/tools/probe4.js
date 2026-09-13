@@ -1,0 +1,36 @@
+const puppeteer=require('puppeteer-core');
+const CHROME='C:/Program Files/Google/Chrome/Application/chrome.exe';
+const BASE=process.env.BASE||'http://localhost:8000';
+(async()=>{
+ const b=await puppeteer.launch({executablePath:CHROME,headless:'new',args:['--no-sandbox','--disable-gpu']});
+ const p=await b.newPage(); await p.setViewport({width:360,height:780,isMobile:true,hasTouch:true});
+ const errs=[]; p.on('console',m=>{if(m.type()==='error')errs.push(m.text().slice(0,100));});
+ p.on('pageerror',e=>errs.push('pageerror '+e.message.slice(0,100)));
+ await p.goto(BASE+'/location',{waitUntil:'networkidle0'});
+ console.log('=== REQ-F-041 클라이언트 검증: 입력 중 실시간 오류 금지 · blur 이후 표시 ===');
+ await p.click('#f-name'); await p.type('#f-name','a');
+ let s=await p.evaluate(()=>({err:document.querySelectorAll('[aria-invalid="true"]').length, msg:[...document.querySelectorAll('.field-error,.err-msg,[id$="-error"]')].filter(e=>e.textContent.trim()).length}));
+ console.log('입력 중(1자, blur 전): aria-invalid='+s.err+' 오류문구='+s.msg+' → '+(s.err===0?'실시간 오류 없음(Pass)':'**입력 중 오류 표시**'));
+ await p.evaluate(()=>{document.querySelector('#f-name').value='';});
+ await p.click('#f-phone'); // blur name
+ await new Promise(r=>setTimeout(r,300));
+ s=await p.evaluate(()=>({err:document.querySelectorAll('[aria-invalid="true"]').length,msgs:[...document.querySelectorAll('[id$="-error"],.field-error')].map(e=>e.textContent.trim()).filter(Boolean)}));
+ console.log('이름 blur(빈 값) 후: aria-invalid='+s.err+' 문구='+JSON.stringify(s.msgs));
+ console.log('\n=== REQ-F-041 제출 시 첫 오류 항목으로 포커스 이동 ===');
+ await p.evaluate(()=>document.querySelector('#contact-form').querySelector('button[type=submit],button').click());
+ await new Promise(r=>setTimeout(r,600));
+ console.log(JSON.stringify(await p.evaluate(()=>{const a=document.activeElement;return {focus:a?a.id||a.tagName+'.'+a.className:'(none)', invalid:document.querySelectorAll('[aria-invalid="true"]').length, summary:!!document.querySelector('[role="alert"]'), url:location.pathname};})));
+ console.log('\n=== REQ-F-046 ③ 결과 블록 포커스 (정상 제출) ===');
+ await p.goto(BASE+'/location',{waitUntil:'networkidle0'});
+ await p.type('#f-name','TEST-포커스');
+ await p.type('#f-phone','010-1234-5678');
+ await p.type('#f-message','TEST-포커스 이동 확인');
+ await p.click('#f-consent');
+ console.log('글자수 카운터:', await p.evaluate(()=>{const c=document.querySelector('[id$="count"],.counter,.char-count');return c?c.textContent.trim():'(미발견)';}));
+ await Promise.all([p.waitForNavigation({waitUntil:'networkidle0'}).catch(()=>{}), p.evaluate(()=>document.querySelector('#contact-form button[type=submit],#contact-form button').click())]);
+ await new Promise(r=>setTimeout(r,800));
+ console.log(JSON.stringify(await p.evaluate(()=>{const a=document.activeElement;const r=document.querySelector('[role="status"]');
+  return {activeElement:a?(a.id||a.tagName+'.'+(typeof a.className==='string'?a.className:'')):'(none)', resultBlock:!!r, resultText:r?r.textContent.replace(/\s+/g,' ').trim().slice(0,50):null, formGone:!document.querySelector('#contact-form')};})));
+ console.log('\n콘솔 에러: '+(errs.length?errs.length+'건 '+errs.slice(0,3).join(' / '):'0건'));
+ await b.close();
+})();

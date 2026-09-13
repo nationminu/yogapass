@@ -1,0 +1,17 @@
+### REQ-F-064 · REQ-F-021 — 데이터 파일 변경 → 반영 (운영 미리보기 스택, 소스 무수정)
+-- 변경 전: 전화 tel: 링크 수 --
+  / tel:=0 강사카드=0
+  /instructors tel:=0 강사카드=0
+  /location tel:=0 강사카드=0
+-- content/ 교체 (임시 사본) + seed_content --
+	HINT: content/privacy.yml 의 각 항목 본문을 고객 확정값으로 채우고 status 를 confirmed 로 바꾼 뒤 다시 배포하십시오 (REQ-N-023 ① · REQ-F-050 · T-F).
+seed_content 완료 created=3 updated=20 dry_run=False
+-- 변경 후 --
+  / tel:=7
+  /instructors tel:=6
+  /location tel:=11
+-- tel: 값 --
+href="tel:025550100"
+-- 헤더/푸터/오시는 길 3곳 반영 확인 --
+헤더 tel: 4 | 푸터 tel: 1 | 본문 tel: 5
+본문 주소 노출: true

@@ -1,0 +1,13 @@
+### 개발팀 자동 테스트 재실행 (qa 확인)
+...........2026-09-13T16:36:31+0900 WARNING django.request Not Found: /no-such-page
+.2026-09-13T16:36:31+0900 WARNING django.request Not Found: /no-such-page
+...
+----------------------------------------------------------------------
+Ran 53 tests in 3.239s
+
+OK
+Destroying test database for alias 'default'...
+
+### 린트·포맷
+All checks passed!
+85 files already formatted

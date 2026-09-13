@@ -1,0 +1,6 @@
+### home : 1건
+{"@context":"https://schema.org","@type":"HealthAndBeautyBusiness","name":"요가패스","url":"http://localhost:8000/"}
+### location : 1건
+{"@context":"https://schema.org","@type":"HealthAndBeautyBusiness","name":"요가패스","url":"http://localhost:8000/"}
+### instructors : 0건
+### privacy : 0건

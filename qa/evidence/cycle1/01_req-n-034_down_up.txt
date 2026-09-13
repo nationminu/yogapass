@@ -1,0 +1,67 @@
+ Container yogapass-proxy-1  Stopping
+ Container yogapass-scheduler-1  Stopping
+ Container yogapass-backup-1  Stopping
+ Container yogapass-backup-1  Stopped
+ Container yogapass-backup-1  Removing
+ Container yogapass-backup-1  Removed
+ Container yogapass-scheduler-1  Stopped
+ Container yogapass-scheduler-1  Removing
+ Container yogapass-scheduler-1  Removed
+ Container yogapass-proxy-1  Stopped
+ Container yogapass-proxy-1  Removing
+ Container yogapass-proxy-1  Removed
+ Container yogapass-app-1  Stopping
+ Container yogapass-app-1  Stopped
+ Container yogapass-app-1  Removing
+ Container yogapass-app-1  Removed
+ Container yogapass-mail-1  Stopping
+ Container yogapass-db-1  Stopping
+ Container yogapass-db-1  Stopped
+ Container yogapass-db-1  Removing
+ Container yogapass-db-1  Removed
+ Container yogapass-mail-1  Stopped
+ Container yogapass-mail-1  Removing
+ Container yogapass-mail-1  Removed
+ Network yogapass_internal  Removing
+ Network yogapass_internal  Removed
+=== UP ===
+ Network yogapass_internal  Creating
+ Network yogapass_internal  Created
+ Container yogapass-mail-1  Creating
+ Container yogapass-db-1  Creating
+ Container yogapass-mail-1  Created
+ Container yogapass-db-1  Created
+ Container yogapass-scheduler-1  Creating
+ Container yogapass-backup-1  Creating
+ Container yogapass-app-1  Creating
+ Container yogapass-backup-1  Created
+ Container yogapass-scheduler-1  Created
+ Container yogapass-app-1  Created
+ Container yogapass-proxy-1  Creating
+ Container yogapass-proxy-1  Created
+ Container yogapass-mail-1  Starting
+ Container yogapass-db-1  Starting
+ Container yogapass-db-1  Started
+ Container yogapass-db-1  Waiting
+ Container yogapass-db-1  Waiting
+ Container yogapass-mail-1  Started
+ Container yogapass-db-1  Waiting
+ Container yogapass-db-1  Healthy
+ Container yogapass-db-1  Healthy
+ Container yogapass-app-1  Starting
+ Container yogapass-backup-1  Starting
+ Container yogapass-db-1  Healthy
+ Container yogapass-scheduler-1  Starting
+ Container yogapass-scheduler-1  Started
+ Container yogapass-backup-1  Started
+ Container yogapass-app-1  Started
+ Container yogapass-proxy-1  Starting
+ Container yogapass-proxy-1  Started
+=== PS ===
+NAME                   IMAGE                    COMMAND                  SERVICE             CREATED             STATUS                             PORTS
+yogapass-app-1         yogapass-app             "/usr/local/bin/entr…"   app                 41 seconds ago      Up 26 seconds (healthy)            127.0.0.1:8000->8000/tcp
+yogapass-backup-1      yogapass-backup          "/usr/local/bin/entr…"   backup              41 seconds ago      Exited (0) 24 seconds ago          
+yogapass-db-1          postgres:17-alpine       "docker-entrypoint.s…"   db                  41 seconds ago      Up 39 seconds (healthy)            127.0.0.1:5432->5432/tcp
+yogapass-mail-1        axllent/mailpit:latest   "/mailpit"               mail                41 seconds ago      Up 39 seconds (healthy)            1025/tcp, 1110/tcp, 127.0.0.1:8025->8025/tcp
+yogapass-proxy-1       nginx:alpine             "/docker-entrypoint.…"   proxy               41 seconds ago      Up 25 seconds (health: starting)   127.0.0.1:8080->80/tcp
+yogapass-scheduler-1   yogapass-scheduler       "/usr/local/bin/entr…"   scheduler           41 seconds ago      Up 27 seconds (health: starting)   

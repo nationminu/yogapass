@@ -1,0 +1,8 @@
+### rate_limit_alert 아웃박스
+2026-09-13T16:13:26+0900 WARNING core QA_TOOLS: ON — 이 환경은 인증 뒤에 있어야 합니다
+kind             | to_addr            | status | attempts | scheduled_at                                               | sent_at | related_ref      | last_error
+-----------------+--------------------+--------+----------+------------------------------------------------------------+---------+------------------+-----------
+rate_limit_alert | o*s@yogapass.local | queued | 0        | 2026-09-13T07:13:18.442798+00:00 (KST 2026-09-13 16:13:18) |         | befafe6bbe3bde53 |           
+(1건)
+### inquiry 건수
+16

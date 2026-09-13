@@ -1,0 +1,96 @@
+REQ-F-001	3	공통	Must	공통 헤더
+REQ-F-002	3	공통	Must	공통 푸터
+REQ-F-003	3	공통	Must	전역 주 CTA
+REQ-F-004	3	1차	Must	전화 걸기 링크
+REQ-F-005	3	공통	Must	개인정보 처리방침 전역 링크
+REQ-F-006	3	공통	Must	화면 간 이동 일관성
+REQ-F-010	3	1차	Must	메인 첫 화면(Hero)
+REQ-F-011	3	1차	Must	스튜디오 소개 요약
+REQ-F-012	3	공통	Should	강사 미리보기
+REQ-F-013	3	1차	Should	위치 요약
+REQ-F-014	3	공통	Should	수업 유형 소개
+REQ-F-015	3	공통	Should	메인 하단 전환 섹션
+REQ-F-020	3	공통	Must	강사 목록
+REQ-F-021	3	공통	Must	강사 데이터 분리
+REQ-F-022	3	공통	Must	강사 사진 대체 처리
+REQ-F-023	3	공통	Should	강사 → 전환 연결
+REQ-F-030	3	1차	Must	지도 표시
+REQ-F-031	3	1차	Must	길찾기 외부 링크
+REQ-F-032	3	1차	Must	지도 지연 로딩
+REQ-F-033	3	1차	Must	오시는 길 정보
+REQ-F-034	3	1차	Could	주소 복사
+REQ-F-035	3	1차	Must	지도 접근성 대체
+REQ-F-040	3	공통	Must	문의 폼 제공
+REQ-F-041	3	1차	Must	필수 입력 검증 (클라이언트)
+REQ-F-042	3	공통	Must	서버 측 입력 검증
+REQ-F-043	3	공통	Must	개인정보 수집·이용 동의
+REQ-F-044	3	공통	Must	스팸 방지 (문의 폼)
+REQ-F-045	3	공통	Must	스튜디오 알림
+REQ-F-046	3	공통	Must	전송 결과 안내 · 중복 제출 방지
+REQ-F-050	3	공통	Must	처리방침 화면
+REQ-F-051	3	공통	Must	처리방침 입력 항목 정의
+REQ-F-052	3	공통	Must	위탁·외부 처리 목록 정리
+REQ-F-053	3	공통	Should	시행일·개정 이력
+REQ-F-060	3	공통	Must	404 화면
+REQ-F-061	3	1차	Should	SNS 링크
+REQ-F-062	3	공통	Should	분석 도구 설치
+REQ-F-063	3	공통	Should	전환 측정 대체 수단
+REQ-F-064	3	공통	Must	콘텐츠 데이터 분리
+REQ-F-065	3	1차	Could	공용 오류 화면 (5xx·점검)
+REQ-N-001	5.1	공통	Must	모든 화면이 주요 뷰포트에서 레이아웃 붕괴 없이 표시
+REQ-N-002	5.1	공통	Must	모바일 우선 설계 — 360px 첫 화면에 주 CTA·전화 진입 수단 노출
+REQ-N-003	5.1	공통	Must	최신 주요 브라우저에서 기능·레이아웃 정상
+REQ-N-004	5.1	공통	Must	Lighthouse 모바일 기준 성능 점수
+REQ-N-005	5.1	1차	Must	지도·외부 스크립트로 인한 초기 로딩 저하 방지
+REQ-N-006	5.1	공통	Must	WCAG 2.1 AA (KWCAG 2.2) 준수
+REQ-N-007	5.1	공통	Must	Lighthouse 접근성 점수
+REQ-N-008	5.1	공통	Must	폼 접근성
+REQ-N-009	5.1	공통	Should	본문 바로가기(skip link)와 문서 구조
+REQ-N-010	5.1	공통	Must	화면별 title·description
+REQ-N-011	5.1	1차	Must	지역 검색 대응 문구
+REQ-N-012	5.1	1차	Must	지역 업체 구조화 데이터
+REQ-N-013	5.1	공통	Must	sitemap.xml, robots.txt, canonical
+REQ-N-014	5.1	1차	Should	OG·소셜 공유 태그
+REQ-N-015	5.1	공통	Must	Lighthouse SEO·권장사항 점수
+REQ-N-016	5.1	공통	Must	시맨틱 마크업
+REQ-N-017	5.1	1차	Must	전 구간 HTTPS
+REQ-N-018	5.1	공통	Must	비밀 정보 분리
+REQ-N-019	5.1	공통	Must	폼·인증 공통 악용 방지 (단일 정의처)
+REQ-N-020	5.1	공통	Must	수집 최소화·고지·파기
+REQ-N-021	5.1	공통	Must	외부 처리 사업자 기록
+REQ-N-022	5.1	공통	Must	알림 메일 도달
+REQ-N-023	5.1	공통	Must	오픈 판정 기준
+REQ-N-024	5.1	공통	Must	이미지 출처·라이선스 기록 100%
+REQ-N-025	5.1	공통	Must	화이트·블루 기반 색상 체계, 보유 로고 적용
+REQ-N-026	5.1	공통	Should	콘텐츠 수정 절차 문서화
+REQ-N-027	5.1	공통	Must	한국어 단일 언어
+REQ-N-028	5.1	공통	Must	JavaScript 비활성 시 정보 제공 콘텐츠 동작 — 적용 범위 한정
+REQ-N-029	5.1	공통	Must	JavaScript 비활성 시 대체 안내
+REQ-N-030	5.1	1차	Could	폼의 JS 없는 기본 제출(서버 렌더 응답) 지원
+REQ-N-031	5.1.1	1차	Should	헬스체크·자동 재시작
+REQ-N-032	5.1.1	1차	Must	백업·복구 (복구 리허설 포함)
+REQ-N-033	5.1.1	1차	Must	배포·롤백 절차
+REQ-N-034	5.1.1	1차	Must	로컬·스테이징·운영 동일 compose 구성
+REQ-N-037	5.1.1	공통	Must	알림 메일 체계와 발송 신뢰성
+REQ-N-038	5.1.1	공통	Must	항목별 보관·파기 (확대)
+REQ-N-039	5.1.1	공통	Must	개인정보 접근 통제·작업 기록
+REQ-N-040	5.1.1	1차	Should	스테이징(검증) 환경
+REQ-C-001	6	1차	-	로고 원본 파일(벡터 또는 고해상도) + 브랜드 색상 코드
+REQ-C-002	6	1차	-	스튜디오 소개 문구(메인 헤드라인·서브카피)
+REQ-C-003	6	1차	-	강점·차별점 3~4가지
+REQ-C-004	6	공통	-	강사 정보 (이름·경력·자격·담당 수업·소개 문구, 인원수)
+REQ-C-005	6	공통	-	강사 사진
+REQ-C-006	6	공통	-	수업 유형 설명 · 시간표 · 정원 · 요금
+REQ-C-007	6	1차	-	주소(건물명·층), 가까운 역·출구·도보 시간, 주차 정보
+REQ-C-008	6	공통	-	운영시간·휴무일
+REQ-C-009	6	1차	-	대표 전화번호
+REQ-C-010	6	1차	-	사업자 정보(상호·대표자·사업자등록번호·주소)
+REQ-C-011	6	1차	-	SNS·카카오톡 채널 계정 주소
+REQ-C-012	6	공통	-	개인정보 처리방침 입력값(수집 항목·목적·항목별 보관 기간·파기·위탁·보호책임자·시행일)
+REQ-C-013	6	1차	-	분위기 이미지(스톡·일러스트)
+REQ-C-014	6	1차	-	이미지 플레이스홀더 규격 정의
+REQ-C-015	6	공통	-	화면 안내 문구(버튼·폼 라벨·오류·완료·빈 상태)
+REQ-C-016	6	공통	-	메타 title·description·OG 문구
+REQ-C-017	6	1차	-	파비콘·OG 공유 이미지
+REQ-C-018	6	1차	-	도메인 주소(canonical·sitemap·OG url에 사용)
+REQ-C-019	6	공통	-	알림 수신 이메일 주소·담당자

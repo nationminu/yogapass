@@ -1,0 +1,15 @@
+{% load jsonld %}{% comment %} 메인(SCR-001) 전용 구조화 데이터 — IA §6.4 "메인: `WebSite`" (REQ-N-012 · DEF-001 ④).
+   · 오시는 길·메인 공통의 `HealthAndBeautyBusiness` 는 jsonld_localbusiness.html 이 따로 낸다.
+   · `name` 은 title 과 같은 브랜드 문자열(IA §6.2)을 쓴다. 미확정 값은 넣지 않는다(REQ-N-023).
+   · `SearchAction`(사이트 내 검색)은 1차에 검색 기능이 없어 넣지 않는다. {% endcomment %}
+{% spaceless %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": {{ seo_brand|json_script_safe }},
+  "url": "{{ site_base_url }}/",
+  "inLanguage": "ko-KR"
+}
+</script>
+{% endspaceless %}

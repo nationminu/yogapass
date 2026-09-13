@@ -20,10 +20,16 @@
   font-size: var(--fs-body-sm); line-height: 1.9;
 }
 .ftr-grid { display: grid; gap: 28px; }
-.ftr a { color: var(--color-on-navy); text-decoration: none; display: block; min-height: 32px; }
+/* 링크 행의 터치 타깃 44px 이상 (REQ-N-006 ② · DEF-005). 글자 크기·색은 그대로 두고
+   행 높이만 키운다 — 링크 텍스트가 세로 중앙에 오도록 flex 로 정렬한다. */
+.ftr a {
+  color: var(--color-on-navy); text-decoration: none;
+  display: flex; align-items: center; min-height: var(--touch-min);
+}
 .ftr a:hover { text-decoration: underline; }
 .ftr .ft-muted { color: var(--color-on-navy-muted); }
-.ftr .ft-small { font-size: 13px; }
+/* 문장 하한 14px (디자인 시스템 §타이포 · REQ-N-006 ⑤ · DEF-005). 13px 로 내리지 않는다. */
+.ftr .ft-small { font-size: var(--fs-caption); }
 .ftr-h { font-size: 14px; margin-bottom: 10px; }
 .ftr .strong { font-weight: var(--fw-bold); }
 .ftr-copy { grid-column: 1 / -1; border-top: 1px solid var(--color-on-navy-line); padding-top: var(--space-4); }

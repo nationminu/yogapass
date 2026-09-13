@@ -112,7 +112,8 @@
   --focus-ring-color-on-dark: #FFFFFF;
 
   /* ---- 전역 UI 규칙 파생 토큰 (요구사항 §3.0) ---- */
-  --header-h: 64px;              /* <768px */
+  --header-min-h: 64px;          /* <768px — 헤더 행의 min-height(정적 값) */
+  --header-h: var(--header-min-h);  /* 실제 헤더 높이. viewport.js 가 실측값으로 덮는다(2줄 GNB 등) */
   --fixed-bar-h: 60px;           /* G-2 하한 56px 이상 — 44px 버튼 + 상하 8px */
   --safe-b: env(safe-area-inset-bottom, 0px);
   /* G-3: 본문 하단 여백 = 고정 바 높이 + safe-area + 16px */
@@ -131,7 +132,7 @@
     --fs-lead: 17px; --fs-body: 16px; --fs-body-sm: 15px;
     --fs-label: 16px; --fs-eyebrow: 13px;
     --container-pad: 24px; --grid-gutter: 20px;
-    --header-h: 68px;
+    --header-min-h: 68px;
   }
 }
 
@@ -150,12 +151,21 @@
     --fs-h2: 32px;
     --fs-lead: 18px;
     --container-pad: 40px;
-    --header-h: 72px;
+    --header-min-h: 72px;
     /* 고정 바 미노출 구간 — 본문 하단 여백 해제 */
     --fixed-bar-h: 0px;
     --body-pad-bottom: 0px;
     --scroll-pad-bottom: var(--anchor-offset);
   }
+}
+
+/* ---- 고정 바가 렌더되지 않는 화면 (CMP-007 S3 — 자기 참조 + 대표 전화 미확정) ----
+   바가 없으면 본문 하단 여백도 두지 않는다(REQ-F-003 ② · G-3 단서 · DEF-006).
+   선택자 특이성 (0,1,1) 이라 위 미디어 쿼리의 :root (0,1,0) 선언을 순서와 무관하게 덮는다. */
+html[data-fixed-bar="off"] {
+  --fixed-bar-h: 0px;
+  --body-pad-bottom: 0px;
+  --scroll-pad-bottom: var(--anchor-offset);
 }
 
 /* ---- G-11: 400% 확대 상황(1280px 400% 확대 ≈ 가로 320px · 세로 400px 상당) ----

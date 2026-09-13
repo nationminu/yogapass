@@ -4,9 +4,12 @@
 #       미확정 항목은 화면에서 해당 요소·행 자체를 렌더하지 않는다(REQ-N-023).
 settings:
   name:
-    value: "요가패스"
+    value: "강남 요가패스"
     is_published: true
-    note: "[TBD: T-G] 정식 상호 확정 후 교체"
+    # DEF-001: 표시 상호와 title 브랜드 문자열(IA §6.2 `강남 요가패스`)이 서로 달라
+    # 화면·메타에서 두 이름이 섞였다. 두 원본을 같은 문자열로 맞췄다.
+    # (SITE_NAME 환경 변수 기본값도 "강남 요가패스" 다 — config/settings/base.py)
+    note: "[TBD: T-G] 정식 상호 확정 후 교체 — IA §6.2 브랜드 표기와 함께 바꾼다"
   tagline:
     value: "강남 요가 스튜디오"
     is_published: true

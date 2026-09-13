@@ -4,7 +4,7 @@ from: qa
 to: developer
 phase: P5
 severity: minor
-status: open
+status: resolved
 related_req: [REQ-N-015, REQ-N-004]
 related_tc: [TC-107]
 related_scr: [SCR-001]
@@ -53,11 +53,18 @@ security: Applying inline style violates the following Content Security Policy d
 ---
 
 ## 조치 (developer 작성)
-- 원인:
-- 조치 내용:
-- 수정 파일:
-- 영향 범위 (회귀 테스트 필요 영역):
-- 일자:
+
+- **원인**: 메인 템플릿에서 한 번만 쓰이는 간격을 CSS 클래스로 만들지 않고 인라인 `style` 로 적었다. 응답 헤더의 CSP 가 `style-src 'self'` 라 인라인 style 속성은 **적용되지 않고 콘솔 오류만 남는다.** 템플릿에 인라인 style 이 들어가는 것을 막는 검사도 없었다.
+- **조치 내용**
+  1. 메인의 인라인 style **4곳 전부**(qa 가 관측한 2곳 + 조건부 렌더라 그때 보이지 않던 2곳)를 클래스로 교체했다.
+     - `margin-top: var(--space-6)` → 기존 클래스 `callout-sec`(같은 값)
+     - `margin-top: var(--space-4)` → `mt-4`, `margin-top: var(--space-3)` → `mt-3` (`static/css/base.css` 에 간격 토큰을 쓰는 **유틸리티 `.mt-3/4/5/6` 신설**)
+     - `margin-top:10px` → `.inquiry-note-lead`(`pages/home.css`, `.sec-h p`·`.band p` 와 같은 10px)
+  2. **회귀 테스트 추가** — `tests/test_seo_markup.py::MarkupRulesTests.test_no_inline_style_attribute`: 5화면 렌더 결과에 `style="` 0건. 브라우저 점검(`tests/browser/layout-check.js`)도 서버가 내려준 인라인 style 수를 매 화면·뷰포트마다 센다.
+  3. 확인: 운영 미리보기 `:8001` 5화면 `grep -c 'style="'` → **전건 0**, Chrome 헤드리스 4뷰포트 × 4화면 **콘솔 오류 0건**(404 화면은 자기 응답 코드 404 가 콘솔에 1줄 남는 것이 전부 — 스크립트·CSP 오류 아님).
+- **수정 파일**: `developer/site/templates/pages/home.html`, `static/css/base.css`, `static/css/pages/home.css`, 신규 `tests/test_seo_markup.py` · `tests/browser/layout-check.js`
+- **영향 범위 (회귀 테스트 필요 영역)**: 메인 섹션 3(수업 안내 콜아웃)·4(강사 전체 보기)·5(지도·길찾기 보기)·6(문의 유도) 상단 여백, Lighthouse 권장사항 점수. → 메인 콘솔 0건 + Lighthouse 재측정.
+- **일자**: 2026-09-13
 
 ## 재검증 (qa 작성)
 | 사이클 | 결과 (closed / reopened) | 일자 | 비고 |

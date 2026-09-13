@@ -315,3 +315,44 @@ class NoScriptAndAccessibilityTests(TestCase):
         self.assertIn("지도 불러오기", body)
         self.assertIn('data-map-src="https://map.example/embed"', body)
         self.assertIn("지도를 불러오면 지도 서비스으로 연결됩니다.", body)
+
+
+class ClockOffsetTokenExpiryTests(InquiryFormBase):
+    """DEF-008 — `QA_CLOCK_OFFSET_SECONDS` 가 submit_token 만료 판정에도 적용된다.
+
+    §9.6 ⑦의 `token_state=expired` 를 **검증 환경에서 실제로 유발할 수 있는지**를 본다.
+    (종전에는 `TOKEN_MAX_AGE` 를 직접 패치해야만 재현할 수 있어 qa 가 판정할 수 없었다.)
+    """
+
+    OFFSET_25H = {"QA_CLOCK_OFFSET_SECONDS": "90000"}  # +25시간
+
+    @override_settings(QA_TOOLS_ENABLED=True)
+    def test_offset_beyond_ttl_expires_the_token(self):
+        token = self.token()  # 실제 시각에 발급
+        with mock.patch.dict(os.environ, self.OFFSET_25H):
+            with self.assertLogs("core.inquiry", level="INFO") as logs:
+                response = self.post(submit_token=token)
+        body = response.content.decode()
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("시간이 지나 문의가 접수되지 않았습니다.", body)
+        self.assertIn('id="contact-form"', body)  # 폼 재렌더(입력값 보존)
+        self.assertEqual(Inquiry.objects.count(), 0)
+        self.assertEqual(Outbox.objects.count(), 0)
+        self.assertIn("inquiry.expired token_state=expired ref=none", "\n".join(logs.output))
+
+    @override_settings(QA_TOOLS_ENABLED=True)
+    def test_offset_inside_ttl_keeps_the_token_valid(self):
+        token = self.token()
+        with mock.patch.dict(os.environ, {"QA_CLOCK_OFFSET_SECONDS": "3600"}):  # +1시간
+            response = self.post(submit_token=token)
+        self.assertIn("문의가 접수되었습니다.", response.content.decode())
+        self.assertEqual(Inquiry.objects.count(), 1)
+
+    @override_settings(QA_TOOLS_ENABLED=False)
+    def test_offset_is_ignored_without_the_master_switch(self):
+        """운영 이미지에는 해석기가 없다 — 오프셋 변수가 있어도 동작이 같다(§10.6)."""
+        token = self.token()
+        with mock.patch.dict(os.environ, self.OFFSET_25H):
+            response = self.post(submit_token=token)
+        self.assertIn("문의가 접수되었습니다.", response.content.decode())
+        self.assertEqual(Inquiry.objects.count(), 1)

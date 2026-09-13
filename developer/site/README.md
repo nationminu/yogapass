@@ -64,6 +64,10 @@ $C exec app ruff check .                        # 린트
 $C exec app ruff format .                       # 포맷
 $C logs -f scheduler                            # 정기 작업 로그
 
+# 레이아웃 회귀 점검 (실제 렌더 측정 — 가로 스크롤·터치 타깃·글꼴 하한·인라인 style·콘솔 오류)
+#   Chrome 과 puppeteer-core 가 필요하다(저장소에 두지 않는다). NODE_PATH 로 위치를 알려준다.
+BASE=http://localhost:8000 NODE_PATH=../../qa/tools/node_modules node tests/browser/layout-check.js
+
 # --- 운영 작업 (스케줄러가 자동 실행한다. 아래는 수동 실행법) ---
 $C exec scheduler python manage.py run_backup            # DB 백업 + 무결성 확인 + 회전
 $C exec scheduler python manage.py run_backup --dry-run  # 대상·여유 공간·회전 예정만
@@ -94,6 +98,8 @@ $C exec app python qa/concurrency.py --url http://127.0.0.1:8000/location --coun
 
 ```bash
 cp .env .env.prodcheck   # DJANGO_ENV=production, DJANGO_DEBUG=0, APP_PORT=8001, COMPOSE_PROFILES= 로 수정
+#  ★ DJANGO_SETTINGS_MODULE 도 config.settings.production 으로 바꾼다 — env_file 값이 이미지 기본값을 덮으므로
+#     그냥 복사하면 local 설정으로 뜨고 404 가 디버그 화면으로 나온다.
 ENV_FILE=.env.prodcheck docker compose -f compose.yaml -f compose.prod.yaml -p yogapass-prodcheck \
   --env-file .env.prodcheck up -d --build
 # http://localhost:8001 (gunicorn + WhiteNoise: 해시 파일명 · brotli · immutable 캐시)
@@ -114,7 +120,9 @@ templates/   base.html · partials/ · pages/ · errors/
 static/      css(tokens·base·components·pages) · js · fonts(Pretendard) · icons(Lucide) · img
 content/     시드 데이터(*.yml) — 사람이 고치는 단일 원본
 deploy/      entrypoint · gunicorn · crontab · nginx 설정·점검 화면
-tests/       스모크 · 화면 · 문의 폼 응답 형태 6종 테스트
+tests/       스모크 · 화면 · 문의 폼 응답 형태 7종 · SEO/마크업 · 처리방침 대조 테스트
+tests/browser/ 실제 렌더 측정 도구(layout-check.js — Chrome + puppeteer-core 필요, 배포 대상 아님)
+assets-work/ 자산 작업 사본(임시 OG 원본 등). **static/ 에 두지 않는다** — 이미지·배포 산출물에서 제외
 ```
 
 ## 7. 폰트 (Pretendard) 재생성

@@ -1,5 +1,8 @@
 {% load static icons %}<!DOCTYPE html>
-<html lang="ko">
+{% comment %} data-fixed-bar — 고정 바(CMP-007)가 이 화면에 **렌더되는지** 를 CSS 에 알린다.
+   S3(자기 참조 + 대표 전화 미확정)처럼 바가 없는 화면에서는 본문 하단 여백도 두지 않는다
+   (REQ-F-003 ② · §3.0 G-3 "고정 바가 노출되는 뷰포트에서" · DEF-006). {% endcomment %}
+<html lang="ko" data-fixed-bar="{% if cta.show_bar %}on{% else %}off{% endif %}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">

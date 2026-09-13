@@ -9,6 +9,7 @@ from django.templatetags.static import static
 
 from apps.content.services import nav_items, site_settings
 from apps.core.cta import cta_state
+from apps.core.seo import BRAND as SEO_BRAND
 
 
 def site(request):
@@ -17,6 +18,8 @@ def site(request):
     has_phone = bool(phone)
     return {
         "site_name": values.get("name") or settings.SITE_NAME,
+        # title·OG 제목의 브랜드 문자열 — IA §6.2 가 원본(DB 적재 상태와 무관하다 · DEF-001)
+        "seo_brand": SEO_BRAND,
         "site_tagline": values.get("tagline") or "",
         "site": values,
         "site_phone": phone,

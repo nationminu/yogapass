@@ -12,3 +12,17 @@ qa/
 tests/
 README.md
 .ruff_cache/
+
+# ---- 운영 이미지에 들어갈 이유가 없는 것들 (DEF-010) ----
+# 작업 중간 파일(래스터 변환용 사본 등). static/ 아래에 두지 않지만 이중으로 막는다.
+assets-work/
+*.TEMP-*
+# 컨테이너 안에서 쓰지 않는 파일들 — 빌드·배포는 호스트에서 이 파일들을 쓴다.
+# ⚠ requirements-dev.txt 는 제외하지 않는다(dev 스테이지가 COPY 한다).
+Dockerfile
+.dockerignore
+compose.yaml
+compose.local.yaml
+compose.prod.yaml
+# 배포 스크립트가 남기는 로컬 상태 파일
+.deploy-rollback-image

@@ -10,7 +10,6 @@
 | `icon-192.png` · `icon-512.png` | `design/assets/icon-master-512.svg` | `rsvg-convert` | 임시 로고 기반 |
 | `apple-touch-icon.png` | `design/assets/apple-touch-icon-master-180.svg` | `rsvg-convert` | 임시 로고 기반 |
 | `og-image.png` | `design/assets/og-image.svg` | **⚠ 임시본** — 아래 참조 | **임시(TEMPORARY)** |
-| `og-image.TEMP-source.svg` | 같음 | 위 임시본을 굽기 위한 작업 사본(폰트 목록만 다름) | **임시(TEMPORARY)** |
 | `logo-horizontal.svg` · `logo-mark.svg` · `apple-touch-icon.svg` · `og-image.svg` | `design/assets/` | 복사 | 임시 로고 기반 |
 
 ---
@@ -22,16 +21,21 @@
 래스터 변환기(fontconfig/freetype)가 로드하지 못한다. 그래서 변환 환경에서 쓸 수 있는 **Noto Sans CJK KR** 로 렌더했다.
 → **자간·글자 폭이 Pretendard 조판과 다르다.** 그 외는 동일하다.
 
-**임시본 표시 3곳**: ① 작업 사본 파일명 `og-image.TEMP-source.svg` ② 그 파일 머리 주석 ③ `og-image.png` 안의 PNG `tEXt Comment` 청크
+**임시본 표시 3곳**: ① 작업 사본 파일명 `assets-work/og-image.TEMP-source.svg` ② 그 파일 머리 주석 ③ `og-image.png` 안의 PNG `tEXt Comment` 청크
 (`Comment = TEMPORARY placeholder OG image. TKT-DSN-002 …`).
+
+> **⚠ 작업 사본의 위치 (DEF-010)**: 변환용 작업 사본은 `developer/site/assets-work/` 에 둔다.
+> `static/` 아래에 두면 ① 운영 이미지의 `/app/static/img/` 에 들어가고(자산 목록 대조에서 초과 1건)
+> ② `collectstatic` 이 배포 산출물로 굽고 ③ 정적 경로로 직접 접근할 수 있게 된다.
+> `.dockerignore` 가 `assets-work/` 와 `*.TEMP-*` 를 이중으로 제외한다.
 
 **생성·검증 명령** (일회용 컨테이너 — 틀·프로젝트에 변환 도구를 설치하지 않는다):
 
 ```bash
-# developer/site/static/img 에서
-docker run --rm -v "$(pwd -W):/out" alpine:3.20 sh -c '
+# developer/site 에서 (작업 사본은 assets-work/, 결과물은 static/img/)
+docker run --rm -v "$(pwd -W)/assets-work:/work" -v "$(pwd -W)/static/img:/out" alpine:3.20 sh -c '
   apk add --no-cache rsvg-convert imagemagick font-noto-cjk optipng
-  cd /tmp && cp /out/og-image.TEMP-source.svg src.svg
+  cd /tmp && cp /work/og-image.TEMP-source.svg src.svg
   rsvg-convert -w 1200 -h 630 src.svg -o og-raw.png
   optipng -quiet -o5 og-raw.png && cp og-raw.png /out/og-image.png'
 # PNG tEXt Comment 삽입은 apps 컨테이너의 python 으로 수행(IHDR 뒤 tEXt 청크 1개)
@@ -52,5 +56,5 @@ docker run --rm -v "$(pwd -W):/out" alpine:3.20 sh -c '
 1. Pretendard 가 설치된 환경 또는 텍스트를 아웃라인(path)으로 바꾼 SVG 로 `design/assets/og-image.svg` 를 1200×630 PNG(≤300KB)로 내보낸다.
 2. 그 파일을 **`developer/site/static/img/og-image.png` 에 덮어쓴다.** 파일명·경로가 같으므로 템플릿·뷰·설정은 고치지 않는다
    (`apps/core/context_processors._og_image` 가 파일 존재 여부만 본다).
-3. `og-image.TEMP-source.svg` 를 삭제하고 이 문서의 임시 표기 행을 갱신한다.
+3. `assets-work/og-image.TEMP-source.svg` 를 삭제하고 이 문서의 임시 표기 행을 갱신한다.
 4. 운영 배포 시 `collectstatic` 이 해시 파일명으로 다시 굽는다 — 별도 작업 없다.

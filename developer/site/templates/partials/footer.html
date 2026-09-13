@@ -3,7 +3,7 @@
 <footer class="ftr" data-surface="dark">
   <div class="wrap ftr-grid">
     <div class="ftr-brand">
-      {% inline_svg "img/logo-horizontal.svg" "logo-svg" %}
+      {% inline_svg "img/logo-horizontal.svg" "logo-svg" uid="ftr" %}
       {% if site.address %}<p class="ft-muted">{{ site_name }} · {{ site.address }}</p>{% endif %}
       {% if has_phone %}<p class="ft-muted"><a href="{% tel_href site_phone %}">{{ site_phone }}</a></p>{% endif %}
       {% if site.hours %}<p class="ft-muted">{{ site.hours }}</p>{% endif %}

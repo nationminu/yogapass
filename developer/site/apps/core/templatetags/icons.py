@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import functools
+import re
 from pathlib import Path
 
 from django import template
@@ -47,15 +48,37 @@ def tel_href(number: str) -> str:
 
 
 @register.simple_tag
-def inline_svg(path: str, css_class: str = "") -> str:
-    """static/ 아래의 SVG 를 인라인 삽입한다 (로고 등 currentColor 상속이 필요한 자산)."""
+def inline_svg(path: str, css_class: str = "", uid: str = "") -> str:
+    """static/ 아래의 SVG 를 인라인 삽입한다 (로고 등 currentColor 상속이 필요한 자산).
+
+    `uid` — **같은 SVG 를 한 문서에 두 번 이상 넣을 때 반드시 준다**(DEF-002).
+    파일 안의 `id` 와 그 참조(`aria-labelledby`·`href="#…"`·`url(#…)`)에 접미사를 붙여
+    문서 안에서 유일하게 만든다. 중복 id 는 HTML 검증 오류이고(REQ-N-016), `aria-labelledby`
+    가 문서상 첫 요소만 참조해 **두 번째 로고의 접근 이름이 어긋난다**(REQ-N-006 ④).
+    """
     full = Path(settings.BASE_DIR) / "static" / path
     if not full.is_file():
         return ""
     raw = _strip_comments(full.read_text(encoding="utf-8").strip())
+    if uid:
+        raw = _namespace_ids(raw, uid)
     if css_class:
         raw = raw.replace("<svg", f'<svg class="{css_class}"', 1)
     return mark_safe(raw)  # noqa: S308 - 저장소 내 정적 파일
+
+
+def _namespace_ids(raw: str, uid: str) -> str:
+    """SVG 안의 id 와 그 참조 전부에 `-{uid}` 접미사를 붙인다."""
+    ids = re.findall(r'\sid="([^"]+)"', raw)
+    for name in dict.fromkeys(ids):  # 중복 제거 · 순서 유지
+        new = f"{name}-{uid}"
+        raw = raw.replace(f'id="{name}"', f'id="{new}"')
+        raw = raw.replace(f'="#{name}"', f'="#{new}"')  # href · xlink:href
+        raw = raw.replace(f"url(#{name})", f"url(#{new})")
+        # aria-labelledby · aria-describedby 는 공백으로 구분된 토큰 목록이다
+        pattern = r'(aria-(?:labelledby|describedby)="[^"]*)\b' + re.escape(name) + r"\b"
+        raw = re.sub(pattern, r"\g<1>" + new, raw)
+    return raw
 
 
 def _strip_comments(raw: str) -> str:

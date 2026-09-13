@@ -27,6 +27,7 @@ from apps.content.services import (
     lesson_types,
     site_settings,
 )
+from apps.core.seo import meta as seo_meta
 from apps.inquiry.forms import HONEYPOT_FIELD, MESSAGE_MAX, NAME_MAX, InquiryForm
 from apps.inquiry.services import TOKEN_FIELD, handle_submission, issue_token
 
@@ -47,10 +48,7 @@ LOCATION_ROWS = [
 def home(request):
     """SCR-001 메인. 섹션 2·3·4 는 데이터가 없으면 렌더하지 않는다(조건부 렌더)."""
     context = {
-        "meta_title": None,  # base.html 이 SITE_NAME 기본 패턴을 쓴다
-        "meta_description": (
-            "강남 요가 스튜디오 요가패스의 위치와 수업 안내, 문의 방법을 안내합니다."
-        ),
+        **seo_meta("SCR-001"),  # title·description 은 IA §6.2·§6.3 표가 원본이다(apps/core/seo.py)
         "canonical_path": "/",
         "lesson_types": lesson_types(),
         "instructors": featured_instructors(limit=3),
@@ -71,8 +69,7 @@ def instructors(request):
     else:
         grid_class = "g-3"
     context = {
-        "meta_title": "요가 강사 소개",
-        "meta_description": "요가패스에서 수업을 진행하는 강사와 담당 수업을 소개합니다.",
+        **seo_meta("SCR-002"),
         "canonical_path": "/instructors",
         "instructors": people,
         "grid_class": grid_class,
@@ -104,8 +101,7 @@ def _location_context(request):
         if values.get(key)
     ]
     return {
-        "meta_title": "오시는 길",
-        "meta_description": ("강남 요가패스의 위치와 찾아오시는 방법, 문의하기를 안내합니다."),
+        **seo_meta("SCR-003"),
         "canonical_path": "/location",
         "page_id": "location",
         "info_rows": rows,
@@ -158,10 +154,7 @@ def privacy(request):
     """SCR-006 — 본문은 content/privacy.yml 이 단일 원본이다(기술 설계 §6.2)."""
     document = privacy_document()
     context = {
-        "meta_title": "개인정보 처리방침",
-        "meta_description": (
-            "요가패스가 수집하는 개인정보의 항목과 이용 목적, 보관 기간, 파기 절차를 안내합니다."
-        ),
+        **seo_meta("SCR-006"),
         "canonical_path": "/privacy",
         "page_id": "privacy",
         "document": document,
@@ -199,7 +192,7 @@ def robots_txt(request):
 
 def page_not_found(request, exception=None):
     """SCR-008 — 실제 404 상태 코드로 응답한다(REQ-F-060)."""
-    context = {"page_id": "error-404", "meta_title": "페이지를 찾을 수 없습니다", "noindex": True}
+    context = {"page_id": "error-404", **seo_meta("SCR-008"), "noindex": True}
     return render(request, "errors/404.html", context, status=404)
 
 
@@ -207,12 +200,12 @@ def server_error(request):
     """SCR-009 — 전용 오류 화면. DB 장애 상태에서도 렌더되므로 동적 데이터에 의존하지 않는다."""
     context = {
         "page_id": "error-500",
-        "meta_title": "일시적인 오류가 발생했습니다",
+        **seo_meta("SCR-009"),
         "noindex": True,
     }
     return render(request, "errors/500.html", context, status=500)
 
 
 def permission_denied(request, exception=None):
-    context = {"page_id": "error-404", "meta_title": "페이지를 찾을 수 없습니다", "noindex": True}
+    context = {"page_id": "error-404", **seo_meta("SCR-008"), "noindex": True}
     return render(request, "errors/404.html", context, status=404)

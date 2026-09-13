@@ -1,21 +1,26 @@
 ---
 doc_id: DEV-REPORT
-title: 개발 보고서 — 1차 구현 (3단계 · 운영·배포·백업·검증 지원 도구)
+title: 개발 보고서 — 1차 구현(3단계) + P5 1차 결함 수정(DEF-001~010)
 phase: P4
 owner: developer
-version: 0.3
+version: 0.4
 status: draft
 reviewers: [designer, planner]
-inputs: [developer/04_tech-design.md, planning/02_requirements.md, planning/02_storyboard.md, design/03_design-system.md, design/03_page-design.md, design/mockups/, shared/tickets/TKT-DSN-002_to-developer_favicon-og-raster.md, shared/reviews/P4a_tech-design_devops_r2.md, shared/reviews/P4a_tech-design_qa_r2.md]
+inputs: [developer/04_tech-design.md, planning/02_requirements.md, planning/02_storyboard.md, design/03_design-system.md, design/03_page-design.md, design/mockups/, shared/tickets/TKT-DSN-002_to-developer_favicon-og-raster.md, shared/reviews/P4a_tech-design_devops_r2.md, shared/reviews/P4a_tech-design_qa_r2.md, qa/05_test-report.md, shared/tickets/DEF-001_meta-title-description-mismatch.md, shared/tickets/DEF-002_duplicate-id-html-validation.md, shared/tickets/DEF-003_csp-blocks-inline-style-home.md, shared/tickets/DEF-004_reflow-320px-horizontal-scroll.md, shared/tickets/DEF-005_touch-target-and-font-minimum.md, shared/tickets/DEF-006_bottom-padding-without-fixed-bar.md, shared/tickets/DEF-007_rollback-guard-untagged-image.md, shared/tickets/DEF-008_clock-offset-not-applied-to-token-expiry.md, shared/tickets/DEF-009_privacy-collected-items-vs-schema.md, shared/tickets/DEF-010_temp-source-file-in-prod-image.md]
 updated: 2026-09-13
 ---
 
-# 개발 보고서 (초안) — 1차 구현 3단계
+# 개발 보고서 (초안) — 1차 구현 3단계 + **P5 1차 결함 수정**
 
-> **이 문서의 상태**: `draft`. 1차 구현 **14개 작업 중 작업 1~13 + 작업 14 일부**를 마친 시점의 보고다.
+> **이 문서의 상태**: `draft`. 1차 구현 **14개 작업 중 작업 1~13 + 작업 14 일부**를 마치고, **P5 1차 검증 결함(DEF-001~010)을 전건 수정**한 시점의 보고다.
 > **규칙**: 이 문서에는 **직접 실행해 확인한 것만** 적는다. 실행하지 않은 항목은 "미확인"으로 적고 "완료"로 쓰지 않는다.
-> 설계 근거는 `developer/04_tech-design.md` **v0.4**, 실행 절차는 `developer/site/README.md`.
-> v0.1(1단계) 대비 달라진 곳은 **▲**, **v0.3(3단계)에서 새로 한 것은 ★** 로 표시했다.
+> 설계 근거는 `developer/04_tech-design.md` **v0.5**, 실행 절차는 `developer/site/README.md`.
+> v0.1(1단계) 대비 달라진 곳은 **▲**, v0.3(3단계)에서 새로 한 것은 **★**, **v0.4(P5 결함 수정)에서 한 것은 ★★** 로 표시했다.
+>
+> **★★ 이번 판(v0.4)의 핵심 3줄**
+> 1. **DEF-001~010 을 전건 수정**했다(미수정·`rejected` 제안 **0건**). 판정 기준이 있는 것은 **승인 산출물의 문자열·수치를 그대로** 따랐다(IA §6.2·§6.3, REQ-N-006, REQ-F-003 ②).
+> 2. **회귀 테스트 27건과 브라우저 레이아웃 점검 도구를 추가**했다 — 같은 결함이 다시 들어오면 `manage.py test`(80건) 또는 `tests/browser/layout-check.js` 가 먼저 실패한다.
+> 3. **결함 수정 중 발견해 함께 고친 것 2건**: 헤더 주 CTA 가 전 구간에 노출되던 CSS 순서 문제(G-8 위반 · DEF-004 의 실제 원인), `viewport.js` ↔ `--header-h` 되먹임으로 **헤더가 1px 씩 계속 자라던 현상**. §4.3 에 확인 요청 6건을 남겼다.
 >
 > **★ 이번 판(v0.3)의 핵심 3줄**
 > 1. **PM 결정 2건을 반영했다** — ① 폼 토큰 **만료 = 다시 작성 안내**(설계 §9.6 ⑤를 ⑤/⑦로 분리, 테스트 5건 추가) ② **OG 이미지 임시본** 생성·교체 절차 확정.
@@ -38,7 +43,8 @@ updated: 2026-09-13
 | 백업·복구 | ★ `run_backup` **정상·`--dry-run`·라벨·락 충돌 중단·실패 주입·회전(일7/주4/월3)** 전건 실행. **`restore.sh` 로컬 복구 리허설 1회 성공**(문의 36건 → 백업 시점 11건으로 복원) |
 | 배포·롤백 | ★ `deploy.sh` **0단계 사전 점검 실행 확인**(디스크·롤백 이미지·IRREVERSIBLE·최근 백업·`check_release` 로 **배포 차단까지 확인**) · `rollback.sh` 가드 2종 확인. **실제 배포·롤백은 서버 필요 → 미확인** |
 | 검증 지원 도구 | ★ **①~⑪ 전부 구현**, 운영 안전장치 **5중 전건 실행 확인**(운영 이미지에 `qa/`·`qa_*` 명령 **0건**, `QA_TOOLS_ENABLED` 없이 실행 시 **종료 코드 2**, 운영+QA 조합 **기동 거부**) |
-| 자동 테스트 | ★ **53건 전부 통과** (v0.2 48건 → 53건 · 토큰 만료 5건 + 동시 이중 제출 1건 추가, 중복 1건 대체), `ruff check` · `ruff format --check` 통과 |
+| 자동 테스트 | ★★ **80건 전부 통과** (v0.3 53건 → 80건 · **P5 결함 회귀 27건 추가**), `ruff check` · `ruff format --check` 통과 |
+| ★★ P5 1차 결함 | **DEF-001~010 전건 수정 완료**(미수정 0건). 확인 명령·결과는 **§4.2**, designer·planner·qa 확인 요청 6건은 **§4.3** |
 | 검증팀 전달 가능 여부 | ★ **가능.** 화면·폼·SEO·접근성·**백업/복구·검증 지원 도구 전부** 지금 검증할 수 있다. 남은 제약은 **브라우저·실기기·서버가 필요한 항목**뿐이다(§4 말미·§8) |
 
 ---
@@ -90,11 +96,11 @@ updated: 2026-09-13
 | REQ-N-001·002 | 반응형 4구간 | 부분 | 각 페이지 CSS 에 `min-width` 4구간 작성. **실측(360/768/1280px)은 미수행** — 브라우저 실행 환경 없음(§6 #1) |
 | REQ-N-004·005·007·015 | 성능·Lighthouse | 부분 | 폰트 self-host·해시·brotli·`immutable` 확인. **측정은 작업 11** |
 | REQ-N-006·008·009 | 접근성 | ▲ 부분 | skip link · `main[tabindex=-1]` · h1 1개 · 랜드마크 · 44px 하한 · `label[for]` · `aria-describedby` · `aria-invalid` · **오류 요약 `role="alert"` + 항목 링크** · 결과 블록 `role="status"` + 포커스 이동 · **색 외 아이콘·텍스트 병기**. 자동 점검 도구 실행은 작업 13 |
-| REQ-N-010~016 | SEO | ▲ 완료(값 제외) | `templates/partials/meta.html`(title·description·canonical·OG) · `apps/core/sitemaps.py`(색인 4화면) · `views.robots_txt`(Disallow 0건) · `jsonld_localbusiness.html`. **도메인은 `SITE_BASE_URL` 교체만으로 전환된다**(§4 #12) |
+| REQ-N-010~016 | SEO | ★★ 완료(값 제외) | **`apps/core/seo.py`(title·description 원본 — IA §6.2·§6.3 표)** · `templates/partials/meta.html`(출력·canonical·OG) · `apps/core/sitemaps.py`(색인 4화면) · `views.robots_txt`(Disallow 0건)  · `jsonld_localbusiness.html` + ★★ `jsonld_website.html`(메인). 회귀 테스트 `tests/test_seo_markup.py`. **도메인은 `SITE_BASE_URL` 교체만으로 전환된다**(§4 #12) |
 | REQ-N-017·022 | HTTPS · 메일 발신 인증 | 미착수 | 운영 nginx·도메인 확정 후(§13) |
 | REQ-N-018 | 비밀 정보 분리 | 완료 | `.env` 커밋 제외 확인, 운영 이미지 레이어 비밀 문자열 0건(1단계 확인 유지) |
 | REQ-N-019 | 폼 악용 방지 **단일 구현** | ▲ 완료 | `apps/core/ratelimit.py`(10분 5회 / 1일 20회, 차단 지속·`Retry-After` 계산, **사용량 알림 3임계 + 1시간 합산**) · honeypot · 서버 검증 |
-| REQ-N-020 | 개인정보 최소 수집 | ▲ 완료 | 저장 항목 3개 + `source_ip_hash`(**원본 IP 미저장**). 로그에 이름·전화·본문 미기록(테스트로 고정) |
+| REQ-N-020 | 개인정보 최소 수집 | ★★ 완료 | 저장 항목 3개 + `consent_at`·`phone_norm`(파생) + `source_ip_hash`(**원본 IP 미저장**). 로그에 이름·전화·본문 미기록(테스트로 고정). ★★ `Inquiry.PII_FIELDS`·`PII_POLICY_TERMS` ↔ `content/privacy.yml` **양방향 대조를 `tests/test_privacy_policy.py` 가 자동 검사** |
 | REQ-N-023 | `[TBD]` 노출 금지 · 오픈 판정 | ▲ 완료(장치) | `/`·`/instructors`·`/location` 렌더 HTML 에 `TBD` **0건**(테스트). `/privacy` 는 1차 수용 기준상 `[TBD]` 를 보이며, **그 상태의 운영 배포는 `manage.py check_release` 가 종료 코드 1 로 막는다**(§3.2) |
 | REQ-N-027 | 한국어 | 완료 | `LANGUAGE_CODE=ko-kr` · `<html lang="ko">` |
 | REQ-N-028 | JS 비활성 시 정보 화면 동작 | ▲ 완료 | 전 화면이 **서버 렌더 HTML 단독으로 완성**된다. 모바일 메뉴·처리방침 목차·강사 경력 접기 모두 `<details>` 기반이라 JS 없이 동작. **curl(=JS 0) 로 전 화면 본문·링크 확인**(§4 #5) |
@@ -233,7 +239,7 @@ updated: 2026-09-13
 | 41 | **복구 리허설(로컬)** | `echo yes \| COMPOSE_FILES="… compose.local.yaml" sh deploy/restore.sh /backups/…dump` | 백업(11건) → 시드로 36건 → 복구 → **11건**. **`pre-restore` 자동 덤프 생성 확인** · `migrate --check` 통과 · `/healthz` 200 |
 | 42 | 복구 **운영 가드** | `DJANGO_ENV=production` .env 로 `restore.sh` | `✗ 운영 환경입니다. … --i-know-this-is-production` 로 중단. **인라인 주석이 붙은 값에서도 가드가 걸리도록** 파서를 고쳤다(§6 #11) |
 | 43 | **배포 0단계** | `APP_VERSION=… sh deploy/deploy.sh --dry-run` | 디스크 여유·현재 이미지·IRREVERSIBLE 0개·최근 백업 확인 후 **`check_release` 실패로 배포 중단** — REQ-N-023 ①이 실제로 배포를 막는다 |
-| 44 | 롤백 가드 | `ROLLBACK_VERSION=9.9.9 sh deploy/rollback.sh` / 인자 없이 | `✗ 이미지 … 가 서버에 없습니다` / `✗ 되돌릴 이미지를 정할 수 없습니다` |
+| 44 | 롤백 가드 | `ROLLBACK_VERSION=9.9.9 sh deploy/rollback.sh` / 인자 없이 | `✗ 이미지 … 가 서버에 없습니다` / `✗ 되돌릴 이미지를 정할 수 없습니다`<br>⚠ **v0.4 정정(DEF-007)**: 뒤쪽 기재는 **`.deploy-rollback-image` 가 없을 때만** 맞다. 그 파일에 **태그 없는 이름**이 들어 있으면 v0.3 시점 스크립트는 거부하지 않고 **롤백을 실행했다.** 태그 가드를 추가해 지금은 거부한다 — 실행 확인은 §4.2 표 |
 | 45 | 점검 화면 | `$C stop app` → `curl :8080/` | **HTTP 502 + 정적 점검 화면**(앱 없이 렌더) → `start app` 후 200 복귀 |
 | 46 | 스크립트 문법 | `sh -n deploy/{deploy,rollback,restore}.sh` | 3건 모두 통과 |
 
@@ -274,6 +280,73 @@ updated: 2026-09-13
 
 ---
 
+## ★★ 4.2 P5 1차 결함 수정 실행 확인 (2026-09-13 · DEF-001~010)
+
+> **전제**: qa 1차 검증에서 발행된 **DEF-001~010 을 전건 수정**했다(미수정 0건). 아래는 **직접 실행한 명령과 결과**다.
+> 실행 환경: 로컬 개발 스택 `:8000`(바인드 마운트) + **운영 미리보기 `:8001`**(prod 이미지 `yogapass-app:0.1.0-fix1`, `DJANGO_SETTINGS_MODULE=config.settings.production`, gunicorn + WhiteNoise).
+> 운영 미리보기 기동: `sed` 로 만든 `.env.prodcheck`(`DJANGO_ENV=production` · `DJANGO_DEBUG=0` · `APP_PORT=8001` · `COMPOSE_PROFILES=` · `APP_VERSION=0.1.0-fix1`) + `ENV_FILE=.env.prodcheck docker compose -f compose.yaml -f compose.prod.yaml -p yogapass-prodcheck --env-file .env.prodcheck up -d --build` → `migrate` → `seed_content`.
+> ⚠ **`.env` 를 그대로 복사하면 `DJANGO_SETTINGS_MODULE=config.settings.local` 이 함께 따라와 운영 미리보기가 local 설정으로 뜬다**(404 가 디버그 화면으로 나온다). `.env.prodcheck` 에서 이 줄도 `config.settings.production` 으로 바꿔야 한다 — qa 가 미리보기를 다시 만들 때 주의.
+
+### 4.2.1 결함별 확인
+
+| DEF | 확인 명령 | 결과 |
+|---|---|---|
+| **001** | `curl -s :8001/{,instructors,location,privacy,nope} \| grep -oE '<title>…\|<meta name="description"…'` | **5화면 title 전건 IA §6.2 표와 일치**(`강남 요가패스 \| 강남 요가 스튜디오·수업 안내` 외 4건), **4화면 description 전건 IA §6.3 표와 문자열 일치 · 길이 62·69·57·56자**(50~90 충족). `noindex` 화면 description 없음 |
+| **001 ④** | `curl -s :8001/ \| grep -o '"@type": "[^"]*"'` | `HealthAndBeautyBusiness` + **`WebSite`** 2건 (오시는 길은 `HealthAndBeautyBusiness` 1건) |
+| **002** | `java -jar vnu.jar --format gnu --skip-non-html html/`(5화면 저장본) | **error 0건**(종전 5건 → 0). 남은 출력은 `instructors.html` 의 `info warning: Section lacks heading` 1줄뿐 — 오류 아님(§4.3 ④) |
+| **002** | `curl … \| grep -oE ' id="[^"]+"' \| sort \| uniq -d` | 5화면 전건 **중복 id 0건** |
+| **003** | `curl … \| grep -c 'style="'` (5화면) | **전건 0** (종전 메인 2건) |
+| **003** | Chrome 헤드리스 콘솔 수집 | 4화면 × 4뷰포트 **콘솔 오류 0건**. `/nope` 만 1건 — **자기 응답 코드 404 를 브라우저가 기록한 것**(REQ-F-060 이 요구하는 동작. 스크립트·CSP 오류 아님) |
+| **004** | `BASE=http://localhost:8001 NODE_PATH=../../qa/tools/node_modules node tests/browser/layout-check.js` | 5화면 × **320/360/768/1280px 가로 스크롤 0건**(320px `scrollWidth == clientWidth == 320`). 헤더 구성도 명세대로 — `<768` CTA 없음 / `768~1279` **CTA 없음(G-8)** / `≥1280` CTA 표시 + 전화 아이콘 숨김 |
+| **004(추가)** | 같은 도구의 헤더 높이 재측정 | 65 → 65 · 69 → 69 · 73 → 73px (**되먹임 증가 없음**. 수정 전에는 로드마다 106·110·118px 로 자랐다) |
+| **005** | Chrome 헤드리스 실측(360px) | 헤더 로고 **그래픽 140×32 / 링크 140×44** · 푸터 링크 6종 **328×44** · 저작권 **14px**(`© 2026 강남 요가패스`) · GNB 항목 최소 **44×44**(37→44) |
+| **006** | 같은 도구의 `body` 하단 여백 | `/location`(전화 `[TBD]`) 320·360·768px **고정 바 없음 + `padding-bottom: 0px`** / 다른 4화면 77px(바 있음) / 1280px 0px |
+| **006** | 전화 확정 시드 후 재측정 | `/location` 에 고정 바 노출 + 여백 **77px**, 320px 가로 스크롤 없음 → **확인 후 값 원복**(`phone` = null · `is_published: false`) |
+| **007** | `sh deploy/rollback.sh` 8가지 상황(태그 없음·빈 파일·`latest`·대상 없음·없는 버전·정상 태그 `--dry-run`·비대화형 확인 없음·`deploy.sh --dry-run`) | **8건 전부 의도대로**(DEF-007 티켓 표에 전문 기재). 실행 전후 `docker ps` 동일 — **스택 변경 0건**, `.deploy-rollback-image` 잔존 0 |
+| **008** | 오프셋 컨테이너(+25시간) 로 만료 토큰 POST | `HTTP 200` + "시간이 지나 문의가 접수되지 않았습니다." + 폼 재렌더 + **새 토큰** · 저장 **0건**(`qa_show inquiry --count-only` = 0) · 로그 **`inquiry.expired token_state=expired ref=none`** → **§9.6 ⑦ `expired` 판정 가능** |
+| **009** | `manage.py test` + `qa_pii_columns` ↔ `privacy.yml` 대조 | 개인정보 컬럼 **6개 전부 방침 표에 존재**(누락 0). 자동 테스트가 매번 대조 |
+| **010** | `docker run --rm --entrypoint sh yogapass-app:0.1.0-fix1 -c 'ls -la /app/static/img/'` · `find /app -name "*TEMP*"` | `/app/static/img/` **11개(TEMP 파일 없음)** · `find` **0건** · `/app` 루트에서 `Dockerfile`·`compose*.yaml` 도 사라짐(`qa/`·`tests/`·`.env` 없음은 종전 유지) |
+
+### 4.2.2 전체 회귀 (수정 후)
+
+| # | 항목 | 명령 | 결과 |
+|---|---|---|---|
+| 62 | 자동 테스트 | `manage.py test`(`config.settings.test`) | **Ran 80 tests … OK** (53 → 80, **+27**) |
+| 63 | 린트·포맷 | `ruff check .` / `ruff format --check .` | `All checks passed!` / `88 files already formatted` |
+| 64 | 화면 상태 코드(운영 미리보기) | `curl -o /dev/null -w %{http_code}` × 6 | `/` 200 · `/instructors` 200 · `/location` 200 · `/privacy` 200 · `/nope` **404**(SCR-008 화면) · `/healthz` 200 |
+| 65 | 운영 이미지 빌드 | `… -f compose.prod.yaml build app`(`--build` 동반 기동) | **성공** — `yogapass-app:0.1.0-fix1` |
+| 66 | 운영 설정 점검 | `manage.py check --deploy`(미리보기) | **오류 0건** · 경고 5건 = `content.W001`(처리방침 미확정, 의도) + HTTPS 관련 4건(http 미리보기라 SSL 옵션 해제 — 종전과 동일) |
+| 67 | 배포 차단 점검 | `manage.py check_release` | **종료 코드 1 · `pending=11`**(의도된 동작 유지 — 처리방침 확정 전 배포 차단) |
+| 68 | CSP 헤더 | `curl -I :8001/` | `default-src 'self'; script-src 'self'; style-src 'self'; …` 종전과 동일 |
+| 69 | OG 이미지 | `curl -o /dev/null -w %{http_code} <og:image 경로>` | **200**(해시 파일명). 절대 URL 의 호스트는 `SITE_BASE_URL` 값이라 미리보기 포트와 다름 — 설정 문제 아님 |
+
+### 4.2.3 새로 추가한 회귀 테스트 (27건)
+
+| 파일 | 건수 | 막는 결함 |
+|---|---|---|
+| `tests/test_seo_markup.py` | 21 | **DEF-001**(IA 표 문자열 일치·길이·유일성·키워드·**DB 값 무관**·JSON-LD) · **DEF-002**(중복 id·접근 이름) · **DEF-003**(인라인 style 0) · **DEF-006**(고정 바 유무 ↔ 하단 여백) · **DEF-010**(static 작업 파일·`.dockerignore`) |
+| `tests/test_privacy_policy.py` | 3 | **DEF-009**(PII 컬럼 ↔ 처리방침 표 양방향 대조) |
+| `tests/test_inquiry.py`(추가분) | 3 | **DEF-008**(오프셋으로 만료 유발 / TTL 안이면 정상 / **마스터 스위치 꺼지면 무영향**) |
+| `tests/browser/layout-check.js`(신규 도구) | — | **DEF-003·004·005·006** — 5화면 × 4뷰포트에서 가로 스크롤·터치 타깃·글꼴 하한·인라인 style·콘솔 오류·헤더 높이 증가·고정 바 대비 여백을 한 번에 측정(위반 시 종료 코드 1) |
+
+> `layout-check.js` 는 **puppeteer-core·Chrome 이 필요**하다(저장소에 두지 않는다 — 검증 도구는 qa 소관).
+> 실행: `BASE=http://localhost:8001 NODE_PATH=../../qa/tools/node_modules node tests/browser/layout-check.js`
+
+---
+
+## ★★ 4.3 확인 요청 (designer · planner · qa)
+
+| # | 항목 | 내용 | 요청 대상 |
+|---|---|---|---|
+| ① | **로고 클릭 영역 44px** | DEF-005 의 qa 권고 ⓐ 를 적용했다 — **로고 그래픽은 32px 그대로**, 링크에 `min-height: 44px` 만 걸어 클릭 영역을 140×44 로 만들었다. 디자인 시스템 §헤더의 "로고 높이 32px" 와 충돌하지 않는다고 판단했지만 **명세 해석이므로 확인이 필요**하다 | designer · planner |
+| ② | **푸터 링크 행 높이 32 → 44px** | 터치 타깃 하한을 맞추느라 푸터 링크 6종의 행 높이가 커졌다(1열 구간 푸터 세로 +약 72px). 글자 크기·색·정렬은 그대로다. **인접 간격은 0px**(맞닿음) — 44px 이상 타깃이 맞닿는 구성을 허용할지 판단이 필요하다 | designer · qa |
+| ③ | **GNB 항목 최소 폭 44px** | `768px` 이상에서 "홈"이 37×44px 이라 가로 하한 미달이었다(qa 1차는 360px 만 실측). 패딩 토큰 `--gnb-item-pad-x`(12px — IA §2.1 GNB 폭 계산 전제)는 **건드리지 않고** `min-width: 44px` 만 걸었다 → GNB 전체 폭 284 → **291px**. IA §2.1 의 폭 전제와 어긋나지 않는지 확인 필요 | designer · planner |
+| ④ | **`instructors` 의 `Section lacks heading`** | vnu **오류가 아니라 info warning** 이라 REQ-N-016 판정에 영향이 없고, `<section>` → `<div>` 전환은 랜드마크 구성 변경이라 이번 수정에 넣지 않았다. 전환할지 제목을 넣을지 정해 주면 반영하겠다 | designer |
+| ⑤ | **표시 상호를 "강남 요가패스" 로 통일** | DEF-001 수정에서 `content/site.yml` 의 `name` 을 `요가패스` → **`강남 요가패스`** 로 맞췄다(IA §6.2 브랜드·`SITE_NAME` 기본값과 동일). 화면 노출 지점: 헤더 로고 `aria-label`, 푸터 저작권, 메인 h1 폴백, 알림 메일 제목. **정식 상호(T-G)가 확정되면 함께 교체**한다 | planner · PM |
+| ⑥ | **헤더 높이 토큰 분리** | `viewport.js` 가 실측값을 쓰는 `--header-h` 와 헤더 행의 `min-height` 가 같은 변수를 써서 헤더가 1px 씩 계속 자라고 있었다(측정 중 64 → 118px). `min-height` 전용 **정적 토큰 `--header-min-h`(64/68/72px — 값은 디자인 시스템 그대로)** 를 분리했다. 토큰 **이름이 추가**된 변경이라 알린다 | designer |
+
+---
+
 ## 5. 자체 테스트
 
 | 파일 | 건수 | 내용 |
@@ -281,7 +354,9 @@ updated: 2026-09-13
 | `tests/test_smoke.py` | 9 | URL·상태 코드·공통 레이아웃·CTA 상태(H1~H3/S1~S3)·식별자 규칙·보안 헤더 |
 | ▲ `tests/test_pages.py` | 19 | 화면 공통 규칙(h1 1개·랜드마크·canonical·OG·sitemap·robots·**템플릿 주석 누출 0**) · SCR-002 인원 경계값 · 경력 접기 · SCR-006 목차 11항목·표 라벨·`<details>` · 404·500 · 전화 확정 전후 렌더 · **배포 사전 점검** |
 | ★ `tests/test_inquiry.py` | 25 | **응답 형태 7종 전건** + 경계값 + 아웃박스 본문 + 사용량 알림 + honeypot 화면 동일성 + 필수 표시 3중 + 동의 문구 + `<noscript>` + 지도 버튼 조건부 렌더 + ★ **만료 5건**(부재·만료·변조·재제출 성공·검증 우선) + ★ **동시 이중 제출 1건** |
-| **합계** | ★ **53** | `manage.py test` **전건 통과** |
+| ★★ `tests/test_seo_markup.py` | 21 | **P5 결함 회귀** — title·description 이 IA 표와 문자열 일치·50~90자·유일·키워드·**DB 값 무관** / 구조화 데이터 2종 / **중복 id 0·접근 이름** / **인라인 style 0** / 고정 바 유무 ↔ 하단 여백 / static 작업 파일 0 |
+| ★★ `tests/test_privacy_policy.py` | 3 | **P5 결함 회귀** — 개인정보 컬럼(`PII_FIELDS`) ↔ 처리방침 수집 항목 표 양방향 대조 |
+| **합계** | ★★ **80** | `manage.py test` **전건 통과** (v0.3 53건 → **80건**, P5 결함 회귀 27건 추가) |
 
 - 린트: `ruff check .` 통과(규칙 `E,F,W,I,UP,B,DJ,S`).
 - 정적 자산 크기(참고): 페이지 CSS brotli 합계 **약 12KB**, 폰트 선언 `fonts.css` brotli **10.3KB**, JS 합계 **13KB(비압축, 4파일)**. 최종 측정은 작업 11.
@@ -324,6 +399,7 @@ updated: 2026-09-13
 - ★ **`og-image.png` 임시본 (PM 결정 2026-09-13)**: 아래 보류 사유는 그대로지만, PM 결정에 따라 **변환 환경에서 쓸 수 있는 폰트(Noto Sans CJK KR)로 렌더한 임시본**을 넣었다. **임시인 것은 폰트(자간·글자 폭)뿐이고 레이아웃·색·문구·좌표는 원본 그대로**다.
   - 티켓이 경고한 **여백 초과는 실측으로 배제**했다 — 텍스트+로고만 렌더해 `magick -trim` 으로 잰 경계가 **516×323 at (97,136)** 이라 좌우 96px 여백 안에 들어간다(§4 #30).
   - **임시본 표시 4곳**: 작업 사본 파일명 `og-image.TEMP-source.svg` · 그 파일 머리 주석 · `og-image.png` 의 PNG `tEXt Comment` · 인계 메모 `static/img/SOURCES.md`.
+    ★★ **v0.4(DEF-010) 변경**: 작업 사본을 **`assets-work/og-image.TEMP-source.svg` 로 옮겼다**(운영 이미지·`collectstatic` 대상에서 제외). 표시 4곳은 그대로이며 경로만 바뀌었다.
   - **교체 시 코드 변경 0** — 같은 경로에 덮어쓰면 된다. 절차는 `static/img/SOURCES.md` 와 티켓 처리 결과 ⑤에 적었다.
 - **원래의 보류 사유(유지)**: 원본 `og-image.svg` 는 `font-family: Pretendard` 로 조판돼 있고, 우리가 가진 Pretendard 는 **`unicode-range` 분할 woff2 서브셋**뿐이라 fontconfig 가 로드하지 못한다. 폴백 폰트로 구우면 글자 폭이 달라져 **좌우 96px 여백을 넘을 수 있다**(티켓이 경고한 바로 그 상황)고 판단했고, 육안 확인 수단도 없다. 티켓의 방침 ②대로 **placeholder 를 만들지 않고 `og:image` 계열 태그를 빼고 빌드**했다. 파일이 `static/img/og-image.png` 에 놓이면 **코드 변경 없이** 태그 5줄(`og:image`·width·height·alt·`twitter:card`)이 붙는다(`apps/core/context_processors._og_image`).
 - **designer 에게 알릴 사항 1건(결함)**: `design/assets/favicon.svg` 는 **XML 로 파싱되지 않는다.** 6행 주석 안의 `--color-primary` 가 XML 주석 규칙(연속 하이픈 금지)을 어긴다. 브라우저는 `image/svg+xml` 을 XML 로 파싱하므로 **파비콘이 표시되지 않는다.** 우리 사본(`static/img/favicon.svg`)은 문구를 고쳐 해소했고 변환도 그 사본으로 했다. **원본 수정은 designer 소관**이라 티켓 처리 결과에 적었다.
@@ -341,6 +417,11 @@ updated: 2026-09-13
 - **빈도 제한 조정**: `.env` 의 `RATE_LIMIT_FORM_WINDOW_MAX`·`RATE_LIMIT_FORM_DAY_MAX` 로 낮춘다. 사용량 알림 임계는 `QA_TOOLS_ENABLED=1` 일 때만 `QA_RATE_LIMIT_ALERT_*` 로 낮아진다
 - ★ **`.env` 작성 주의**: **값 줄에 인라인 주석을 쓰지 않는다.** `docker run --env-file` 과 셸 파서가 주석을 값으로 읽는다(§6 #11).
 - **의견을 받고 싶은 것 1건**: §6 #3(강사 경력 접기 기준을 "3줄 초과" 대신 **항목 4개 이상**으로 근사 — designer 확인). §6 #7(토큰 만료)은 **PM 결정으로 종결**됐다.
+- ★★ **2차 검증(재검증) 요청 범위** — 자세한 확인 명령·결과는 §4.2
+  1. **DEF-001~010 재검증**: TC-102·103·104(메타) · `50_html_validate`(vnu) · TC-107(콘솔·Lighthouse 권장사항) · TC-098(320px reflow) · TC-096(터치 타깃·글꼴) · TC-004(고정 바·하단 여백, **전화 확정/미확정 양쪽**) · TC-125(롤백 가드) · TC-059(§9.6 ⑦ **`expired` 포함 3상태 전건**) · TC-112(PII ↔ 처리방침) · TC-116(운영 이미지 자산 목록)
+  2. **회귀로 함께 봐야 하는 것**: 전 화면 헤더·푸터(로고·GNB·푸터 링크 크기 변경) · 앵커 이동 위치(`#contact`·`#map`, `--header-h` 사용처) · `/privacy` 표 카드 전환(p2 행 2개 증가) · 알림 메일 제목의 상호 표기 · 문의 폼 ①⑤(오프셋 없는 정상 환경)
+  3. **운영 미리보기를 다시 만들 때**: `.env.prodcheck` 의 `DJANGO_SETTINGS_MODULE` 도 `config.settings.production` 으로 바꿔야 한다(§4.2 머리말 주의)
+  4. **판정 보류를 부탁하는 것**: §4.3 확인 요청 ①②③(로고·푸터·GNB 의 클릭 영역 처리와 인접 간격 해석) — designer·planner 확인 결과에 따라 값이 달라질 수 있다
 
 ---
 
@@ -357,6 +438,7 @@ updated: 2026-09-13
 
 | 버전 | 일자 | 작성자 | 내용 | 관련 리뷰/CR |
 |---|---|---|---|---|
+| **0.4** | **2026-09-13** | developer | **P5 1차 결함 수정 — DEF-001~010 전건(미수정 0건).** ① **DEF-001(Major)**: title·description 원본을 `apps/core/seo.py`(IA §6.2·§6.3 표 그대로)로 단일화하고 브랜드 문자열을 DB 에서 분리, 메인 `WebSite` JSON-LD 추가, 표시 상호를 "강남 요가패스" 로 통일 ② **002** 인라인 SVG id 네임스페이스(`inline_svg uid=`) → vnu **error 0건** ③ **003** 메인 인라인 style 4곳 제거(유틸리티 클래스) ④ **004** 헤더 주 CTA 가 전 구간 노출되던 CSS 순서 문제 수정(G-8 위반 동반) + **헤더 높이 되먹임 제거** → 320px 가로 스크롤 0 ⑤ **005** 로고·푸터·GNB **클릭 영역만** 44px 확보 + 저작권 14px(토큰 값 불변, qa 권고 ⓐ) ⑥ **006** 고정 바 미렌더 화면의 하단 여백 해제(`html[data-fixed-bar]`) ⑦ **007** 롤백 대상 **태그 가드**·확인 입력·`--dry-run` + `deploy.sh --dry-run` 부수 효과 제거, **§4.1 #44 의 잘못된 기재 정정** ⑧ **008** `submit_token` 만료 판정에 clock 오프셋 적용 → §9.6 ⑦ `expired` 판정 가능 ⑨ **009** 처리방침 수집 항목 표에 `consent_at`·`phone_norm` 추가 + 자동 대조 ⑩ **010** 작업 사본을 `assets-work/` 로 옮기고 `.dockerignore` 정리 → 운영 이미지 자산 11개. **회귀 테스트 27건 + 브라우저 레이아웃 점검 도구 추가**(자동 테스트 53 → **80건**), §4.2 실행 확인 표·§4.3 확인 요청 6건 신설 | `shared/tickets/DEF-001…010`, `qa/05_test-report.md` |
 | **0.3** | **2026-09-13** | developer | **PM 결정 2건 + 구현 3단계(작업 11·12·13).** ① 폼 **토큰 만료 → 재작성 안내**(⑤/⑦ 분리 · 입력값 보존 · 새 토큰 · 테스트 5건) ② **OG 이미지 임시본**(여백 실측 · 임시 표시 4곳 · 교체 시 코드 변경 0) ③ **폰트 폴백 메트릭 실측 적용**(Windows 실측 / macOS 미실측 표시) ④ **배포·롤백·복구 스크립트 + nginx 운영·스테이징 샘플 2종** ⑤ **백업 일원화(`run_backup`)·회전·실패 주입·락 충돌 중단 + 복구 리허설 1회 성공** ⑥ **일일 운영 요약·`/healthz` 폴링·파기·카운터 정리 스케줄 가동** ⑦ **검증 지원 도구 ①~⑪ + 안전장치 5중 전건 실행 확인** ⑧ **결함 1건 수정** — 동시 이중 제출 500. 실행 확인 **20건 추가**(§4.1), 자동 테스트 48 → **53건** | PM 결정 2026-09-13, TKT-DSN-002 |
 | 0.2 | 2026-09-13 | developer | **구현 2단계** — 1차 6화면 완성(SCR-002·003·006 신규, 008·009 디자인 반영) · **문의 폼과 응답 형태 6종**(§3.1) · 빈도 제한·사용량 알림 · SEO/접근성/`<noscript>` 마감 · 파비콘 래스터 4종(TKT-DSN-002) · **템플릿 주석 누출 결함 수정** · 자동 테스트 9 → 48건 | TKT-DSN-002 |
 | 0.1 | 2026-09-13 | developer | 최초 작성(초안) — 구현 1단계(작업 1~3 + SCR-001 뼈대)와 실행 명령 28건의 확인 결과 | `shared/reviews/P4a_tech-design_devops_r2.md`, `shared/reviews/P4a_tech-design_qa_r2.md` |

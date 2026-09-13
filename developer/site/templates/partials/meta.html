@@ -1,5 +1,7 @@
 {% load static %}{% spaceless %}
-<title>{% if meta_title %}{{ meta_title }} · {{ site_name }}{% else %}{{ site_name }}{% endif %}</title>
+{% comment %} title 은 **전문(全文)** 을 뷰가 넘긴다 — 원본은 `apps/core/seo.py`(IA §6.2 표).
+   여기서 브랜드를 덧붙이지 않는다(DEF-001: 구분자·브랜드가 IA 와 달라지는 원인이었다). {% endcomment %}
+<title>{% if meta_title %}{{ meta_title }}{% else %}{{ seo_brand }}{% endif %}</title>
 {% if meta_description %}<meta name="description" content="{{ meta_description }}">{% endif %}
 {% if canonical_path %}<link rel="canonical" href="{{ site_base_url }}{{ canonical_path }}">{% endif %}
 {% if force_noindex or noindex %}<meta name="robots" content="noindex, nofollow">{% endif %}
@@ -8,7 +10,7 @@
 og_image 값만 채워지고 이 템플릿은 고치지 않는다. {% endcomment %}
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="{{ site_name }}">
-<meta property="og:title" content="{% if meta_title %}{{ meta_title }}{% else %}{{ site_name }}{% endif %}">
+<meta property="og:title" content="{% if meta_title %}{{ meta_title }}{% else %}{{ seo_brand }}{% endif %}">
 {% if meta_description %}<meta property="og:description" content="{{ meta_description }}">{% endif %}
 {% if canonical_path %}<meta property="og:url" content="{{ site_base_url }}{{ canonical_path }}">{% endif %}
 {% if og_image %}<meta property="og:image" content="{{ site_base_url }}{{ og_image }}">

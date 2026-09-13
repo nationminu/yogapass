@@ -36,6 +36,18 @@ class Inquiry(models.Model):
         ),
     }
 
+    #: 개인정보 컬럼 ↔ **처리방침 수집 항목 표에 실제로 적힌 표현** (REQ-N-020 · DEF-009)
+    #: `content/privacy.yml` p2 표에 이 문자열이 없으면 자동 테스트가 실패한다
+    #: (tests/test_privacy_policy.py). 컬럼을 추가하면 방침 표와 이 표를 함께 고친다.
+    PII_POLICY_TERMS = {
+        "name": "이름",
+        "phone": "휴대폰 번호",
+        "phone_norm": "정규화 표기",
+        "message": "문의 내용",
+        "consent_at": "동의 시각",
+        "source_ip_hash": "출처 IP 의 해시값",
+    }
+
     public_ref = models.UUIDField("외부 식별자", default=uuid.uuid4, unique=True, editable=False)
     name = models.CharField("이름", max_length=20)
     phone = models.CharField("휴대폰 번호", max_length=20)

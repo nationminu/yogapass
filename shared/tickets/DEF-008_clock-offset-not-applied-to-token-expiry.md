@@ -4,7 +4,7 @@ from: qa
 to: developer
 phase: P5
 severity: minor
-status: open
+status: resolved
 related_req: [REQ-F-046]
 related_tc: [TC-059]
 related_scr: [SCR-003]
@@ -74,11 +74,23 @@ Django `signing.loads(max_age=…)` 는 **서명에 박힌 타임스탬프와 `t
 ---
 
 ## 조치 (developer 작성)
-- 원인:
-- 조치 내용:
-- 수정 파일:
-- 영향 범위 (회귀 테스트 필요 영역):
-- 일자:
+
+**요청 ⓐ 를 채택했다** — 토큰 만료 판정을 기준 시각 오프셋에 연동한다(요건 ⑩과 일관, 검증 전용 토글을 새로 만들지 않는다).
+
+- **원인**: qa 의 코드 분석이 정확하다. `django.core.signing.loads(max_age=…)` 는 서명에 박힌 타임스탬프를 **`time.time()`** 과 비교하므로 `apps/core/clock.now()` 를 거치지 않는다. `submit_token` 24시간 만료는 **PM 결정(2026-09-13)으로 뒤늦게 생긴 항목**이라 §10.3 "적용" 목록에도 빠져 있었다.
+- **조치 내용**
+  1. `apps/inquiry/services.read_token()` 이 **`max_age = TOKEN_MAX_AGE − clock.offset_seconds()`** 로 넘긴다. 서명 타임스탬프 비교는 그대로 두고 **허용 수명을 오프셋만큼 줄이는** 방식이라, 기준 시각을 미래로 민 것과 결과가 같다(수식: `age_real > MAX_AGE − offset ⟺ age_real + offset > MAX_AGE`). 음수 오프셋(과거 이동)이면 수명이 늘어난다 — 시계를 되돌린 의미와 같다.
+  2. **운영 이미지에서는 해석되지 않는다** — `clock.offset_seconds()` → `qaflags` → `qa/qa_settings.py` 경로이고 운영 이미지에는 `qa/` 자체가 없다. `QA_TOOLS_ENABLED=0` 이면 항상 `0` 이라 동작이 종전과 완전히 같다(§10.6 ②③). 이미지 내부 `find /app -name "qa_*.py"` **0건**을 이번에도 확인했다.
+  3. **기술 설계 §10.3 갱신** — "적용(오프셋이 움직인다)" 목록에 `submit_token` 만료 판정을 추가하고, `signing.loads` 가 clock 을 우회한다는 구현 주의를 행으로 명시했다(v0.5).
+  4. **회귀 테스트 추가** — `tests/test_inquiry.py::ClockOffsetTokenExpiryTests` 3건: ⓐ 오프셋 +25시간 → `token_state=expired` · 재작성 안내 · 폼 재렌더 · 저장 0 ⓑ 오프셋 +1시간(TTL 안) → 정상 접수 ⓒ **`QA_TOOLS_ENABLED=0` 이면 같은 환경 변수가 있어도 정상 접수**(운영 동작 불변 보장).
+- **재현 절차로 확인**(qa 의 환경 그대로)
+  1. `docker compose … run --rm -d -p 8020:8000 -e QA_TOOLS_ENABLED=1 -e QA_CLOCK_OFFSET_SECONDS=90000 app python manage.py runserver 0.0.0.0:8000` → 기동 로그 `CLOCK OFFSET: 90000s`
+  2. `:8000/location` 에서 토큰·CSRF 수령 → `:8020/location` 으로 정상 값 POST
+  3. 결과: **HTTP 200 · "시간이 지나 문의가 접수되지 않았습니다." · `id="contact-form"` 재렌더 · 새 `submit_token` 발급 · 저장 0건(`qa_show inquiry --count-only` = 0) · 로그 `inquiry.expired token_state=expired ref=none`**
+     → §9.6 ⑦의 **`expired` 분기를 P5 가 유발할 수 있다.** (확인 후 임시 컨테이너 삭제)
+- **수정 파일**: `developer/site/apps/inquiry/services.py`, `developer/site/tests/test_inquiry.py`, `developer/04_tech-design.md` §10.3
+- **영향 범위 (회귀 테스트 필요 영역)**: 문의 폼 응답 형태 §9.6 **①(정상)·⑤(재사용)·⑦(만료·부재·변조)** 전체. 오프셋이 걸리지 않은 환경(로컬·운영)에서 ①이 그대로 통과하는지 반드시 함께 확인(자동 테스트 `manage.py test` 80건 통과로 1차 확인).
+- **일자**: 2026-09-13
 
 ## 재검증 (qa 작성)
 | 사이클 | 결과 (closed / reopened) | 일자 | 비고 |

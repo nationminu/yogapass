@@ -4,7 +4,7 @@ from: qa
 to: developer
 phase: P5
 severity: minor
-status: open
+status: resolved
 related_req: [REQ-F-003, REQ-N-002]
 related_tc: [TC-004]
 related_scr: [SCR-003]
@@ -48,11 +48,18 @@ created: 2026-09-13
 ---
 
 ## 조치 (developer 작성)
-- 원인:
-- 조치 내용:
-- 수정 파일:
-- 영향 범위 (회귀 테스트 필요 영역):
-- 일자:
+
+- **원인**: 고정 바의 **렌더 여부는 서버가**(`cta.show_bar` — 자기 참조 + 전화 미확정이면 S3 로 요소 자체를 렌더하지 않음), **하단 여백은 CSS 가**(`body { padding-bottom: var(--body-pad-bottom) }`, 뷰포트 조건만 봄) 각각 판단했다. 두 판단이 연결돼 있지 않아 "바는 없는데 여백은 있는" 상태가 생겼다. `≥1280px` 은 미디어 쿼리가 여백을 0 으로 만들어 정상으로 보였을 뿐이다.
+- **조치 내용**
+  1. **서버 판단을 CSS 로 전달** — `templates/base.html` 의 `<html>` 에 `data-fixed-bar="{% if cta.show_bar %}on{% else %}off{% endif %}"` 를 붙였다.
+  2. `tokens.css` 에 `html[data-fixed-bar="off"] { --fixed-bar-h: 0px; --body-pad-bottom: 0px; --scroll-pad-bottom: var(--anchor-offset); }` 추가. 선택자 특이성 (0,1,1) 이라 미디어 쿼리의 `:root` (0,1,0) 선언을 **순서와 무관하게** 덮는다. `scroll-padding-bottom`(G-9)도 함께 풀린다.
+  3. **회귀 테스트 추가**
+     - `tests/test_seo_markup.py::FixedBarPaddingTests` — `/location`(전화 `[TBD]`)은 `barwrap` 없음 + `data-fixed-bar="off"`, 다른 화면은 `on`, **전화 확정 시 `/location` 도 `on`**, 그리고 스타일시트에 여백 해제 규칙이 있는지.
+     - `tests/browser/layout-check.js` — 매 화면·뷰포트에서 "고정 바가 없는데 `body` 하단 여백이 0 이 아니면" 위반으로 잡는다.
+- **확인 결과**(운영 미리보기 `:8001`, Chrome 헤드리스): `/location` 320·360·768px **고정 바 없음 + `padding-bottom: 0px`** / 1280px 0px / 다른 4화면 77px(바 있음). **전화 확정 시드 상태에서는 `/location` 도 바 노출 + 77px** 로 정상 복귀(확인 후 값 원복).
+- **수정 파일**: `developer/site/templates/base.html`, `static/css/tokens.css`, 신규 `tests/test_seo_markup.py` · `tests/browser/layout-check.js`
+- **영향 범위 (회귀 테스트 필요 영역)**: 전 화면 `body` 하단 여백과 앵커 스크롤 여백. 특히 `/location`(TC-004) + 전화 확정/미확정 양쪽(TC-003·005·007).
+- **일자**: 2026-09-13
 
 ## 재검증 (qa 작성)
 | 사이클 | 결과 (closed / reopened) | 일자 | 비고 |

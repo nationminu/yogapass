@@ -23,6 +23,9 @@
     if (height > 0) root.style.setProperty("--fixed-bar-h", height + "px");
   }
 
+  /* --header-h 는 **앵커 오프셋(G-10)용 실측값**이다.
+     헤더 행의 min-height 는 별도 토큰 --header-min-h 를 쓴다 — 같은 변수를 쓰면
+     "실측 높이 → 변수 → min-height → 더 큰 높이" 되먹임으로 헤더가 계속 자란다. */
   function syncHeader() {
     if (!header) return;
     var height = Math.round(header.getBoundingClientRect().height);

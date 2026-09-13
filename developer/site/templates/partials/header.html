@@ -6,7 +6,8 @@
 <header class="hdr">
   <div class="wrap hdr-row">
     <a class="logo" href="/" aria-label="{{ site_name }} 홈">
-      {% inline_svg "img/logo-horizontal.svg" "logo-svg" %}
+      {# uid: 한 문서에 같은 SVG 가 2개 이상이라 id 를 분리한다 (DEF-002) #}
+      {% inline_svg "img/logo-horizontal.svg" "logo-svg" uid="hdr" %}
     </a>
 
     <nav class="gnb" aria-label="주 메뉴">

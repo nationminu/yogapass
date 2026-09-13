@@ -30,7 +30,7 @@ from django.core import signing
 from django.db import IntegrityError, transaction
 from django.utils import timezone
 
-from apps.core.clock import now
+from apps.core.clock import now, offset_seconds
 from apps.core.net import client_ip, ip_hash
 from apps.core.ratelimit import check_form_submission, usage_alert_reasons
 from apps.inquiry.forms import HONEYPOT_FIELD, InquiryForm
@@ -82,11 +82,21 @@ def read_token(raw: str) -> tuple[str, str]:
     · missing : 토큰 필드 자체가 없다(폼을 거치지 않은 제출)
     · expired : 서명은 맞지만 24시간(TOKEN_MAX_AGE)이 지났다
     · invalid : 서명이 맞지 않는다(변조 · SECRET_KEY 교체)
+
+    **기준 시각 오프셋 적용 (기술 설계 §10.3 · DEF-008)**
+    `signing.loads(max_age=…)` 는 서명에 박힌 타임스탬프를 `time.time()` 과 비교하므로
+    `apps.core.clock` 을 거치지 않는다. 그래서 `QA_CLOCK_OFFSET_SECONDS` 로는 만료를
+    유발할 수 없었고 §9.6 ⑦의 `expired` 분기를 검증할 수단이 없었다.
+    오프셋만큼 **허용 수명을 줄여서**(= 기준 시각을 미래로 민 것과 같다) 같은 결과를 만든다.
+    · 운영 이미지에는 오프셋 해석기가 없어 `clock.offset_seconds()` 가 항상 0 이다 →
+      동작은 종전과 완전히 같다(§10.6 ②③).
+    · 음수 오프셋(과거로 이동)이면 수명이 늘어난다 — 시계를 되돌린 것과 같은 의미다.
     """
     if not raw:
         return "missing", ""
+    max_age = TOKEN_MAX_AGE - offset_seconds()
     try:
-        value = signing.loads(raw, salt=TOKEN_SALT, max_age=TOKEN_MAX_AGE)
+        value = signing.loads(raw, salt=TOKEN_SALT, max_age=max_age)
     except signing.SignatureExpired:
         return "expired", ""
     except signing.BadSignature:

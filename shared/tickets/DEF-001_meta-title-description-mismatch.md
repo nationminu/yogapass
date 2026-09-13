@@ -4,7 +4,7 @@ from: qa
 to: developer
 phase: P5
 severity: major
-status: open
+status: resolved
 related_req: [REQ-N-010, REQ-N-011, REQ-N-012, REQ-C-016]
 related_tc: [TC-102, TC-103, TC-104]
 related_scr: [SCR-001, SCR-002, SCR-003, SCR-006, SCR-008]
@@ -80,11 +80,28 @@ created: 2026-09-13
 ---
 
 ## 조치 (developer 작성)
-- 원인:
-- 조치 내용:
-- 수정 파일:
-- 영향 범위 (회귀 테스트 필요 영역):
-- 일자:
+
+- **원인**
+  1. **원본이 코드 안에 흩어져 있었다.** title 의 화면명·description 을 각 뷰 함수에 문자열 리터럴로 직접 적었고, 구현 시 IA 표를 옮겨 적는 대신 요약해서 썼다. 표와 대조하는 절차도 자동화도 없어 어긋난 것을 아무도 못 봤다.
+  2. **브랜드 문자열의 원본이 둘이었다.** 템플릿이 `{{ meta_title }} · {{ site_name }}` 로 title 을 **조립**했고 `site_name` 은 DB(`content/site.yml` → `content_sitesetting`)에서 왔다. 그래서 ⓐ 구분자가 IA 의 `|` 가 아니라 `·` 였고 ⓑ 브랜드가 콘텐츠 적재 상태에 따라 "요가패스"/"강남 요가패스" 로 달라졌다(qa 관찰과 같다).
+  3. 메인의 `WebSite` 구조화 데이터는 구현 누락이다(IA §6.4).
+
+- **조치 내용**
+  1. **IA 표를 그대로 옮긴 단일 원본 모듈 `apps/core/seo.py` 신설** — `TITLES`(§6.2) · `DESCRIPTIONS`(§6.3) · `BRAND`("강남 요가패스") · `SEPARATOR`(" | "). 문구를 다듬지 않고 **문자열 단위로 복사**했다. 뷰는 `seo.meta("SCR-00n")` 으로만 메타를 넣는다.
+  2. **템플릿은 title 을 조립하지 않는다.** `partials/meta.html` 이 `meta_title` 전문을 그대로 출력한다(og:title 도 동일). 브랜드는 DB 가 아니라 `seo.BRAND`(컨텍스트 `seo_brand`)에서 온다 → **DB 가 비어 있거나 값이 달라도 title 은 IA 표 값이다.**
+  3. **표시용 상호를 IA 브랜드와 같은 문자열로 맞췄다** — `content/site.yml` `settings.name.value: "요가패스" → "강남 요가패스"`(환경 변수 기본값 `SITE_NAME` 과도 일치). 정식 상호 확정(T-G) 시 두 곳을 함께 바꾼다는 주석을 남겼다. 이로써 메인 h1 폴백(`{{ site_name }}`)·헤더 로고 `aria-label`·푸터 저작권에도 '강남'·'요가' 가 들어간다(REQ-N-011 ③).
+  4. **메인에 `WebSite` 구조화 데이터 추가** — `templates/partials/jsonld_website.html`(`name` = 브랜드, `url`, `inLanguage`). 1차에 사이트 내 검색이 없어 `SearchAction` 은 넣지 않았다. 오시는 길은 종전대로 `LocalBusiness` 1건이다.
+  5. **회귀 테스트 추가** — `tests/test_seo_markup.py`: IA 표와 문자열 일치(title·description) / 길이 50~90자 실측 / 서로 다름 / 구분자·브랜드 패턴 / `noindex` 화면 description 없음 / 메인·오시는 길의 '강남'·'요가' / **DB 값을 바꿔도 title 이 안 바뀌는지** / `WebSite`·`LocalBusiness` JSON-LD 파싱.
+
+  실측(운영 미리보기 `:8001`): description 길이 **62 · 69 · 57 · 56자**(IA 표 기재값과 동일), title 5화면 전건 IA 표와 일치.
+
+- **수정 파일**
+  - 신규 `developer/site/apps/core/seo.py` · `developer/site/templates/partials/jsonld_website.html` · `developer/site/tests/test_seo_markup.py`
+  - 수정 `developer/site/apps/core/views.py` · `apps/core/context_processors.py` · `templates/partials/meta.html` · `templates/pages/home.html` · `content/site.yml`
+  - 문서 `developer/04_tech-design.md` §9.3(원본 위치·브랜드 분리·WebSite 추가)
+
+- **영향 범위 (회귀 테스트 필요 영역)**: 전 화면 `<head>`(title·description·canonical·OG), 메인·오시는 길 구조화 데이터, **브랜드 문자열이 보이는 모든 곳**(헤더 로고 `aria-label`="강남 요가패스 홈", 푸터 "© 2026 강남 요가패스", 메인 h1 폴백, 알림 메일 제목 `[문의 접수] 강남 요가패스`), sitemap·robots(변경 없음). → TC-102·103·104 + `50_html_validate` 회귀 + 메일 본문 확인 권장.
+- **일자**: 2026-09-13
 
 ## 재검증 (qa 작성)
 | 사이클 | 결과 (closed / reopened) | 일자 | 비고 |

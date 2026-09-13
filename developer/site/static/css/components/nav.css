@@ -5,15 +5,26 @@
   background: var(--color-surface);             /* 반투명 금지 */
   border-bottom: 1px solid var(--color-border);
 }
-.hdr-row { display: flex; align-items: center; gap: var(--space-6); min-height: var(--header-h); }
+/* min-height 는 --header-min-h 를 쓴다 — viewport.js 가 실측해서 덮는 --header-h 를 여기에 쓰면
+   "높이 → 변수 → min-height → 높이" 되먹임으로 헤더가 1px 씩 계속 자란다(1차 수정에서 발견). */
+.hdr-row { display: flex; align-items: center; gap: var(--space-6); min-height: var(--header-min-h); }
 
-.logo { display: flex; align-items: center; color: var(--color-navy); text-decoration: none; }
+/* 로고: **그래픽 높이는 32px 그대로**(디자인 시스템 §헤더) 두고
+   링크의 클릭·터치 영역만 44px 이상으로 넓힌다 — DEF-005 qa 권고 ⓐ. 시각 변화 없음. */
+.logo {
+  display: flex; align-items: center; min-height: var(--touch-min);
+  color: var(--color-navy); text-decoration: none;
+}
 .logo .logo-svg { width: auto; height: 32px; max-width: var(--logo-max-w); }
 
 /* --- GNB: 768px 이상에서만 인라인 노출 --- */
 .gnb { display: none; margin-left: auto; gap: var(--space-1); }
 .gnb a {
-  display: flex; align-items: center; min-height: var(--touch-min);
+  display: flex; align-items: center; justify-content: center;
+  /* 세로뿐 아니라 **가로도** 44px 이상이어야 한다(REQ-N-006 ②). 두 글자 항목("홈")이
+     12px 패딩만으로는 37px 이라 하한에 못 미쳤다. 패딩 토큰(--gnb-item-pad-x)은 그대로 두고
+     하한만 건다 → 폭이 늘어나는 항목은 "홈" 하나(37→44px)다. ※ designer·planner 확인 대상 */
+  min-height: var(--touch-min); min-width: var(--touch-min);
   padding: 0 var(--gnb-item-pad-x); border-radius: var(--radius-sm);
   font-size: 15px; font-weight: var(--fw-regular);
   color: var(--color-ink); text-decoration: none;
@@ -26,7 +37,10 @@
 
 .hdr-right { display: flex; align-items: center; gap: var(--space-2); margin-left: auto; }
 .hdr-tel { display: none; font-size: 15px; font-weight: var(--fw-bold); color: var(--color-ink); text-decoration: none; white-space: nowrap; }
-.hdr-cta { display: none; }
+/* ⚠ 선택자에 `.hdr` 을 붙여 (0,2,0) 으로 만든다 — `.hdr-cta`(0,1,0) 만 쓰면 뒤에 로드되는
+   components/base.css 의 `.btn { display: inline-flex }`(같은 특이성·나중 순서)가 이겨서
+   **헤더 주 CTA 가 전 구간에 노출된다.** 320px 가로 스크롤(DEF-004)과 G-8 위반의 원인이었다. */
+.hdr .hdr-cta { display: none; }
 
 /* --- 모바일 메뉴(CMP-005): <details> 가 정본. aria-expanded 를 수동 부착하지 않는다 --- */
 .mnav { position: static; }
@@ -62,6 +76,7 @@
 }
 @media (min-width: 1280px) {
   .hdr-tel { display: inline-flex; align-items: center; min-height: var(--touch-min); }
-  .hdr-tel-icon { display: none; }
-  .hdr-cta { display: inline-flex; }
+  /* 같은 이유로 `.hdr` 을 붙인다(`.btn` 과의 순서 경쟁 — DEF-004) */
+  .hdr .hdr-tel-icon { display: none; }
+  .hdr .hdr-cta { display: inline-flex; }
 }

@@ -36,6 +36,8 @@
 
 /* 문의 안내 */
 .inquiry-note { display: flex; flex-direction: column; gap: var(--space-4); }
+/* 제목 아래 설명 간격 10px — 목업 `.sec-h p`·`.band p` 와 같은 값 (DEF-003: 인라인 style 제거) */
+.inquiry-note-lead { margin-top: 10px; }
 @media (min-width: 1280px) {
   .inquiry-note { flex-direction: row; justify-content: space-between; align-items: center; gap: var(--space-7); }
 }

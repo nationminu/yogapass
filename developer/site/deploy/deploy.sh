@@ -62,7 +62,23 @@ if [ -n "$CURRENT_IMAGE" ]; then
   log "   현재 가동 이미지: $CURRENT_IMAGE"
   docker image inspect "$CURRENT_IMAGE" >/dev/null 2>&1 \
     || fail "롤백 대상 이미지($CURRENT_IMAGE)가 서버에 없습니다. 배포를 중단합니다."
-  echo "$CURRENT_IMAGE" > .deploy-rollback-image
+  # ★ 태그 가드 (DEF-007) — 태그 없는 이름·latest 는 롤백 대상이 될 수 없다.
+  #   태그가 없으면 docker 가 :latest 로 해석해 rollback.sh 의 존재 확인을 그냥 통과하고,
+  #   APP_VERSION 에 이미지 이름이 그대로 들어가 엉뚱한 이미지로 기동된다.
+  CURRENT_TAG=""
+  case "$CURRENT_IMAGE" in
+    *:*) CURRENT_TAG=${CURRENT_IMAGE##*:}; case "$CURRENT_TAG" in */*) CURRENT_TAG="" ;; esac ;;
+  esac
+  if [ -z "$CURRENT_TAG" ] || [ "$CURRENT_TAG" = "latest" ]; then
+    log "⚠ 현재 이미지($CURRENT_IMAGE)에 릴리스 태그가 없어 롤백 대상으로 **기록하지 않습니다.**"
+    log "   운영·스테이징은 APP_VERSION 태그가 붙은 이미지로만 기동하십시오(로컬 재현에서는 정상)."
+    [ "$DRY_RUN" = "1" ] || rm -f .deploy-rollback-image
+  elif [ "$DRY_RUN" = "1" ]; then
+    # --dry-run 은 파일을 남기지 않는다(부수 효과 금지 — DEF-007 부가 지적)
+    log "   (--dry-run) 롤백 대상 기록 예정: $CURRENT_IMAGE"
+  else
+    echo "$CURRENT_IMAGE" > .deploy-rollback-image
+  fi
 else
   log "   현재 가동 중인 app 컨테이너가 없습니다(최초 배포로 간주)."
 fi
@@ -112,14 +128,14 @@ APP_VERSION="$APP_VERSION" $COMPOSE build app || fail "빌드 실패"
 log "3) 마이그레이션"
 if ! APP_VERSION="$APP_VERSION" $COMPOSE run --rm -T app python manage.py migrate --noinput; then
   log "✗ 마이그레이션 실패 → 롤백"
-  ./deploy/rollback.sh || true
+  ROLLBACK_ASSUME_YES=1 ./deploy/rollback.sh || true
   exit 1
 fi
 
 # ---------------------------------------------------------------- 4) 기동
 log "4) 기동 (app · scheduler)"
 APP_VERSION="$APP_VERSION" $COMPOSE up -d --no-deps app scheduler || {
-  log "✗ 기동 실패 → 롤백"; ./deploy/rollback.sh || true; exit 1;
+  log "✗ 기동 실패 → 롤백"; ROLLBACK_ASSUME_YES=1 ./deploy/rollback.sh || true; exit 1;
 }
 
 # ---------------------------------------------------------------- 5) 확인
@@ -133,7 +149,7 @@ done
 DOWNTIME=$(( $(date +%s) - DEPLOY_START ))
 if [ "$OK" != "1" ]; then
   log "✗ /healthz 가 ${HEALTH_TIMEOUT}초 안에 200 을 주지 않았습니다 → 롤백"
-  ./deploy/rollback.sh || true
+  ROLLBACK_ASSUME_YES=1 ./deploy/rollback.sh || true
   exit 1
 fi
 log "   /healthz 200 · 실측 다운타임(0.5단계~최초 200): ${DOWNTIME}초 (목표 60초 이내)"

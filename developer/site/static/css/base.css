@@ -19,6 +19,14 @@ ul, ol { margin: 0; padding: 0; }
 a { color: var(--color-primary); }
 .muted { color: var(--color-muted); }
 
+/* 상단 여백 유틸리티 (DEF-003)
+   응답 헤더의 CSP 가 `style-src 'self'` 라 **인라인 style 속성은 적용되지 않는다.**
+   템플릿에서 간격이 필요하면 인라인 style 이 아니라 이 클래스를 쓴다. 값은 간격 토큰 그대로다. */
+.mt-3 { margin-top: var(--space-3); }
+.mt-4 { margin-top: var(--space-4); }
+.mt-5 { margin-top: var(--space-5); }
+.mt-6 { margin-top: var(--space-6); }
+
 .visually-hidden {
   position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;

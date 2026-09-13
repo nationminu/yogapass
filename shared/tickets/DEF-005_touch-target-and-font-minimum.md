@@ -4,7 +4,7 @@ from: qa
 to: developer
 phase: P5
 severity: minor
-status: open
+status: resolved
 related_req: [REQ-N-006]
 related_tc: [TC-096, TC-098]
 related_scr: [SCR-001, SCR-002, SCR-003, SCR-006, SCR-008]
@@ -67,11 +67,23 @@ created: 2026-09-13
 ---
 
 ## 조치 (developer 작성)
-- 원인:
-- 조치 내용:
-- 수정 파일:
-- 영향 범위 (회귀 테스트 필요 영역):
-- 일자:
+
+> **처리 방침**: 티켓의 **권고안 ⓐ(클릭 영역만 넓힌다)** 를 적용했다. 디자인 시스템의 **토큰 값과 그래픽 치수는 그대로 두고 적용 방식만** 바꿨다. ⓑ(요구사항 개정)는 제안하지 않는다.
+
+- **원인**
+  1. 헤더 로고: 링크(`a.logo`)에 높이 규정을 두지 않아 **그래픽(32px) = 클릭 영역**이 됐다. 디자인 시스템이 규정한 것은 *그래픽 높이 32px* 이지 *클릭 영역 32px* 이 아니다.
+  2. 푸터 링크: `.ftr a { min-height: 32px }` 으로 터치 타깃 하한(44px)보다 낮은 값을 직접 적었다.
+  3. 저작권: `.ftr .ft-small { font-size: 13px }` — 문장 하한 14px(디자인 시스템 §타이포)을 어긴 값을 토큰이 아니라 숫자로 적었다. 하한 토큰 `--fs-caption`(14px, 주석 "문장 하한 — 더 내리지 않는다")이 이미 있는데 쓰지 않았다.
+- **조치 내용**
+  1. `a.logo { min-height: var(--touch-min) }` — **SVG 는 32px 그대로**, 링크만 44px. 실측 **그래픽 140×32 / 링크 140×44**(시각 변화 없음).
+  2. `.ftr a { display: flex; align-items: center; min-height: var(--touch-min) }` — 푸터 링크 6종 실측 **328×44**(글자 크기·색·정렬 그대로, 행 높이만 32→44px).
+  3. `.ftr .ft-small { font-size: var(--fs-caption) }` — 저작권·사업자 정보 **14px**(실측 확인). 토큰 값은 건드리지 않았다.
+  4. **같은 성격으로 함께 고친 것 — GNB 항목 가로 폭**: `768px` 이상에서 `.gnb a` 의 두 글자 항목("홈")이 **37×44px** 로 가로 하한에 미달했다(qa 는 360px 만 실측해 목록에 없다). 패딩 토큰 `--gnb-item-pad-x`(12px, IA §2.1 전제)는 그대로 두고 `min-width: var(--touch-min)` 만 걸었다 → 37→44px, GNB 전체 폭 284→291px. **이 건은 designer·planner 확인 대상**(개발 보고서 §4.3 확인 요청 ③).
+  5. **회귀 점검 도구** — `tests/browser/layout-check.js` 가 5화면 × 320/360/768/1280px 에서 조작 요소 44×44 미만·문장 글꼴 14px 미만을 매번 센다(제외 기준은 이 티켓과 동일: 인라인 링크·화면 밖 요소(skip link·honeypot)·label 이 44px 이상인 체크박스). **현재 4화면 × 4뷰포트 위반 0건.**
+- **수정 파일**: `developer/site/static/css/components/nav.css`(로고·GNB), `static/css/components/layout.css`(푸터 링크·글꼴), 신규 `tests/browser/layout-check.js`
+- **영향 범위 (회귀 테스트 필요 영역)**: 전 화면 헤더·푸터. 푸터 세로 길이가 링크당 12px 늘어난다(1열 구간에서 약 +72px). GNB 폭 +7px. → 360px 실측 재수행 + 인접 간격 + 320px 레이아웃 회귀 + **768px 이상 GNB 배치** 확인.
+- **확인 요청(재검증 시 함께 봐 주십시오)**: 푸터 링크는 세로로 맞닿아 있어 **인접 간격이 0px** 이다(수정 전 32px 행일 때와 같다. 모바일 패널 52px 행도 같은 구조다). 44px 이상 타깃이 맞닿는 구성을 인접 간격 8px 규칙 위반으로 볼지 qa·designer 판단이 필요하다. 간격을 넣으려면 푸터 세로 여백이 더 늘어난다.
+- **일자**: 2026-09-13
 
 ## 재검증 (qa 작성)
 | 사이클 | 결과 (closed / reopened) | 일자 | 비고 |

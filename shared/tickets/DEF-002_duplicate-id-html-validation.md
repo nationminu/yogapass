@@ -4,7 +4,7 @@ from: qa
 to: developer
 phase: P5
 severity: minor
-status: open
+status: resolved
 related_req: [REQ-N-016, REQ-N-006]
 related_tc: [TC-108]
 related_scr: [SCR-001, SCR-002, SCR-003, SCR-006, SCR-008]
@@ -52,11 +52,17 @@ html/privacy.html:342.3-342.19: error: Duplicate ID “ypht”.
 ---
 
 ## 조치 (developer 작성)
-- 원인:
-- 조치 내용:
-- 수정 파일:
-- 영향 범위 (회귀 테스트 필요 영역):
-- 일자:
+
+- **원인**: `{% inline_svg %}` 태그가 SVG 파일 내용을 **그대로** 삽입한다. `logo-horizontal.svg` 안에 `<title id="ypht">` 와 `aria-labelledby="ypht"` 가 들어 있고, 이 파일을 헤더·푸터 두 곳에서 넣으므로 같은 id 가 문서에 2번 나온다. "같은 자산을 한 문서에 두 번 넣을 때 id 를 분리한다"는 장치가 없었다.
+- **조치 내용**
+  1. `inline_svg` 에 **`uid` 인자 추가** — 파일 안의 모든 `id` 와 그 참조(`aria-labelledby`·`aria-describedby` 토큰, `href="#…"`, `url(#…)`)에 `-{uid}` 접미사를 붙인다. 헤더 `uid="hdr"` · 푸터 `uid="ftr"` · 메인 히어로 심볼 `uid="hero"` → `ypht-hdr` / `ypht-ftr` / `ypmt-hero`.
+     **접근 이름도 함께 고쳐진다** — 푸터 로고가 자기 `<title>` 을 참조한다(REQ-N-006 ④).
+  2. **회귀 테스트 추가** — `tests/test_seo_markup.py::MarkupRulesTests`: 5화면 전건 **중복 id 0건**, 그리고 `aria-labelledby` 가 **자기 SVG 안의 title id** 를 가리키는지.
+  3. 재검사(운영 미리보기 `:8001` 5화면, `vnu.jar 26.x --format gnu --skip-non-html`): **error 0건**.
+- **수정 파일**: `developer/site/apps/core/templatetags/icons.py`(`inline_svg`·`_namespace_ids`), `templates/partials/header.html`, `templates/partials/footer.html`, `templates/pages/home.html`, 신규 `tests/test_seo_markup.py`
+- **영향 범위 (회귀 테스트 필요 영역)**: 인라인 SVG 를 넣는 모든 위치(헤더·푸터 로고, 히어로 심볼). 아이콘(`{% icon %}`)은 id 를 쓰지 않아 영향 없음. → vnu 재실행 + `18_a11y_markup`(SVG 대체 텍스트·랜드마크) 회귀.
+- **미처리(의도)**: `instructors.html` 의 `info warning: Section lacks heading` 은 **오류가 아니라** REQ-N-016 판정 대상이 아니고, `<section>`→`<div>` 전환은 랜드마크·문서 구조 변경이라 designer 확인이 필요해 이번 수정에 넣지 않았다(개발 보고서 §4.3 확인 요청 ④).
+- **일자**: 2026-09-13
 
 ## 재검증 (qa 작성)
 | 사이클 | 결과 (closed / reopened) | 일자 | 비고 |

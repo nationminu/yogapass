@@ -3,7 +3,7 @@ doc_id: DEV-TECH
 title: 기술 설계서 — 1차(2026-11-06 오픈 범위) + 2차 스키마 선설계
 phase: P4
 owner: developer
-version: 0.4
+version: 0.5
 status: in-review
 reviewers: [devops, qa]
 inputs: [planning/02_requirements.md, planning/02_information-architecture.md, planning/02_storyboard.md, design/03_design-system.md, design/03_page-design.md, design/mockups/, interviews/2026-09-12_infra-constraints.md, interviews/2026-09-12_booking-rules.md, pm/01_project-plan.md, pm/gates/G3a_design.md, shared/reviews/CR-001_impact_developer_r2.md, shared/reviews/P3_design-docs_developer_r1.md, shared/reviews/P4a_tech-design_devops_r1.md, shared/reviews/P4a_tech-design_qa_r1.md, shared/reviews/P4a_tech-design_devops_r2.md, shared/reviews/P4a_tech-design_qa_r2.md]
@@ -811,10 +811,10 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 
 | 항목 | 구현 |
 |---|---|
-| title·description | 뷰 컨텍스트 → `partials/meta.html`. IA §6.2·6.3 패턴 사용. **description은 색인 대상 공개 화면만**, 50~90자 |
+| title·description | **원본은 `apps/core/seo.py` 의 표**(v0.5 — IA §6.2·§6.3 표를 문자열 그대로 옮긴 것). 뷰가 `seo.meta("SCR-00n")` 으로 컨텍스트에 넣고 `partials/meta.html` 은 **덧붙이지 않고 그대로** 출력한다. **description 은 색인 대상 공개 화면만**, 50~90자.<br>⚠ **브랜드 문자열(`강남 요가패스`)을 DB·환경 변수에서 가져오지 않는다** — 콘텐츠 적재 상태(시드 전·DB 정지)에 따라 title 이 달라져 IA 표와 어긋났다(DEF-001). 표시용 상호(`site_name`)는 종전대로 `content/site.yml` → `SITE_NAME` 이며 두 값을 같은 문자열로 맞춰 둔다. 회귀 테스트: `tests/test_seo_markup.py` |
 | canonical | `SITE_BASE_URL` + 경로(슬래시 없는 정규 형태) |
 | OG·twitter | `og:title/description/image/url` + `twitter:card`. **OG 이미지 미수령 시 태그를 빼고 빌드**하고 수령 시 추가 |
-| 구조화 데이터 | `jsonld_localbusiness.html` — 상호·주소·전화·영업시간·URL을 `content_sitesetting`에서 읽어 생성. **`[TBD]` 값이면 해당 속성을 넣지 않는다**(빈 값·자리표시자 출력 금지) |
+| 구조화 데이터 | `jsonld_localbusiness.html`(공개 화면 공통) — 상호·주소·전화·영업시간·URL을 `content_sitesetting`에서 읽어 생성. **`[TBD]` 값이면 해당 속성을 넣지 않는다**(빈 값·자리표시자 출력 금지).<br>**`jsonld_website.html` — 메인 전용 `WebSite`**(IA §6.4, v0.5 추가 · DEF-001 ④). 1차에 사이트 내 검색이 없어 `SearchAction` 은 넣지 않는다 |
 | sitemap | 프레임워크 sitemaps, **색인 대상 공개 화면만**(1차: `/`·`/instructors`·`/location`·`/privacy`) |
 | robots.txt | **Disallow 규칙 0건** + `Sitemap:` 1줄(IA §6.5) |
 | noindex | 404·500·`/healthz`에 메타 `noindex`. 스테이징은 전 응답 헤더로 강제 |
@@ -943,7 +943,8 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 
 | 구분 | 대상 | v0.2 확정 |
 |---|---|---|
-| **적용(오프셋이 움직인다)** | `inquiry_inquiry.created_at` · `inquiry_inquiry.consent_at` · `core_ratelimitcounter.window_start`·`blocked_until` · `mailer_outbox.scheduled_at`·`sent_at` · `core_jobrunlog.started_at`·`finished_at` · 보관 기간 만료 판정 | **전부 `core.clock.now()` 경유로 구현한다.** `auto_now_add`·`auto_now`·`default=timezone.now`·DB `DEFAULT now()`를 **이 컬럼들에 쓰지 않는다**(린트 규칙 + 코드 리뷰 항목) |
+| **적용(오프셋이 움직인다)** | `inquiry_inquiry.created_at` · `inquiry_inquiry.consent_at` · `core_ratelimitcounter.window_start`·`blocked_until` · `mailer_outbox.scheduled_at`·`sent_at` · `core_jobrunlog.started_at`·`finished_at` · 보관 기간 만료 판정 · **`submit_token` 만료 판정(v0.5 추가)** | **전부 `core.clock.now()` 경유로 구현한다.** `auto_now_add`·`auto_now`·`default=timezone.now`·DB `DEFAULT now()`를 **이 컬럼들에 쓰지 않는다**(린트 규칙 + 코드 리뷰 항목) |
+| **적용 — 구현 주의 (v0.5 신설 · DEF-008)** | `submit_token` 24시간 만료(§9.6 ⑦) | `django.core.signing.loads(max_age=…)` 는 서명 타임스탬프를 **`time.time()`** 과 비교해 `core.clock` 을 우회한다. 그래서 `apps/inquiry/services.read_token()` 은 **`max_age = TOKEN_MAX_AGE − clock.offset_seconds()`** 로 넘긴다(기준 시각을 미래로 민 것과 같은 결과). 운영 이미지에는 오프셋 해석기가 없어 항상 `0` 이므로 동작이 달라지지 않는다(§10.6 ②③). **이 경로가 없으면 §9.6 ⑦의 `expired` 분기를 P5 가 유발할 수 없다** |
 | **비적용(오프셋과 무관)** | ⓐ **supercronic의 cron 스케줄 자체**(컨테이너 시스템 시계로 돈다) ⓑ `created_at`/`updated_at` 중 **감사·운영 목적 컬럼**(프레임워크 기본 테이블: 세션 만료 등) ⓒ HTTP 캐시 헤더·쿠키 만료(브라우저 시계) ⓓ nginx·PostgreSQL 로그 타임스탬프 | **cron은 오프셋 대상이 아니다.** 시간 의존 배치(파기·백업·요약)의 P5 판정은 **오프셋이 아니라 ⓐ 수동 실행(`manage.py purge_expired`) + ⓑ `--dry-run` + ⓒ `QA_RETENTION_MINUTES__INQUIRY` 단축**의 조합으로 한다 |
 | 확인 수단 | 오프셋이 실제로 걸렸는지 | 기동 로그 `CLOCK OFFSET: <n>s` 1줄 + `qa_show … --format json`의 `created_at` 값 |
 
@@ -1143,6 +1144,8 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 | 판단 기준 | 마이그레이션 파일의 `# IRREVERSIBLE` 표시(§2.4). 배포 전 체크리스트에서 확인 |
 | **실행 순서 (devops R1 #6)** | `rollback.sh`도 배포와 같은 순서를 지킨다 — **① `scheduler` 정지 → ② 마이그레이션 되돌리기(필요 시) 또는 DB 복구 → ③ `APP_VERSION` 되돌려 `app`·`scheduler` 기동 → ④ `/healthz` 확인** |
 | **전제 (devops R1 #7)** | **이전 이미지가 서버에 남아 있어야 한다.** `deploy.sh` 0단계에서 미리 확인하며(없으면 배포 자체를 중단), 라벨 필터로만 이미지를 정리한다(§12.1) |
+| **대상 가드 (v0.5 신설 · DEF-007)** | 되돌릴 대상은 **릴리스 태그가 붙은 이미지여야 한다.** `yogapass-app` 처럼 태그 없는 이름·`:latest`·태그 자리에 `/` 가 섞인 값은 **거부하고 아무것도 실행하지 않는다**(태그가 없으면 docker 가 `:latest` 로 해석해 존재 확인을 통과하고, `APP_VERSION` 에 이미지 이름이 들어가 기동이 깨진다). `deploy.sh` 0단계도 **태그 없는 현재 이미지는 `.deploy-rollback-image` 에 기록하지 않으며, `--dry-run` 은 이 파일을 만들지 않는다** |
+| **확인·리허설 (v0.5 신설)** | 인자 없이 실행해도 **확인 입력(`yes`) 없이는 진행하지 않는다.** 자동 롤백(`deploy.sh` 3·4·5단계)은 `ROLLBACK_ASSUME_YES=1` 로 호출하고, 사람이 비대화형 셸에서 부르면 거부한다. `--dry-run` 은 대상 판정·가드까지만 수행한다 |
 | 롤백 판단 기준 | **배포 후 5분 내 `/healthz` 미회복 시 롤백**(권고값 — devops 배포 계획서에서 확정, §12.2) |
 
 ### 12.5 백업 · 복구 (REQ-N-032 — G7a 통과 조건) — **v0.2에서 실행 주체·알림 경로 확정 (devops R1 #1 Must)**
@@ -1497,3 +1500,4 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 | **0.2** | **2026-09-12** | developer | **R1 교차 검토 반영 (Must 5 · Should 19 전건 반영, 미반영 0건 — §17 처리 대장).** ① 백업을 `scheduler`의 `manage.py run_backup`으로 일원화하고 실행 기록·실패 알림(`kind=backup_failed`)·실패 주입 경로를 확정(§12.5.1, `backup` 상시 컨테이너 폐지) ② 스테이징 접근 제어 신설 — nginx `auth_basic`·`QA_TOOLS_ENABLED` 마스터 스위치·검증 도구 HTTP 노출 0(§3.5.1·§10.6 5중 장치) ③ **문의 폼 응답 형태 표 6행×5열 신설**(§9.6 — REQ-F-042의 P5 판정 기준) ④ 로컬 compose에 `proxy`·`backup` **선택 프로필** 추가 + "세 환경 동일 구성" 판정 정의(§3.2.1) ⑤ REQ-N-032·033을 P5 창 안(10-17·10-20)으로 선행 배치하고 선행 조건·G7 이월 전환 규칙 명시(§12.6.2). 그 밖에 nginx 요청 9행화·HTML 압축 주체·정적 점검 화면·배포 절차 2.5단계·이미지 보존·다운타임 목표·일일 운영 요약 메일·`.env` 재발급·clock 적용 범위(§10.3)·`qa_purge_test_data` 규칙(§10.4)·Safari 검증 수단(§10.5)·도구 출력 규격(§10.2)·`qa_pii_columns`(⑪ 신설)·빈도 제한 알림 임계값·§13 #11·#12 신설과 #6 재현 절차(§13.1). 기술 리스크 12 → 15건, 1차 산정 약 15 → **약 16작업일**. **PM 결정 5건을 §14.4로 분리**(일정·SMTP 선연결·오프사이트 백업·소스 반입 수단·G5 판정 범위) | `shared/reviews/P4a_tech-design_devops_r1.md`, `shared/reviews/P4a_tech-design_qa_r1.md` |
 | **0.3** | **2026-09-13** | developer | **R2 교차 검토 반영 (신규 Must 0건 · Should 8 · Could 4 — 전건 반영, 미반영 0건 — §17.4).** ① 배포 절차의 **스케줄러 정지를 0.5단계로 앞당기고 라벨 백업의 `skipped` 를 배포 중단 사유로** 확정(§12.2·§12.5.1·§12.5.3) ② 일일 운영 요약의 백업 판정을 **"24시간 내 성공 기록 없음 = 점검 필요"로 반전**하고 `skipped` 별도 집계(§3.3) ③ **`/healthz` 호출은 항상 앱에 직접(nginx 비경유)** 을 명시해 스테이징 `auth_basic` 과의 충돌·자동 롤백 오발동을 차단(§3.3·§3.4·§3.5.1·§12.2) ④ `.env.example` 의 **`COMPOSE_PROFILES`** 로 플래그 없는 로컬 기동 = REQ-N-034 문면 충족(§3.2.1·§3.5) ⑤ **`mail` 을 프로필로 분리**해 운영·스테이징 판정 지점 확정(§3.2) ⑥ **폼 차단 지속 시간·`Retry-After` 계산식** 확정(§5.3) ⑦ **판정용 로그 `key=value` 형식·조회 수단** 명시(§9.6) ⑧ 선행 조건 **10-16 재확인 체크포인트**(§12.6.2) ⑨ 로컬 `auth_basic` 선검증(더미 자격)으로 **스테이징 단독 판정 5건 → 4건**(§13) ⑩ `${BACKUP_DIR}` 를 `scheduler` 에만 마운트(§3.5). **구현 1단계 착수에 따른 사실 반영**: PyYAML 6.0.3 의존성 추가·패치 버전 고정(§2.7), `config/env.py`·`deploy/nginx/htpasswd.dummy` 추가(§4), 환경별 `.env` 선택을 `ENV_FILE` 로 처리(§3.5) | `shared/reviews/P4a_tech-design_devops_r2.md`, `shared/reviews/P4a_tech-design_qa_r2.md` |
 | **0.4** | **2026-09-13** | developer | **PM 결정 2건 반영 + 구현 3단계(운영·배포·백업·검증 도구) 확정 사실 반영.** ① **§9.6 표를 6행 → 7행으로 분리** — ⑤ `submit_token` **재사용(중복 제출)** 과 ⑦ **만료·부재·변조** 를 다른 처리로 확정했다. ⑦은 **저장 없이 성공 화면을 주던 동작을 버리고 "시간이 지나 다시 작성해 주세요" 안내 + 폼 재렌더 + 입력값 보존 + 새 토큰 발급**으로 바꿨으며(PM 결정 2026-09-13), 수용 기준 연결을 ⑤→REQ-F-046 ② / ⑦→REQ-F-046 ①·REQ-N-030 으로 나누고 처리 순서·판정 증거·로그 키(`inquiry.expired token_state=expired\|missing\|invalid`)를 명시했다 ② **동시 이중 제출이 500 이 되던 경로**를 구현 중 발견해 닫고(UNIQUE 충돌 → ⑤ 처리) 그 규칙을 §9.6에 적었다 ③ 일일 운영 요약 **ⓑ(재시작 횟수)를 "응답 회복 전환 횟수"** 로 구현 확정(§3.3 — docker 소켓 마운트 회피) ④ 검증 요건 **⑪의 선언 형식을 모델 속성 `PII_FIELDS`** 로 확정(§10.1 — 필드 상속은 마이그레이션 상태를 바꾼다) ⑤ **§11.1 진행 상황 표 신설** — 작업 11(부분)·12·13 완료. OG 이미지는 **임시본 생성 + 교체 절차**로 처리했다(TKT-DSN-002) | PM 결정 2026-09-13, `shared/tickets/TKT-DSN-002_to-developer_favicon-og-raster.md` |
+| **0.5** | **2026-09-13** | developer | **P5 1차 결함 수정(DEF-001~010) 반영.** ① **§9.3 title·description 의 원본을 `apps/core/seo.py`(IA §6.2·§6.3 표를 문자열 그대로 옮긴 모듈)로 확정**하고, 브랜드 문자열을 DB·환경 변수에서 가져오지 않도록 분리했다(DEF-001 — 콘텐츠 적재 상태에 따라 title 이 달라졌다) ② **§9.3 구조화 데이터에 메인 전용 `WebSite`(`jsonld_website.html`) 추가**(IA §6.4 · DEF-001 ④) ③ **§10.3 clock 적용 범위에 `submit_token` 만료 판정을 추가**하고 `signing.loads(max_age=…)` 가 `core.clock` 을 우회하는 문제의 처리 방식(`max_age = TOKEN_MAX_AGE − offset_seconds()`)을 명시했다 — 이 경로가 없으면 §9.6 ⑦의 `expired` 분기를 P5 가 유발할 수 없다(DEF-008) ④ **§12.4 롤백에 대상 태그 가드와 확인 입력 규칙 추가**(DEF-007 — 태그 없는 이름·`latest` 거부, `--dry-run` 부수 효과 제거, 자동 롤백은 `ROLLBACK_ASSUME_YES=1`) | `shared/tickets/DEF-001…010`, `qa/05_test-report.md` |

@@ -2,7 +2,52 @@
 
 > 이 문서는 `design/assets/`와 `design/mockups/`에 쓰인 **모든** 폰트·이미지·아이콘·그래픽의 출처와 라이선스를 기록한다.
 > 상업적 사용이 허용되지 않는 자산은 어떤 경우에도 쓰지 않는다 (`CLAUDE.md` §8).
-> **updated: 2026-09-12 · 단계: P3 (G3a 승인 후속 — 파비콘·OG 제작) (version 0.3)**
+> **updated: 2026-09-13 · 단계: P3 회귀 (CR-002 디자인 고도화) (version 0.4)**
+
+---
+
+## 0. v0.4 (CR-002) 추가·변경분 — 먼저 읽으십시오
+
+**외부에서 가져온 파일은 여전히 0건이다.** 목업은 웹폰트·외부 이미지·외부 스크립트·CDN을 일절 로드하지 않는다.
+
+| 파일 | 종류 | 제작·출처 | 라이선스 | 상태 |
+|---|---|---|---|---|
+| `../mockups/index.html` | 목업 목록(PM·고객용 시작점) | **designer 자체 제작** (2026-09-13) | 본 프로젝트 산출물 | 신규 |
+| `../mockups/yp.css` | 화면 목업 공용 스타일시트 (v2.0 토큰) | **designer 자체 제작** (2026-09-13) | 본 프로젝트 산출물 | 신규 |
+| `../mockups/concept-2a.html` | 방향안 ⓐ 고요한 신뢰 | **designer 자체 제작** | 본 프로젝트 산출물 | 신규 |
+| `../mockups/concept-2b.html` | 방향안 ⓑ 숨결 | **designer 자체 제작** | 본 프로젝트 산출물 | 신규 |
+| `../mockups/concept-2c.html` | 방향안 ⓒ 잉크 & 라이트 | **designer 자체 제작** | 본 프로젝트 산출물 | 신규 |
+| `../mockups/scr-001.html` · `scr-002.html` · `scr-003.html` · `scr-006.html` · `scr-008.html` | 1차 5화면 목업 | **designer 자체 제작** (v2.0 재제작) | 본 프로젝트 산출물 | 재제작 |
+| `../mockups/concept-a.html` · `concept-b.html` · `concept-c.html` | v1.x 컨셉 시안 3종 | designer 자체 제작 (2026-09-12) | 본 프로젝트 산출물 | **이력 보존**(현행 아님) |
+
+**v0.4에서 새로 쓰인 그래픽 기법 — 전부 CSS/인라인 SVG 생성이며 외부 자산 0건**
+
+| 기법 | 구현 | 용량 | 비고 |
+|---|---|---|---|
+| 그라데이션 면 | CSS `linear-gradient` + `radial-gradient` 2겹 | 0KB | 히어로·페이지 헤더·CTA 밴드 |
+| **노이즈 결(texture)** | **인라인 SVG `feTurbulence` data-URI** (`width/height 140`, `baseFrequency .85`, `numOctaves 3`) | **약 0.26KB** (CSS에 포함) | **designer 자체 작성.** 외부 노이즈 이미지 파일을 쓰지 않는다. `opacity: .04` 단독, `mix-blend-mode` 미사용 |
+| 라인 격자 | CSS `repeating`/`linear-gradient` 44px·36px | 0KB | 히어로 아트, 지도 자리, 404 아트 |
+| 유기적 블롭 | CSS 비대칭 `border-radius` + 2색 그라데이션 | 0KB | 히어로 아트 |
+| 사선 해치 | CSS `repeating-linear-gradient` | 0KB | 사진 자리 표시(ⓒ) |
+| 아이콘 | **designer가 24px 그리드·stroke 2px·round cap 규격으로 직접 작도한 인라인 SVG** | 0KB | **Lucide 파일을 복사하지 않았다.** P4에서 Lucide 공식 SVG(ISC)로 교체 |
+
+**폰트 — v0.4 확정 (변경 있음)**
+
+- **Pretendard 단일, 굵기 2단(400 · 700)만 사용한다.** 가변 폰트(Pretendard Variable)로 전환하지 않는다.
+- **~~Nanum Myeongjo~~ 는 방향안 ⓑ에서도 쓰지 않는다** — 제목용 한글 서체 추가 금지(`shared/tickets/TKT-DEV-001` A-9). §2 표의 "미채택"이 v0.4에서 **세 방향안 전부에 적용**된다.
+- 300·500·600·800 굵기를 쓰지 않는다(폴백 메트릭 정의가 400·700 두 개뿐 → CLS 0 보호).
+- 목업은 웹폰트를 로드하지 않으므로 **PC 설치 글꼴로 렌더**된다. 실제 조판은 P4 self-host 후 확정된다.
+
+**OG 이미지 재제작 필요 (미처리)**
+
+- `og-image.svg`는 **v1.x 팔레트**(`#F0F5FB`·`#0B4F9E`·`#16263A`)로 제작돼 있다. v2.0 방향안 확정 후 **v2.0 팔레트로 재제작**한다(0.25작업일). 확정 전까지는 현재 파일을 그대로 쓴다 — 색이 다를 뿐 오류는 아니다.
+- `favicon.svg`·`icon-master-512.svg`·`apple-touch-icon-master-180.svg`는 **심볼 단색**이라 v2.0에서도 그대로 쓸 수 있다(Primary `#0B4F9E` 무변경).
+
+**사진 — 여전히 0장**
+
+- 촬영 지침(비율·최소 해상도·안전 영역·장수·색감·초상권)은 **`design/03_page-design.md` v2.0 §11**에 P-1~P-5로 정리했다. PM이 고객에게 그대로 전달할 수 있는 형태다.
+- **사진 도입은 전송 예산(화면당 ≤280KB)을 넘길 수 있으므로 별도 CR로 처리한다**(TKT-DEV-001 A-10).
+- 사진 수령 시 **이 문서 §4에 행을 추가한 뒤** 커밋한다(파일명·출처·라이선스/동의서·취득일·사용 화면).
 
 ---
 
@@ -194,6 +239,7 @@ magick -background none design/assets/favicon.svg -define icon:auto-resize=48,32
 
 | 버전 | 일자 | 작성자 | 내용 |
 |---|---|---|---|
+| **0.4** | **2026-09-13** | **designer** | **CR-002 디자인 고도화 반영.** ① §0 신설 — 신규 목업 5종(`index.html`·`yp.css`·`concept-2a/2b/2c.html`) + 재제작 5종(`scr-001/002/003/006/008.html`) 등록, v1.x 컨셉 목업 3종은 이력 보존으로 표시 ② **v2.0 그래픽 기법 6종 등록** — 전부 CSS/인라인 SVG 생성, 외부 자산 0건. **노이즈 텍스처는 `feTurbulence` 인라인 data-URI(약 0.26KB)** 로 designer가 직접 작성했고 외부 노이즈 이미지 파일을 쓰지 않는다 ③ **폰트 확정 변경** — 굵기 **2단(400·700)** 고정, 가변 폰트 미전환, **Nanum Myeongjo를 세 방향안 전부에서 미채택**(제목용 한글 서체 추가 금지 · TKT-DEV-001 A-9) ④ **OG 이미지 재제작 필요**(v1.x 팔레트) 명시, 파비콘 3종은 그대로 사용 가능 ⑤ 사진 촬영 지침 위치(`03_page-design.md` §11) 연결 + **사진 도입은 전송 예산 영향으로 별도 CR** 명시 |
 | 0.1 | 2026-09-12 | designer | 최초 작성 — 임시 로고 2종 등록, 폰트·아이콘 후보와 라이선스 정리, 사진 미확보 [TBD] 목록화 |
 | 0.3 | 2026-09-12 | designer | **G3a 승인 후속** — ① **파비콘·OG SVG 원본 4종 제작·등록**(`favicon.svg`·`icon-master-512.svg`·`apple-touch-icon-master-180.svg`·`og-image.svg`) + §4.1 신설(래스터 내보내기 규격·변환 명령·HTML 삽입 규격·대비 6건·`og:image:alt`) ② **G3a 지적 처리 — `scr-006.html` 인라인 SVG 등록**(실측 13개소) + **목업 8파일 전량 `<svg>` 실측표(합계 113)** 추가로 미등록 0건 확인, 지적문의 "18개소"는 `scr-003.html` 값임을 병기 ③ **고객 로고 수령 시 교체 절차 1줄 확정** ④ §4 파비콘·OG 행 갱신 (근거: G3a 게이트 지적 · 디자인 시스템 §6.3) |
 | 0.2 | 2026-09-12 | designer | P3 상세 디자인 반영 — **폰트 Pretendard 단일 채택**(SIL OFL 1.1, self-host 요건 명시) · **아이콘 Lucide 채택**(ISC, 1차 16종 목록 + 고지 방식) · 1차 목업 4종(scr-001·002·003·008)의 인라인 SVG 등록 · 파비콘·OG 규격 확정 · 확정 팔레트 대비 측정표 위치 참조 추가 |

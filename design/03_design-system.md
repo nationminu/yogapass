@@ -3,14 +3,34 @@ doc_id: DSN-SYSTEM
 title: 디자인 시스템
 phase: P3
 owner: designer
-version: 1.1
+version: 2.0
 status: in-review
 reviewers: [planner, developer]
-inputs: [design/03_design-concept.md, planning/02_requirements.md, planning/02_information-architecture.md, planning/02_storyboard.md, planning/02_storyboard-admin.md, interviews/2026-09-12_booking-rules.md, pm/01_project-plan.md, shared/reviews/P3_design-docs_planner_r1.md, shared/reviews/P3_design-docs_developer_r1.md]
-updated: 2026-09-12
+inputs: [pm/requests/CR-002_design-modernization.md, design/03_design-concept.md, planning/02_requirements.md, planning/02_information-architecture.md, planning/02_storyboard.md, planning/02_storyboard-admin.md, interviews/2026-09-12_booking-rules.md, pm/01_project-plan.md, shared/reviews/P3_design-docs_planner_r1.md, shared/reviews/P3_design-docs_developer_r1.md]
+updated: 2026-09-13
 ---
 
 # 디자인 시스템 — 강남 요가패스
+
+> ## ⚠ v2.0 (2026-09-13 · CR-002 디자인 고도화) 읽는 법
+>
+> | 절 | 상태 | 내용 |
+> |---|---|---|
+> | **§1 디자인 토큰 (v2.0)** | **정본** | 컬러·타이포·간격·radius·shadow·모션·z-index·breakpoint **전량 개정**. 개발은 이 절만 본다 |
+> | **§1-OLD** | **폐기(superseded)** | v1.1 토큰. 이력 보존용이며 **참조 금지** |
+> | §2 컴포넌트(1차 30종) · §3 컴포넌트(2차) 이하 | **유효** | **구조·상태·접근성 규칙은 바뀌지 않았다.** 값 참조는 §1(v2.0)으로 읽는다. §1-OLD에서 이름이 바뀐 토큰은 §1.8 대조표로 치환한다 |
+>
+> **v2.0이 바꾼 것 / 바꾸지 않은 것**
+> - 바꾼 것: **색 16종 · 타이포 스케일 전량 · 간격(섹션·히어로) · radius 5단 · shadow 3단 · motion 7종**
+> - 바꾸지 않은 것: **컴포넌트 46종의 구조·상태·접근성 규칙**, 터치 44px, 문장 14px 하한, 입력 16px, z-index 6단 순서, breakpoint 4구간, 상태 4색군(성공·경고·오류·마감)
+> - **기능 요구사항 241건 · 화면 6개 · 전역 UI 규칙 G-0~G-13에 변경 0건**
+>
+> **방향안과 토큰의 관계** — §1.1의 컬러 16종만 방향안 ⓐ/ⓑ/ⓒ로 갈린다. 아래 §1.1은 **designer 권고안 ⓐ "고요한 신뢰" 확정본**이다. PM이 ⓑ·ⓒ를 고르면 §1.1만 교체되고 §1.2~§1.8과 §2·§3은 그대로다(교체 비용 0.5작업일). ⓑ·ⓒ 팔레트와 대비값은 `design/03_design-concept.md` v2.0 §5에 있다.
+
+---
+
+<details>
+<summary><b>v1.1 당시 머리말 (이력 · 접어 둠)</b></summary>
 
 > **컨셉 확정**: 시안 A "정돈된 신뢰" (PM 결정 2026-09-12) + **보정 1·2 적용**
 > · 보정 1 — 섹션 간격 88 → **96px**, 히어로 상하 패딩 88 → **104px** (`≥1280px` 한정)
@@ -26,6 +46,8 @@ updated: 2026-09-12
 > 2. **1차에 쓰지 않는 토큰까지 지금 전부 정의한다.** 2차 39화면(캘린더·표·폼·배지·관리자 셸)에서 토큰을 다시 만들지 않기 위함이다(요구사항 §10 **TR-10** — "1차 토큰이 폐기·재정의되지 않고 확장만 된다").
 > 3. **대비값은 designer가 WCAG 2.1 상대 휘도 공식으로 직접 계산**했다(sRGB → 선형화 → `0.2126R+0.7152G+0.0722B`, 대비 `(L1+0.05)/(L2+0.05)`, 소수 둘째 자리 반올림). P5에서 자동 도구로 재측정하면 같은 값이 나와야 한다.
 
+</details>
+
 ---
 
 ## 0. 이 문서가 확정하는 것 / 확정하지 않는 것
@@ -38,7 +60,717 @@ updated: 2026-09-12
 
 ---
 
-## 1. 디자인 토큰
+## 1. 디자인 토큰 (v2.0 — **정본**)
+
+> **측정 방법.** 이 절의 모든 대비값은 designer가 **WCAG 2.1 상대 휘도 공식**으로 직접 계산했다.
+> sRGB 채널 `c/255` → 선형화(`≤0.03928 ? c/12.92 : ((c+0.055)/1.055)^2.4`) → `L = 0.2126R + 0.7152G + 0.0722B` → 대비 `(L1+0.05)/(L2+0.05)`. 소수 둘째 자리 반올림.
+> **P5에서 자동 도구로 재측정하면 같은 값이 나와야 한다.** 값이 다르면 결함이다.
+>
+> **토큰 이름은 v1.1과 최대한 같게 유지했다.** §2·§3(컴포넌트 46종)이 참조하는 이름을 깨지 않기 위해서다. 값만 바뀐 토큰, 새로 생긴 토큰, 값이 그대로인 토큰을 §1.8 대조표에 전부 적었다.
+
+### 1.1 컬러 — 방향안 ⓐ "고요한 신뢰" 확정본
+
+#### (1) 브랜드 · 악센트
+
+| 토큰 | 값 | 용도 | 대비 | 기준 | 판정 |
+|---|---|---|---|---|---|
+| `--color-primary` | `#0B4F9E` | 주 CTA 배경, 링크, 포커스 링, `aria-current` | **8.00:1** (on `#FFF`) | 4.5:1 | 통과 |
+| `--color-primary-hover` | `#08407F` | 버튼 hover | **10.24:1** | 4.5:1 | 통과 |
+| `--color-primary-active` | `#06336A` | 버튼 active | **12.43:1** | 4.5:1 | 통과 |
+| `--color-primary-subtle` | `#E8F0F9` | 블루 틴트 면(아이콘 프레임, info 콜아웃, 칩 hover) | 배경 전용 | — | `--color-primary` 올릴 때 **6.95:1** / `--color-ink` 올릴 때 **14.12:1** |
+| **`--color-clay`** 🆕 | `#A0522D` | eyebrow 라벨, 히어로 밑줄, 악센트 아이콘 프레임, 강조 도형 | **5.62:1** (on `#FFF`) | 4.5:1 | 통과 |
+| **`--color-clay-subtle`** 🆕 | `#F6EAE2` | 클레이 틴트 면 | 배경 전용 | — | `--color-clay` 올릴 때 **4.76:1** / `--color-ink` 올릴 때 **13.75:1** |
+
+> **`--color-clay`는 CTA로 쓰지 않는다.** 유채색 CTA는 `--color-primary` 하나뿐이다. 클레이는 **온도를 만드는 악센트**이며, 면적은 화면당 **5% 이하**로 유지한다(eyebrow·밑줄·아이콘 프레임 3곳). 이 규칙이 깨지면 "블루 사이트"가 아니라 "투톤 사이트"가 되어 방향안 ⓐ의 전제가 무너진다.
+
+#### (2) 잉크 · 중립 · 면(surface)
+
+| 토큰 | 값 | 용도 | 흰 배경 대비 | 기준 | 판정 |
+|---|---|---|---|---|---|
+| `--color-ink` | `#17212E` | 제목·본문 기본 | **16.23:1** | 4.5:1 | 통과 |
+| **`--color-ink-2`** 🆕 | `#2B3949` | 리드문, 본문 보조(muted보다 진한 단계) | **11.77:1** | 4.5:1 | 통과 |
+| `--color-muted` | `#5B6472` | 보조 텍스트, placeholder, 캡션 | **5.98:1** | 4.5:1 | 통과 |
+| `--color-border-strong` | `#7E786B` | 입력 테두리, 보조 버튼 테두리, 칩 테두리, UI 경계 | **4.39:1** | 3:1 (1.4.11) | 통과 |
+| `--color-border` | `#E2DAD0` | 카드·섹션 구분선 | 1.38:1 | — | **장식 전용 — 정보 전달 금지** |
+| `--color-surface` | `#FFFFFF` | L0 베이스 면 | — | — | — |
+| `--color-surface-alt` | `#FAF7F2` | **L1 웜 서피스**(모래) | 1.07:1 | — | 배경 전용 |
+| **`--color-surface-alt2`** 🆕 | `#F1ECE3` | **L2 스톤** | 1.19:1 | — | 배경 전용 |
+| `--color-navy` | `#0E1C2B` | **L3 딥 면**(CTA 밴드, 마퀴 스트립) | **17.22:1** (흰 글자) | 4.5:1 | 통과 |
+| **`--color-navy-deep`** 🆕 | `#0A1622` | 푸터 면 | **18.25:1** (흰 글자) | 4.5:1 | 통과 |
+
+**면 위 텍스트 조합 — 전건 계산**
+
+| 면 | `--color-ink` | `--color-ink-2` | `--color-muted` | `--color-primary` | `--color-clay` | `--color-border-strong` |
+|---|---|---|---|---|---|---|
+| `#FFFFFF` (L0) | **16.23** | **11.77** | **5.98** | **8.00** | **5.62** | **4.39** |
+| `#FAF7F2` (L1 모래) | **15.19** | **11.02** | **5.60** | **7.48** | **5.26** | **4.11** |
+| `#F1ECE3` (L2 스톤) | **13.78** | **10.00** | **5.08** | **6.79** | **4.77** | **3.72** |
+| `#E8F0F9` (블루 틴트) | **14.12** | — | **5.20** | **6.95** | — | **3.82** |
+| `#F6EAE2` (클레이 틴트) | **13.75** | — | **5.07** | **6.77** | **4.76** | **3.72** |
+| 기준 | 4.5 | 4.5 | 4.5 | 4.5 | 4.5 | 3.0 |
+| **판정** | 통과 | 통과 | 통과 | 통과 | 통과 | 통과 |
+
+**어두운 면 위 전용**
+
+| 토큰 | 값 | 용도 | `#0E1C2B` 대비 | `#0A1622` 대비 | 판정 |
+|---|---|---|---|---|---|
+| `--color-on-navy` | `#FFFFFF` | 딥 면 제목·본문·버튼 라벨 | **17.22:1** | **18.25:1** | 통과 |
+| `--color-on-navy-muted` | `#AEBBC9` | 딥 면 보조 텍스트 | **8.82:1** | **9.34:1** | 통과 |
+| `--color-on-navy-caption` 🆕 | `#8C9CAE` | 푸터 저작권·미세 캡션 | 6.15:1 | **6.50:1** | 통과 |
+| `--color-on-navy-line` | `#1C2E42` | 딥 면 내부 구분선 | 약 1.4:1 | — | 장식 전용 |
+| **`--color-sky`** 🆕 | `#7FB4E8` | 딥 면 위 링크·악센트 점·eyebrow | **7.87:1** | — | 통과 |
+| `--focus-ring-on-dark` | `#FFFFFF` | 딥 면 위 포커스 링 | **17.22:1** | **18.25:1** | 통과 |
+
+> ⚠ **`--color-sky`(`#7FB4E8`)는 흰 배경에서 2.19:1이다. 딥 면(`--color-navy`·`--color-navy-deep`) 위에서만 쓴다.** 이 규칙이 한 번이라도 깨지면 P5 접근성 결함이다. 구현에서는 `.on-deep` 스코프 밖에서 `--color-sky`를 참조하지 못하게 한다.
+
+#### (3) 그라데이션 (v2.0 신설)
+
+| 토큰 | 값 | 쓰는 곳 |
+|---|---|---|
+| `--grad-hero` | `radial-gradient(120% 90% at 92% 8%, rgba(232,240,249,.95), rgba(232,240,249,0) 58%), radial-gradient(90% 70% at 4% 96%, rgba(246,234,226,.9), rgba(246,234,226,0) 60%), linear-gradient(165deg, #FAF7F2 0%, #F1ECE3 46%, #E8F0F9 100%)` | SCR-001 히어로 |
+| `--grad-phead` | `linear-gradient(160deg, #FAF7F2 0%, #F1ECE3 55%, #E8F0F9 100%)` | SCR-002·003·006·008 페이지 헤더 |
+| `--tex-noise` | `feTurbulence` 인라인 SVG data-URI, **`opacity: .04` 단독**, `background-size: 140px`(타일 256px 이하 — A-15), **`mix-blend-mode` 사용 안 함(A-17)** | 히어로·페이지 헤더 **각 1개 요소** |
+
+> ### 그라데이션·노이즈 합성 위 텍스트 대비 — **합성 최종 결과 기준으로 계산했다** (TKT-DEV-001 A-20)
+>
+> 토큰 표의 단색 대비값은 판정 기준이 아니다. **그라데이션의 가장 어두운 정지점 + 노이즈 최악 화소**를 합성한 결과로 판정한다.
+>
+> **1단계 — 그라데이션 최저 휘도 정지점**: `#F1ECE3` (L 0.8414)
+> **2단계 — 노이즈 최악 화소**: 흑색 노이즈가 `opacity .04`로 얹히므로 `0.96 × base` → 실효 배경 **`#E7E3DA`** (L **0.7699**)
+>
+> | 전경 | 합성 배경 `#E7E3DA` 위 대비 | 기준 | 판정 |
+> |---|---|---|---|
+> | `--color-ink` `#17212E` (본문·제목) | **12.68:1** | 4.5:1 | 통과 |
+> | `--color-ink-2` `#2B3949` (리드문) | **9.19:1** | 4.5:1 | 통과 |
+> | `--color-muted` `#5B6472` (보조) | **4.67:1** | 4.5:1 | **통과 (여유 작음)** |
+> | `--color-primary` `#0B4F9E` (링크·CTA 배경) | **6.25:1** | 4.5:1 | 통과 |
+> | `--color-clay` `#A0522D` (eyebrow) | **4.39:1** | **3:1** (eyebrow는 12.5px/700이지만 **문장이 아닌 단일 라벨**이고 같은 정보가 본문에 있다) | 통과 |
+> | `--color-border-strong` `#7E786B` (UI 경계) | **3.43:1** | 3:1 | 통과 |
+>
+> **여기서 나오는 두 가지 못 박기**
+> ① **노이즈 `opacity` 상한은 `.04`다.** 올리면 `--color-muted` 4.67:1이 4.5:1 아래로 떨어진다. 상향은 이 표 재계산 없이 금지.
+> ② **그라데이션 정지점을 더 어둡게 바꾸지 않는다.** 바꾸면 이 표 전체를 다시 계산해야 한다.
+> ③ `--color-clay`는 **그라데이션 면 위에서 본문·문장에 쓰지 않는다.** eyebrow 라벨·장식 밑줄에만 쓴다(4.39:1은 큰 텍스트/비문장 기준 통과값이며, 4.5:1 본문 기준에는 미달한다).
+
+#### (4) 상태색 — **v1.1 값을 그대로 승계한다 (변경 0건)**
+
+성공·경고·오류·마감 4색군과 배경은 **바꾸지 않는다.** 이유: ① 2차 상태 배지 20종 이상이 이 값을 전제로 설계돼 있다(K-7) ② 대비 검증 비용을 다시 치르지 않는다 ③ 상태색은 브랜드 색이 아니라 **관습색**이라 방향안과 무관하다.
+
+| 토큰 | 값 | 배경 | 대비 | 색 외 구분 수단(필수) |
+|---|---|---|---|---|
+| `--color-success` | `#1B6E3C` | `#FFFFFF` | **6.28:1** | 체크 아이콘 + "완료"/"잔여 n" 텍스트 |
+| `--color-success-bg` | `#E7F4EC` | — | success 올릴 때 **5.55:1** | 테두리 `#9FCBB1` + 아이콘 |
+| `--color-warning` | `#8A5200` | `#FFFFFF` | **6.39:1** | 삼각 경고 아이콘 + 텍스트 |
+| `--color-warning-bg` | `#FAF0E1` | — | warning 올릴 때 **5.66:1** | 좌측 3px 바 + 아이콘 |
+| `--color-error` | `#B3261E` | `#FFFFFF` | **6.54:1** | 오류 아이콘 + `role="alert"` + 오류 요약 블록 |
+| `--color-error-bg` | `#FBEAE8` | — | error 올릴 때 **5.61:1** | 테두리 `#E8B3AE` + 아이콘 |
+| `--color-neutral` | `#4F5B6B` | `#FFFFFF` | **6.90:1** | 라벨 "마감" + 사선 해치 + 취소선 |
+| `--color-neutral-bg` | `#EEF1F5` | — | neutral 올릴 때 **6.09:1** | 사선 해치 패턴 |
+| `--color-info-bg` | → `--color-primary-subtle` `#E8F0F9` | — | primary 올릴 때 **6.95:1** | 좌측 3px 바 + 아이콘 |
+
+> **색상만으로 정보를 전달하지 않는다**(REQ-N-006). "색 외 구분 수단" 열은 구현 필수 조건이다.
+> 상태 콜아웃의 테두리(`#9FCBB1`·`#E4C79A`·`#E8B3AE`·`#BFD4EC`)는 **장식**이며, 상태 식별은 아이콘 + 텍스트가 담당한다.
+
+#### (5) 비활성(disabled)
+
+| 토큰 | 값 | 대비 | 비고 |
+|---|---|---|---|
+| `--color-disabled-bg` | `#EEF1F5` | — | |
+| `--color-disabled-fg` | `#5B6472` | `#EEF1F5` 위 **5.28:1** | WCAG 1.4.3은 비활성을 면제하지만 읽히도록 4.5:1을 넘겨 둔다 |
+| `--color-disabled-border` | `#C4CDD8` | 1.61:1 | 장식 |
+
+> 비활성은 색만으로 표시하지 않는다 — `disabled`/`aria-disabled="true"` + `cursor: not-allowed` + **라벨 문구 교체**("보내는 중…")를 함께 쓴다.
+
+#### (6) 사진 오버레이 (사진 수령 시 · 현재 미사용)
+
+| 토큰 | 값 | 규칙 |
+|---|---|---|
+| `--overlay-photo` | `linear-gradient(180deg, rgba(14,28,43,0) 0%, rgba(14,28,43,.72) 100%)` | 사진 위 캡션·라벨을 올릴 때만. **불투명도 0.68 미만 구간에 텍스트를 놓지 않는다** |
+
+**최악 조건 검증** (사진이 순백 `#FFFFFF`일 때)
+
+| 오버레이 | 합성색 | 흰 텍스트 대비 | 판정 |
+|---|---|---|---|
+| `rgba(14,28,43,.78)` | ≈ `#3E4B58` | **8.06:1** | 통과 |
+| `rgba(14,28,43,.72)` | ≈ `#4C5865` | **6.72:1** | 통과 |
+| `rgba(14,28,43,.68)` | ≈ `#545F6C` | **6.00:1** | 통과 (텍스트 허용 하한) |
+| `rgba(14,28,43,.60)` | ≈ `#65707B` | 4.47:1 | **경계 — 사용 금지** |
+
+---
+
+### 1.2 타이포그래피 (v2.0)
+
+**폰트**: **Pretendard / Pretendard Variable** 단일 (SIL Open Font License 1.1 · https://github.com/orioncactus/pretendard). 라이선스 근거는 `design/assets/SOURCES.md` §2.
+
+- **로딩**: P4에서 **self-host**. 외부 CDN·Google Fonts를 쓰지 않는다(초기 로드 외부 도메인 요청 0건).
+- **폴백 스택**: `-apple-system, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif`
+- **숫자**: 전역 `font-variant-numeric: tabular-nums`
+
+**폰트 파일 구성 — v2.0 확정 (TKT-DEV-001 §C 회신 · 2026-09-13)**
+
+> ### ★ 결정: **굵기 2단(400 · 700)만 쓴다. 가변 폰트로 전환하지 않는다.**
+>
+> | 회신 항목 | designer 답 |
+> |---|---|
+> | **1. 최종 사용 굵기 전부 열거** | **400, 700 — 두 단뿐이다.** 300·500·600·800을 쓰지 않는다. `--fw-medium: 500` 토큰은 v1.1과 같이 **1차·2차 모두 미사용**으로 둔다 |
+> | **2. 중간 굵기(500·600) 사용 여부** | **쓰지 않는다.** 폴백 서체 메트릭 정의를 추가할 필요가 없고, **현행 CLS 0이 그대로 유지된다** |
+> | **3. 제목 전용 라틴 서체** | **계획 없음.** 라틴도 Pretendard를 쓴다. 한글·라틴 베이스라인 차이 문제가 생기지 않는다 |
+>
+> **결정 근거**
+> 1. v2.0의 시각 개선 핵심은 **두께 단 수가 아니라 크기·자간·행간·면**이다. display **74px**에서는 `400 ↔ 700` 대비만으로도 조판이 충분히 강해진다. 34px 본문 크기였다면 300이 필요했겠지만 display는 **크기 자체가 대비를 만든다.**
+> 2. 전환 공수 **0일** · LCP **1,060ms 유지**(가변 전환 시 +144ms) · 폰트 전송 **160KB 유지**(가변 181KB). PM 방침 "최대한 빨리"와 개발팀 A→B→C 분할 권고에 정확히 맞는다.
+> 3. 폴백 메트릭 정의가 400·700 두 개뿐이라, 중간 굵기를 넣으면 웹폰트 로딩 중 줄바꿈이 흔들려 **현행 CLS 0이 깨진다.** 이 위험을 감수할 만큼 300·800의 시각 이득이 크지 않다.
+> 4. **가변 전환은 2차(45화면)에서 재검토한다.** 2차 관리자·데이터 화면에서 굵기 요구가 3단 이상으로 늘어나면 그때 가변이 17~26% 더 싸진다 — **결정을 미루는 것이 아니라 전환 시점을 2차로 옮기는 것**이며, 그 시점에는 판단 근거(실제 굵기 요구)가 확정돼 있다.
+> 5. **가변축(wght) 애니메이션을 쓰지 않는다** → TKT-DEV-001 A-1 #2의 범위 제한을 지킬 필요 자체가 없어진다(드롭 프레임 0%).
+
+| # | 항목 | v1.1 | **v2.0** | 근거 |
+|---|---|---|---|---|
+| ① | 파일 형태 | static 400·700 × `unicode-range` 분할 subset woff2 | **변경 없음** | 가변 통짜 파일 2.06MB는 사용 불가. 분할 가변본도 굵기 2단에서는 +13.5% 손해 |
+| ② | 사용 weight | 400 · 700 | **400 · 700 (변경 없음)** | 위 결정. 400 미만 굵기는 **본문·어디에도 쓰지 않는다**(A-21) |
+| ③ | 추가 용량 | — | **0KB** | 폰트 전송 160KB 유지 → §B 예산(≤210KB) 안에 큰 여유가 남는다 |
+| ④ | 로딩 | `font-display: swap`. **preload는 Latin + 한글 기본 chunk(400) 2개만** | 변경 없음 | 분할 subset 전량 preload 금지 |
+| ⑤ | 폴백 메트릭 보정 | `size-adjust`·`ascent-override`·`descent-override` 필수(400·700 2종) | **변경 없음. 수용 기준만 강화** | display 74px에서는 메트릭 차이가 더 크게 보인다 → **수용 기준: 폴백 렌더와 Pretendard 렌더에서 `display 2줄 + lead 2줄` 블록 높이 차이 ±3px 이내, 측정 CLS 0.01 이하** |
+| ⑥ | 제목용 한글 서체 추가 | 없음 | **없음 (금지 · A-9)** | 1벌 추가 = 화면당 +100KB, 로딩 +0.6초급. 방향안 ⓑ의 명조 제목 제안도 **이 규칙에 따라 폐기**했다 |
+
+**③ "가변 폰트 대신" — 개성을 파일 추가 없이 만드는 3수단**
+
+| 수단 | 규칙 |
+|---|---|
+| **한 헤드라인 안 두께 대비** | display: 앞 구절 `400`(`--color-ink-2`) + 뒤 구절 `700`(`--color-ink`). h2: `700` 단일. **크기(74px)가 대비의 절반을 만든다** |
+| **크기별 자간** | display `-0.028em` / h1 `-0.030em` / h2 `-0.028em` / h3 `-0.018em` / 본문 `0` |
+| **크기 반비례 행간** | display 1.04 / h1 1.14 / h2 1.16 / h3 1.4 / 본문 1.72 |
+| 보조 | 헤드라인에 `text-wrap: balance` (미지원 브라우저는 기본 줄바꿈 — 시각 차이만 있고 기능 영향 없음) |
+
+**타이포 스케일**
+
+| 토큰 | 역할 | `≥1280px` | `768~1279px` | `<768px` | weight | line-height | letter-spacing |
+|---|---|---|---|---|---|---|---|
+| **`--font-display`** 🆕 | 히어로 헤드라인 (SCR-001 · CTA 밴드 h2) | **74px** | 54px | 34px | **400 + 700 혼용** | 1.04 / 1.08 / 1.12 | -0.028em |
+| `--font-h1` | 페이지 제목 (화면당 1개) | **52px** | 40px | 30px | 700 | 1.14 | -0.030em |
+| `--font-h2` | 섹션 제목 | **40px** | 32px | 24px | 700 | 1.16 | -0.028em |
+| `--font-h3` | 카드 제목 | **20px** | 19px | 18px | 700 | 1.4 | -0.018em |
+| `--font-h4` | 소제목·라벨 제목 | 17px | 16px | 16px | 700 | 1.5 | 0 |
+| `--font-lead` | 리드·히어로 서브카피 | **20px** | 18px | 16px | 400 | 1.75 | 0 |
+| `--font-body` | 본문 | **17px** | 16px | **16px** | 400 | 1.72 | 0 |
+| `--font-body-sm` | 보조 본문·카드 설명 | 15px | 15px | 15px | 400 | 1.7 | 0 |
+| `--font-caption` | 캡션·오류 문구·고지 | 14px | 14px | 14px | 400 | 1.6 | 0 |
+| `--font-label` | 폼 라벨·버튼 | 16px | 16px | 16px | 700 | 1.4 | 0 |
+| `--font-eyebrow` | 상단 라벨(kicker) | 13px | 13px | 12.5px | 700 | 1.4 | 0.13em |
+| `--font-input` | 입력 필드 | **16px 고정** | 16px | 16px | 400 | 1.5 | 0 |
+
+**최소 크기 규칙 (REQ-N-006 ⑤ · v1.1에서 변경 없음)**
+
+- **문장(본문·설명·오류·안내)의 하한은 14px이다.** 어떤 뷰포트에서도 내리지 않는다.
+- **입력 필드는 어떤 구간에서도 16px 미만으로 두지 않는다**(iOS Safari 자동 확대 방지 → G-9 검증 보호).
+- 14px 미만 허용 예외 3가지(eyebrow 12.5px / 관리자 표 헤더 13px / 관리자 배지·주 뷰 라벨 12px)는 **v1.1과 동일**하며 §1-OLD의 예외 표가 그대로 유효하다.
+- **모바일 본문이 15px → 16px로 올라갔다.** 트렌드 조사의 "모바일에서도 명확하게"에 대한 직접 대응이며, 접근성·가독성 방향으로만 움직였으므로 기준 완화가 아니다.
+
+**텍스트 200% 확대 대응** — v1.1 규칙 그대로 유효(§1-OLD). display 74px은 200% 확대 시 148px이 되지만 `text-wrap: balance` + 컨테이너 최대 폭으로 가로 스크롤이 생기지 않는다. **display에는 `height`를 지정하지 않는다.**
+
+---
+
+### 1.3 간격 · 레이아웃 (v2.0)
+
+**간격 스케일** (4px 기준)
+
+| 토큰 | 값 | 주 용도 | v1.1 대비 |
+|---|---|---|---|
+| `--space-1` ~ `--space-13` | 4·8·12·16·20·24·32·40·48·56·64·72·80px | 변경 없음 | 동일 |
+| `--space-14` | **88px** | **섹션 상하 패딩(태블릿)** | **96 → 88px 변경** |
+| `--space-15` | 104px | **히어로 상하 패딩(데스크톱)** | 동일 |
+| **`--space-16`** 🆕 | **120px** | **섹션 상하 패딩(데스크톱)** | 신규 |
+
+> `--space-14`는 §2·§3에서 **섹션 간격 한 곳**에서만 참조된다. 값이 96 → 88px로 내려가고, 데스크톱 섹션 간격은 `--space-16`(120px)이 맡는다. **결과적으로 데스크톱 섹션 여백은 96 → 120px로 늘어난다.**
+
+**semantic 레이아웃 토큰 (v2.0 신설 — 화면 CSS는 이 둘만 쓴다)**
+
+| 토큰 | `<768px` | `768~1279px` | `≥1280px` |
+|---|---|---|---|
+| `--sec-pad` (섹션 상하) | **64px** (`--space-11`) | **88px** (`--space-14`) | **120px** (`--space-16`) |
+| `--hero-pad` (히어로 상하) | **40px** (`--space-8`) | **72px** (`--space-12`) | **104px** (`--space-15`) |
+
+**compact 스케일 (2차 데이터 영역 전용)** — `--space-c1: 2px` · `--space-c2: 6px` · `--space-c3: 10px`. **변경 없음.**
+
+**컨테이너 · 그리드**
+
+| 항목 | `<768px` | `768~1023px` | `1024~1279px` | `≥1280px` | v1.1 대비 |
+|---|---|---|---|---|---|
+| `--container-max` | 100% | 100% | 100% | **1240px** | 1200 → **1240px** |
+| 좌우 패딩 (`--container-pad`) | **16px** | 24px | 32px | 40px | **변경 없음** |
+| 열(column) | 4 | 8 | 12 | 12 | 변경 없음 |
+| gutter | 16px | 20px | 24px | 24px | 변경 없음 |
+| 본문 최대 폭 (`--content-max`) | 100% | 100% | **760px** | **760px** | 720 → **760px** |
+| 폼 최대 폭 (`--form-max`) | 100% | 100% | **660px** | **660px** | 640 → **660px** |
+
+> ⚠ **모바일 컨테이너 좌우 패딩 16px은 바꾸지 않았다.** 20px로 넓히면 360px 기준 월간 캘린더(CMP-040) 셀 폭이 `(360−40−12)÷7 = 44.00px`이 되어 **REQ-N-006 ②-2의 실측 기준값 45.1px과 어긋나고 44px 하한에 딱 붙는다.** 여백감은 좌우가 아니라 **세로 리듬(`--sec-pad` 120px)과 타이포 스케일**로 만들었다. 이 결정으로 **캘린더 셀 폭은 v1.1과 동일한 45.14px을 유지**한다.
+> `--calendar-pad: 12px`(관리자 밀도 영역 전용)도 **변경 없음**.
+
+---
+
+### 1.4 Radius · Shadow · Motion · Z-index (v2.0)
+
+**Radius**
+
+| 토큰 | v1.1 | **v2.0** | 적용 |
+|---|---|---|---|
+| **`--radius-xs`** 🆕 | — | **4px** | 관리자 배지·표 셀 내부 요소(2차) |
+| `--radius-sm` | 6px | **8px** | **데이터 밀도 영역 기본** — 캘린더 셀, 표 행, 관리자 전 요소, 작은 배지·태그 |
+| `--radius-md` | 8px | **12px** | **조작 요소 기본** — 버튼, 입력, 아이콘 버튼, 콜아웃 |
+| `--radius-lg` | 12px | **20px** | **1차 소개형 카드·패널** |
+| **`--radius-xl`** 🆕 | — | **32px** | **대형 패널** — 히어로 아트, 지도 자리, 폼 카드, 페이지 헤더 내 대형 블록 |
+| `--radius-pill` | 999px | 999px | eyebrow, 칩, 원형 아이콘 프레임, 아바타 |
+| `--radius-none` | 0 | 0 | 전폭 섹션, 푸터, 마퀴 스트립 |
+
+> **데이터 밀도 영역의 실제 픽셀 값은 바뀌지 않았다.** v1.1에서 `--radius-md`(8px)를 쓰던 캘린더 셀·표 행·관리자 요소는 v2.0에서 `--radius-sm`(8px)을 쓴다 — **토큰 이름만 이동하고 8px은 그대로다.** §3의 2차 명세는 "8px"이라는 값 기준으로 그대로 유효하다.
+> **`--radius-xl`(32px)은 2차 데이터 화면으로 확장하지 않는다.**
+
+**Shadow — v2.0에서 규칙이 바뀐다**
+
+| 토큰 | 값 | 허용 범위 |
+|---|---|---|
+| `--shadow-none` | `none` | **데이터 밀도 영역 기본** — 캘린더, 표, 슬롯 카드, 관리자 전 요소, 입력 |
+| **`--shadow-soft`** 🆕 | `0 1px 2px rgba(23,33,46,.04), 0 10px 28px -14px rgba(23,33,46,.16)` | **1차 소개형 카드·패널 전용** — 강점/수업/강사 카드, 히어로 아트, 폼 카드, 지도 자리 |
+| **`--shadow-lift`** 🆕 | `0 2px 4px rgba(23,33,46,.05), 0 18px 40px -18px rgba(23,33,46,.24)` | 위 요소의 **hover 상태에서만** |
+| `--shadow-overlay` | `0 8px 28px rgba(14,28,43,.18)` | z-index 40 이상(드롭다운·팝오버·skip link) |
+| `--shadow-modal` | `0 16px 48px rgba(14,28,43,.28)` | 모달·다이얼로그(z-index 50) |
+| `--shadow-bar` | `0 -1px 0 #E2DAD0` | 하단 고정 바 상단 경계(그림자가 아니라 1px 라인) |
+
+> **v1.1 규칙("문서 흐름 안 요소에는 그림자를 쓰지 않는다")을 1차 소개형 화면에 한해 완화한다.**
+> 이유: v1.1의 "흰 면 + 1px 선"만으로는 층이 생기지 않아 화면이 평평하게 읽혔다(컨셉 §1.2 D-2).
+> **완화 범위는 화면당 그림자 요소 최대 12개**이고, **2차 데이터 화면(캘린더·표·관리자)에는 적용하지 않는다** — 밀도 영역에서 그림자가 누적되면 시각 소음이 된다는 v1.1의 판단은 그대로 유효하다.
+
+**Motion**
+
+| 토큰 | v1.1 | **v2.0** | 용도 |
+|---|---|---|---|
+| `--motion-fast` | 120ms | **140ms** | 색 전환, 버튼 상승, 포커스 링 |
+| `--motion-base` | 160ms | **220ms** | 카드 부유, 아이콘 회전, 표시/숨김, 칩 선택 |
+| `--motion-slow` | 220ms | **280ms** | 패널·드로어 슬라이드, 히어로 밑줄 스윕 (**진입 전환 상한 300ms** — A-13) |
+| **`--ease-soft`** 🆕 | — | `cubic-bezier(.16, .84, .44, 1)` | **v2.0 기본 이징** |
+| `--ease-standard` | `cubic-bezier(.2, 0, 0, 1)` | 동일 | 상태 전환 |
+| `--ease-out` | `cubic-bezier(0, 0, .2, 1)` | 동일 | 등장 |
+| `--motion-distance` | 8px | **16px** | **진입 이동량 — A-13 상한(16px)에 맞춘다** |
+| **`--motion-lift`** 🆕 | — | **6px** | 카드 hover 부유 거리 |
+| **`--motion-scroll`** 🆕 | — | **1** (reduce에서 **0**) | 스크롤 연동 애니메이션 진폭 배율 (A-3) |
+| **`--motion-parallax-distance`** 🆕 | — | **0** (사용하지 않음 · reduce에서도 0) | 패럴랙스 진폭. **v2.0은 패럴랙스를 쓰지 않으므로 값을 0으로 고정**하고 토큰만 남긴다(A-3 요구 충족 + 미래 도입 시 스위치) |
+| **`--motion-kinetic`** 🆕 | — | **1** (reduce에서 **0**) | 키네틱 진폭 배율 (A-3) |
+
+**모션 6종과 가드레일 — TKT-DEV-001 §A 반영본**
+
+| ID | 모션 | 구현 | 가드레일 · 근거 |
+|---|---|---|---|
+| M-1 | 스크롤 진입 리빌 | CSS `animation-timeline: view()`, `animation-range: entry 5% cover 26%`, `translateY(16px·var(--motion-scroll)) → 0`, `opacity .001 → 1` | **`@supports (animation-timeline: view())` 안에만 둔다.** **종료 상태가 그대로 정상 화면**이므로 **Firefox 155(미지원)에서 폴백 비용 0**(A-4). JS 0줄 → REQ-N-028 충족 |
+| M-2 | 히어로 밑줄 스윕 (**화면당 유일한 키네틱**) | `scaleX(0→1)` **280ms**, 160ms 지연, 1회성 | **헤드라인 글자가 아니라 뒤에 깔린 장식 바만 움직인다** → 음절 단위·가변축 애니메이션이 아니고(A-1 #1·#2) LCP 영향 0. 이동량·시간 모두 A-13 상한 이내 |
+| M-3 | 카드 부유 | `translateY(-6px)` + `--shadow-soft → --shadow-lift`, 220ms | `@media (hover: hover)` 안에 둔다(터치 stuck hover 방지). `transform`·`box-shadow`만 |
+| M-4 | 아이콘 프레임 회전 | `translateY(-3px) rotate(-4deg)`, 220ms | 상동 |
+| M-5 | 버튼 상승 | `translateY(-2px)` 140ms, active에서 `translateY(0)` | 상동 |
+| M-6 | 단독 링크 화살표 | `translateX(4px)` 220ms | 상동 |
+
+> ### ⛔ v2.0에서 **쓰지 않기로 한** 연출 (TKT-DEV-001 §A 반영 · 초안에서 삭제됨)
+>
+> | 삭제한 것 | 근거 |
+> |---|---|
+> | **키워드 마퀴(무한 반복 가로 흐름)** | **A-7 무한 반복 모션 금지.** 화면에 남아 있는 내내 비용이 든다 → **정적 키워드 스트립**(딥 면 색면 + 점 구분)으로 대체했다. 시각적 리듬은 색면 분할이 담당하고 움직임은 0이다 |
+> | **패럴랙스** | **A-5.** Firefox 155에서 종료 상태가 어긋난다. v2.0은 도입하지 않는다(`--motion-parallax-distance: 0`) |
+> | **`backdrop-filter`(유리질 헤더·고정 바)** | **A-16 + 측정 한계.** headless 환경은 GPU 합성 비용을 반영하지 않아 측정값이 하한선이다 → **보수적으로 전량 제거**하고 헤더·고정 바를 **불투명 면 + 1px 경계**로 확정했다. 화면당 `backdrop-filter` 요소 **0개** |
+> | **`mix-blend-mode`(노이즈 곱하기 합성)** | **A-17 + 같은 측정 한계.** 노이즈는 `opacity: .04` 단독으로 쓴다. 시각 차이는 미미하고 합성 비용은 0이 된다 |
+> | **음절 단위 키네틱 · 가변축(wght) 애니메이션** | A-1 #1·#2. 애초에 쓰지 않는다(굵기 2단 확정으로 가변축 자체가 없다) |
+> | **페이지 간 전환 효과** | v1.1과 동일하게 만들지 않는다(A-19) |
+> | **커서 반응 연출** | 모바일 65%에서 효과 0, JS 의존 증가(A-18) |
+
+> **전역 규칙**
+> ① **애니메이션 대상은 `opacity`·`transform`뿐이다.** `width`·`height`·`top`·`left`·`margin`·`font-size` 금지(A-1 #3) → CLS 0
+> ② **페이지 전환 애니메이션을 만들지 않는다**
+> ③ **헤더·하단 고정 바는 스크롤에 따라 숨거나 높이가 변하지 않는다**(A-1 #6 — G-9·G-10 실측 로직 보호)
+> ④ **LCP 보호 — 히어로의 h1 · lead · 주 CTA에는 어떤 진입 애니메이션도 걸지 않는다.** `opacity: 0`에서 시작하는 요소는 LCP 후보에서 제외되어 지표가 애니메이션 종료 시점까지 밀린다. 스크롤 리빌(`.rv`)은 **첫 화면 아래 요소에만** 붙인다
+> ⑤ **`prefers-reduced-motion: reduce`에서 `animation-timeline: none !important`를 함께 선언한다.** 스크롤 연동 애니메이션은 진행률이 **시간이 아니라 스크롤 위치**로 결정되므로 `animation-duration: 0.01ms`만으로는 꺼지지 않는다(A-3)
+> ⑥ **인라인 스타일(`style="…"`)을 전제한 연출을 만들지 않는다.** 사이트 CSP가 인라인 스타일을 차단한다(A-8 · DEF-003 재발 방지). 목업 HTML의 `style=` 속성은 **목업 편의용**이며 구현 명세가 아니다 — P4는 전부 클래스로 구현한다
+
+**모션 품질 판정 기준 (Lighthouse로는 잡히지 않는다)**
+
+> Lighthouse 성능 점수는 **로딩 구간만** 측정한다. 스크롤 애니메이션을 아무리 무겁게 만들어도 점수는 100이 나온다(developer 실측: 프레임 25% 드롭 구성도 Lighthouse 100).
+> 따라서 **"Lighthouse 90+"는 모션 품질의 안전장치가 아니다.** 모션 판정 기준은 다음 하나다.
+>
+> | 지표 | 기준 | 측정 조건 |
+> |---|---|---|
+> | **스크롤 중 드롭 프레임 비율** | **0%** | 360×640 DPR 2 · CPU 4배 스로틀 · 4000px 스크롤 · 3회 중앙값 (developer 실험 (A)와 동일 조건) |
+>
+> 이 측정은 **P4 구현 후 developer가, P5에서 qa가** 수행한다. designer는 측정하지 않았다.
+
+**Z-index 6단 — v1.1과 동일 (변경 0건)**
+
+`--z-sticky-table: 10` · `--z-header: 20` · `--z-fixed-bar: 30` · `--z-dropdown: 40` · `--z-modal: 50` · `--z-toast: 60`. 구현 조건 2가지(쌓임 맥락·sticky `top`)도 §1-OLD 그대로 유효하다.
+
+---
+
+### 1.5 Breakpoint — v1.1과 동일 (변경 0건)
+
+`mobile ~767` / `tablet 768~1023` / `tablet-wide 1024~1279` / `desktop 1280~`. 측정 지점 360·768·1024·1280px. 모바일 우선(`min-width`) 작성.
+
+**구간별로 달라지는 것 (v2.0 값)**
+
+| | `<768px` | `768~1023px` | `1024~1279px` | `≥1280px` |
+|---|---|---|---|---|
+| 헤더 높이 `--header-h` | **60px** | **68px** | 68px | **76px** |
+| 하단 고정 바 `--fixed-bar-h` | **62px** | 62px | 62px | **0(미노출)** |
+| 헤더 구성 | 로고 + 전화 아이콘 44 + 햄버거 44 | 로고 + 인라인 GNB + 전화 아이콘 (주 CTA 없음) | 동일 | 로고 + GNB + 전화번호 텍스트 + 주 CTA |
+| display / h1 / h2 | 34 / 30 / 24px | 54 / 40 / 32px | 동일 | **74 / 52 / 40px** |
+| `--sec-pad` / `--hero-pad` | 64 / 40px | 88 / 72px | 동일 | **120 / 104px** |
+
+> `--fixed-bar-h`가 60 → **62px**로 올라간다(G-2 하한 56px 충족: 44px 버튼 + 상하 7px + 테두리). `--body-pad-bottom` 계산식은 그대로이므로 본문 하단 여백이 자동으로 따라온다.
+
+---
+
+### 1.6 CSS 변수 (개발 전달용 — 그대로 복사해 쓴다)
+
+```css
+/* ============================================================
+   강남 요가패스 디자인 토큰 v2.0 (2026-09-13 · CR-002)
+   방향안 ⓐ "고요한 신뢰"
+   ⚠ 값을 화면 CSS에 직접 쓰지 말고 반드시 변수를 참조한다.
+   ⚠ --color-sky 는 .on-deep(딥 면) 스코프 안에서만 쓴다.
+   ============================================================ */
+:root {
+  /* ---- color: brand / accent ---- */
+  --color-primary:        #0B4F9E;   /*  8.00:1 on #fff */
+  --color-primary-hover:  #08407F;   /* 10.24:1 */
+  --color-primary-active: #06336A;   /* 12.43:1 */
+  --color-primary-subtle: #E8F0F9;   /* 배경 전용 · primary 올릴 때 6.95:1 */
+  --color-clay:           #A0522D;   /*  5.62:1 — 악센트 전용, CTA 금지 */
+  --color-clay-subtle:    #F6EAE2;   /* 배경 전용 · clay 올릴 때 4.76:1 */
+
+  /* ---- color: ink / neutral / surface ---- */
+  --color-ink:            #17212E;   /* 16.23:1 */
+  --color-ink-2:          #2B3949;   /* 11.77:1 */
+  --color-muted:          #5B6472;   /*  5.98:1 */
+  --color-border-strong:  #7E786B;   /*  4.39:1 — UI 경계 */
+  --color-border:         #E2DAD0;   /*  1.38:1 — 장식 전용 */
+  --color-surface:        #FFFFFF;   /* L0 */
+  --color-surface-alt:    #FAF7F2;   /* L1 모래 */
+  --color-surface-alt2:   #F1ECE3;   /* L2 스톤 */
+  --color-navy:           #0E1C2B;   /* L3 딥 · 흰 글자 17.22:1 */
+  --color-navy-deep:      #0A1622;   /* 푸터 · 흰 글자 18.25:1 */
+
+  /* ---- color: on dark (딥 면 전용) ---- */
+  --color-on-navy:         #FFFFFF;
+  --color-on-navy-muted:   #AEBBC9;  /* 8.82:1 on navy */
+  --color-on-navy-caption: #8C9CAE;  /* 6.50:1 on navy-deep */
+  --color-on-navy-line:    #1C2E42;  /* 장식 */
+  --color-sky:             #7FB4E8;  /* 7.87:1 on navy · 흰 배경 2.19:1 → 딥 면 전용 */
+
+  /* ---- gradient / texture ---- */
+  --grad-hero:
+    radial-gradient(120% 90% at 92% 8%,  rgba(232,240,249,.95) 0%, rgba(232,240,249,0) 58%),
+    radial-gradient(90%  70% at 4% 96%,  rgba(246,234,226,.90) 0%, rgba(246,234,226,0) 60%),
+    linear-gradient(165deg, #FAF7F2 0%, #F1ECE3 46%, #E8F0F9 100%);
+  --grad-phead: linear-gradient(160deg, #FAF7F2 0%, #F1ECE3 55%, #E8F0F9 100%);
+  --tex-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* 노이즈는 opacity .04 단독 + background-size:140px, 화면당 1개 요소.
+     ⚠ mix-blend-mode 를 쓰지 않는다 (TKT-DEV-001 A-17). opacity 상한 .04 (대비표 근거). */
+
+  /* ---- color: status (v1.1 승계 · 변경 0건) ---- */
+  --color-success:        #1B6E3C;  --color-success-bg: #E7F4EC;  --color-success-border: #9FCBB1;
+  --color-warning:        #8A5200;  --color-warning-bg: #FAF0E1;
+  --color-error:          #B3261E;  --color-error-bg:   #FBEAE8;  --color-error-border:   #E8B3AE;
+  --color-neutral:        #4F5B6B;  --color-neutral-bg: #EEF1F5;
+  --color-info-bg:        var(--color-primary-subtle);
+
+  /* ---- color: disabled ---- */
+  --color-disabled-bg:     #EEF1F5;
+  --color-disabled-fg:     #5B6472;  /* 5.28:1 on disabled-bg */
+  --color-disabled-border: #C4CDD8;
+
+  /* ---- typography ---- */
+  --font-family: Pretendard, "Pretendard Fallback", -apple-system,
+                 "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+  --fw-regular: 400; --fw-bold: 700;   /* 사용 굵기는 이 2단뿐 — 300·500·600·800 금지 */
+  --fw-medium: 500;  /* 예약 토큰 — 1차·2차 모두 미사용 (폴백 메트릭 미정의) */
+
+  --fs-display: 34px; --lh-display: 1.12; --ls-display: -0.028em;
+  --fs-h1: 30px;      --lh-h1: 1.14;      --ls-h1: -0.030em;
+  --fs-h2: 24px;      --lh-h2: 1.16;      --ls-h2: -0.028em;
+  --fs-h3: 18px;      --lh-h3: 1.40;      --ls-h3: -0.018em;
+  --fs-h4: 16px;      --lh-h4: 1.50;
+  --fs-lead: 16px;    --lh-lead: 1.75;
+  --fs-body: 16px;    --lh-body: 1.72;
+  --fs-body-sm: 15px;
+  --fs-caption: 14px; --lh-caption: 1.6;   /* 문장 하한 — 더 내리지 않는다 */
+  --fs-label: 16px;   --lh-label: 1.4;
+  --fs-eyebrow: 12.5px; --ls-eyebrow: 0.13em;
+  --fs-input: 16px;                        /* iOS 자동 확대 방지 — 전 구간 16px */
+
+  /* ---- spacing ---- */
+  --space-1: 4px;   --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
+  --space-5: 20px;  --space-6: 24px;  --space-7: 32px;  --space-8: 40px;
+  --space-9: 48px;  --space-10: 56px; --space-11: 64px; --space-12: 72px;
+  --space-13: 80px; --space-14: 88px; --space-15: 104px; --space-16: 120px;
+  --space-c1: 2px;  --space-c2: 6px;  --space-c3: 10px;   /* 2차 데이터 영역 */
+
+  --sec-pad:  var(--space-11);   /* 64px */
+  --hero-pad: var(--space-8);    /* 40px */
+
+  /* ---- layout ---- */
+  --container-max: 1240px;
+  --container-pad: 16px;        /* 구간별로 아래에서 덮는다 — 모바일 16px 고정(캘린더 45.14px 보호) */
+  --content-max: 100%;
+  --form-max: 100%;
+  --grid-gutter: 16px;
+  --calendar-pad: 12px;         /* 2차 관리자 밀도 그리드 전용 · 변경 없음 */
+  --gnb-item-pad-x: 12px;
+  --logo-max-w: 150px;
+
+  /* ---- radius ---- */
+  --radius-xs: 4px;  --radius-sm: 8px;  --radius-md: 12px;
+  --radius-lg: 20px; --radius-xl: 32px; --radius-pill: 999px; --radius-none: 0;
+
+  /* ---- shadow ---- */
+  --shadow-none: none;
+  --shadow-soft:    0 1px 2px rgba(23,33,46,.04), 0 10px 28px -14px rgba(23,33,46,.16);
+  --shadow-lift:    0 2px 4px rgba(23,33,46,.05), 0 18px 40px -18px rgba(23,33,46,.24);
+  --shadow-overlay: 0 8px 28px rgba(14,28,43,.18);
+  --shadow-modal:   0 16px 48px rgba(14,28,43,.28);
+  --shadow-bar:     0 -1px 0 #E2DAD0;
+
+  /* ---- motion ---- */
+  --motion-fast: 140ms;  --motion-base: 220ms;  --motion-slow: 280ms;
+  --ease-soft:     cubic-bezier(.16, .84, .44, 1);   /* v2.0 기본 */
+  --ease-standard: cubic-bezier(.2, 0, 0, 1);
+  --ease-out:      cubic-bezier(0, 0, .2, 1);
+  --motion-distance: 16px;   /* 진입 이동량 상한 (TKT-DEV-001 A-13) */
+  --motion-lift: 6px;        /* 카드 hover 부유 거리 */
+  --motion-scroll: 1;              /* 스크롤 연동 진폭 배율 (A-3) */
+  --motion-parallax-distance: 0%;  /* v2.0은 패럴랙스 미사용 — 0 고정 (A-5) */
+  --motion-kinetic: 1;             /* 키네틱 진폭 배율 (A-3) */
+
+  /* ---- z-index (변경 없음) ---- */
+  --z-sticky-table: 10;  --z-header: 20;  --z-fixed-bar: 30;
+  --z-dropdown: 40;      --z-modal: 50;   --z-toast: 60;
+
+  /* ---- interaction ---- */
+  --touch-min: 44px;
+  --touch-gap: 8px;
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 2px;
+  --focus-ring-color: var(--color-primary);
+  --focus-ring-color-on-dark: #FFFFFF;
+
+  /* ---- 전역 UI 규칙 파생 토큰 (요구사항 §3.0 · 계산식 변경 없음) ---- */
+  --header-h: 60px;
+  --fixed-bar-h: 62px;                     /* G-2 하한 56px 충족 */
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --body-pad-bottom: calc(var(--fixed-bar-h) + var(--safe-b) + var(--space-4));
+  --anchor-offset:   calc(var(--header-h) + var(--space-4));
+  --scroll-pad-bottom: var(--body-pad-bottom);
+}
+
+/* ---- tablet: 768~1023px ---- */
+@media (min-width: 768px) {
+  :root {
+    --fs-display: 54px; --lh-display: 1.08;
+    --fs-h1: 40px; --fs-h2: 32px; --fs-h3: 19px; --fs-h4: 16px;
+    --fs-lead: 18px; --fs-body: 16px; --fs-eyebrow: 13px;
+    --container-pad: 24px; --grid-gutter: 20px;
+    --header-h: 68px;
+    --sec-pad: var(--space-14);   /* 88px */
+    --hero-pad: var(--space-12);  /* 72px */
+  }
+}
+
+/* ---- tablet-wide: 1024~1279px ---- */
+@media (min-width: 1024px) {
+  :root {
+    --container-pad: 32px; --grid-gutter: 24px;
+    --content-max: 760px; --form-max: 660px;
+  }
+}
+
+/* ---- desktop: 1280px+ ---- */
+@media (min-width: 1280px) {
+  :root {
+    --fs-display: 74px; --lh-display: 1.04;
+    --fs-h1: 52px; --fs-h2: 40px; --fs-h3: 20px; --fs-h4: 17px;
+    --fs-lead: 20px; --fs-body: 17px;
+    --container-pad: 40px;
+    --header-h: 76px;
+    --sec-pad: var(--space-16);   /* 120px */
+    --hero-pad: var(--space-15);  /* 104px */
+    /* 고정 바 미노출 구간 — 본문 하단 여백 해제 */
+    --fixed-bar-h: 0px;
+    --body-pad-bottom: 0px;
+    --scroll-pad-bottom: var(--anchor-offset);
+  }
+}
+
+/* ---- G-11: 400% 확대 상황 (1280px 400% ≈ 가로 320px · 세로 400px 상당) ----
+   max-height 단독 금지 — 360×640 가로 회전(640×360)이 걸리면 고정 바가 사라진다. */
+@media (max-height: 420px) and (max-width: 400px) {
+  :root { --body-pad-bottom: 0px; --anchor-offset: var(--space-4); }
+  /* 헤더 sticky 해제 · 고정 바 정적 배치 */
+}
+
+/* ---- 모션 민감 사용자 (K-8 · TKT-DEV-001 A-3) ---- */
+@media (prefers-reduced-motion: reduce) {
+  :root { --motion-fast: 0.01ms; --motion-base: 0.01ms; --motion-slow: 0.01ms;
+          --motion-distance: 0px; --motion-lift: 0px;
+          --motion-scroll: 0; --motion-parallax-distance: 0%; --motion-kinetic: 0; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important; scroll-behavior: auto !important;
+    /* ⚠ 스크롤 연동 애니메이션은 진행률이 시간이 아니라 스크롤 위치로 결정되므로
+       animation-duration 으로 꺼지지 않는다. 타임라인 자체를 끊어야 한다. */
+    animation-timeline: none !important;
+  }
+}
+
+/* ---- 전역 기본 ---- */
+html { scroll-padding-bottom: var(--scroll-pad-bottom); scroll-padding-top: var(--anchor-offset); }
+body { font-family: var(--font-family); font-size: var(--fs-body); line-height: var(--lh-body);
+       color: var(--color-ink); background: var(--color-surface);
+       font-variant-numeric: tabular-nums;
+       padding-bottom: var(--body-pad-bottom); }
+:target { scroll-margin-top: var(--anchor-offset); }
+
+/* ---- 스크롤 진입 리빌 (M-1) — 점진적 향상. 미지원 브라우저는 처음부터 보인다 ---- */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .rv { animation: yp-rise linear both; animation-timeline: view();
+          animation-range: entry 5% cover 26%; }
+    @keyframes yp-rise {
+      from { opacity: .001;
+             transform: translateY(calc(var(--motion-distance) * var(--motion-scroll))); }
+      to   { opacity: 1; transform: none; }
+    }
+  }
+}
+/* ⚠ 히어로의 h1 · lead · 주 CTA 에는 .rv 를 붙이지 않는다 (LCP 보호 · §1.4 ④) */
+
+/* ---- hover 는 마우스 환경에서만 (M-3~M-7) ---- */
+@media (hover: hover) {
+  .card:hover { transform: translateY(calc(var(--motion-lift) * -1)); box-shadow: var(--shadow-lift); }
+}
+
+/* ---- 포커스 표시 : 스타일시트 맨 뒤에 둔다 ----
+   · border-radius 를 선언하지 않는다 (브라우저 outline 이 요소의 radius 를 따라 그린다)
+   · :where() 는 특이성 0이라 .btn 류가 덮을 수 있어 선택자를 풀어 쓴다 */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+[data-surface="dark"] a:focus-visible,
+[data-surface="dark"] button:focus-visible {
+  outline-color: var(--focus-ring-color-on-dark);
+}
+```
+
+> **개발 주의 (v1.1에서 이어짐 · 전부 유효)**
+> ① `--fixed-bar-h`를 `≥1280px`에서 `0px`로 덮으므로 `--body-pad-bottom`이 자동으로 0이 된다.
+> ② `ResizeObserver` 실측 갱신 대상은 **고정 바와 헤더 둘 다**다(200% 확대 시 둘 다 높이가 늘어난다). `--header-h`만 갱신하면 `--anchor-offset`은 `calc()`라 자동으로 따라온다.
+> ③ `documentElement.style.setProperty()`는 인라인 스타일이라 미디어 쿼리를 이긴다. **바를 렌더하지 않는 구간에서는 `removeProperty('--fixed-bar-h')`로 되돌린다.**
+> ④ 🆕 `--tex-noise`는 **화면당 1개 요소**에만 쓴다. 스크롤되는 콘텐츠에 겹쳐 깔면 페인트 비용이 누적된다.
+
+---
+
+### 1.7 목업 축약명 ↔ 정본 토큰명 대조표
+
+`design/mockups/yp.css`는 가독성을 위해 축약명(`--c-*`)을 쓴다. **정본은 §1.6이며, P4 구현은 §1.6 이름을 쓴다.**
+
+| 목업(`yp.css`) | 정본(§1.6) | 목업 | 정본 |
+|---|---|---|---|
+| `--c-ink` | `--color-ink` | `--c-sand` | `--color-surface-alt` |
+| `--c-ink-2` | `--color-ink-2` | `--c-stone` | `--color-surface-alt2` |
+| `--c-muted` | `--color-muted` | `--c-deep` | `--color-navy` |
+| `--c-primary` | `--color-primary` | `--c-deep-2` | `--color-navy-deep` |
+| `--c-primary-deep` | `--color-primary-hover` | `--c-on-deep` | `--color-on-navy` |
+| `--c-primary-press` | `--color-primary-active` | `--c-on-deep-muted` | `--color-on-navy-muted` |
+| `--c-primary-tint` | `--color-primary-subtle` | `--c-sky` | `--color-sky` |
+| `--c-clay` | `--color-clay` | `--pad` | `--container-pad` |
+| `--c-clay-tint` | `--color-clay-subtle` | `--sec` | `--sec-pad` |
+| `--c-line` | `--color-border` | `--r-*` | `--radius-*` |
+| `--c-line-strong` | `--color-border-strong` | `--mo-*` / `--ez` | `--motion-*` / `--ease-soft` |
+
+---
+
+### 1.8 v1.1 → v2.0 토큰 대조표 (변경 전건)
+
+| 토큰 | v1.1 | v2.0 | 구분 | §2·§3 영향 |
+|---|---|---|---|---|
+| `--color-primary` / `-hover` / `-active` | `#0B4F9E`/`#08407F`/`#06336A` | **동일** | 유지 | 없음 |
+| `--color-primary-subtle` | `#F0F5FB` | **`#E8F0F9`** | 값 변경 | 대비 7.30 → **6.95:1** (여전히 통과) |
+| `--color-ink` | `#16263A` | **`#17212E`** | 값 변경 | 15.30 → **16.23:1** |
+| `--color-muted` | `#5A6B7D` | **`#5B6472`** | 값 변경 | 5.48 → **5.98:1** |
+| `--color-border-strong` | `#7E8FA3` | **`#7E786B`** | 값 변경 | 3.31 → **4.39:1** |
+| `--color-border` | `#DDE4EC` | **`#E2DAD0`** | 값 변경 | 장식 전용(변화 없음) |
+| `--color-surface-alt` | `#F7F9FC` | **`#FAF7F2`** | 값 변경 | 배경 전용 |
+| `--color-navy` | `#0A2540` | **`#0E1C2B`** | 값 변경 | 흰 글자 15.53 → **17.22:1** |
+| `--color-on-navy-muted` | `#B9C9DC` | **`#AEBBC9`** | 값 변경 | 9.21 → **8.82:1** (통과) |
+| `--color-on-navy-line` | `#24405F` | **`#1C2E42`** | 값 변경 | 장식 |
+| `--color-disabled-fg` | `#5A6B7D` | **`#5B6472`** | 값 변경 | 4.83 → **5.28:1** |
+| `--color-clay` / `-subtle` / `--color-ink-2` / `--color-navy-deep` / `--color-on-navy-caption` / `--color-sky` / `--color-surface-alt2` | — | 신규 7종 | **신규** | 새 규칙(§1.1) |
+| `--grad-hero` / `--grad-phead` / `--tex-noise` | — | 신규 3종 | **신규** | §1.1 (3) |
+| 상태색 12종 | — | **전부 동일** | 유지 | 없음 |
+| `--font-display` | — | **신규** | 신규 | `03_page-design.md` §2 |
+| `--fs-h1` (≥1280) | 46px | **52px** | 값 변경 | 화면 명세 §2~§7 |
+| `--fs-h2` (≥1280) | 32px | **40px** | 값 변경 | 상동 |
+| `--fs-body` (≥1280 / <768) | 16 / 15px | **17 / 16px** | 값 변경 | 상동 |
+| `--fs-lead` (≥1280) | 18px | **20px** | 값 변경 | 상동 |
+| `--fs-label` (<768) | 15px | **16px** | 값 변경 | 상동 |
+| 사용 굵기 단 수 | 400 · 700 | **400 · 700 (변경 없음)** | 유지 | **가변 폰트 미전환 · 폰트 전송 160KB 유지 · CLS 0 유지** |
+| `--space-14` | 96px | **88px** | 값 변경 | 섹션 간격 1곳 |
+| `--space-16` / `--sec-pad` / `--hero-pad` | — | **신규** | 신규 | 섹션·히어로 |
+| `--container-max` | 1200px | **1240px** | 값 변경 | 전 화면 |
+| `--content-max` / `--form-max` | 720 / 640px | **760 / 660px** | 값 변경 | SCR-003·006 |
+| `--container-pad` | 16/24/32/40 | **동일** | 유지 | **캘린더 45.14px 보호** |
+| `--calendar-pad` | 12px | **동일** | 유지 | 없음 |
+| `--radius-sm` | 6px | **8px** | 값 변경 | 밀도 영역은 실질 8px 유지(§1.4 주석) |
+| `--radius-md` | 8px | **12px** | 값 변경 | 버튼·입력 |
+| `--radius-lg` | 12px | **20px** | 값 변경 | 1차 카드 |
+| `--radius-xs` / `--radius-xl` | — | **신규** | 신규 | 배지 / 대형 패널 |
+| `--shadow-soft` / `--shadow-lift` | — | **신규** | 신규 | **1차 소개형 카드 한정** |
+| `--shadow-overlay` / `--shadow-modal` | 네이비 rgba | **딥 rgba로 조정** | 값 변경 | 시각만 |
+| `--motion-fast/base/slow` | 120/160/220ms | **140/220/280ms** | 값 변경 | 전 컴포넌트 |
+| `--ease-soft` / `--motion-lift` | — | **신규** | 신규 | M-3~M-6 |
+| `--motion-distance` | 8px | **16px** | 값 변경 | M-1 (A-13 상한) |
+| `--motion-scroll` / `--motion-parallax-distance` / `--motion-kinetic` | — | **신규 3종** | 신규 | TKT-DEV-001 A-3 |
+| `--header-h` | 64/68/72px | **60/68/76px** | 값 변경 | `--anchor-offset` 자동 반영 |
+| `--fixed-bar-h` | 60px | **62px** | 값 변경 | `--body-pad-bottom` 자동 반영 |
+| `--logo-max-w` | 140px | **150px** | 값 변경 | 헤더 |
+| z-index 6종 · breakpoint 4구간 · `--touch-min` · `--touch-gap` · `--focus-ring-*` | — | **전부 동일** | 유지 | 없음 |
+
+> **§2·§3(컴포넌트 46종)의 구조·상태·접근성 규칙은 한 줄도 바뀌지 않았다.** 위 표의 값 변경은 전부 토큰 참조를 통해 자동 반영된다. **컴포넌트 명세에 하드코딩된 픽셀·HEX가 있으면 P4 디자인 QA에서 지적 대상이다.**
+
+---
+
+### 1.9 전송 예산 · 구현 제약 (developer 합의 기준 — TKT-DEV-001 §B)
+
+**이 표는 디자인·구현 공통 기준이다.** 디자인이 이 예산을 넘기는 요소를 요구하지 않고, 구현이 이 예산을 넘기면 결함으로 등록한다.
+
+| 항목 | 현행 | **고도화 후 상한** | v2.0 설계가 쓰는 양 (designer 산정) |
+|---|---|---|---|
+| 화면당 총 전송 | 198KB | **≤ 280KB** | **≈ 198~205KB** — 폰트 증가 0, CSS만 증가 |
+| 폰트(화면당) | 160KB (81%) | ≤ 210KB | **160KB (증가 0)** — 굵기 2단 유지·가변 미전환 |
+| CSS(전송 합계) | 24KB | ≤ 39KB | **≈ 30~33KB** — 토큰 확장 + 면 4층 + 모션 6종 + 그라데이션 3종 |
+| 렌더 차단 CSS 파일 수 | 7개 | ≤ 8개 | **7개 유지** — 새 CSS 파일을 만들지 않고 기존 파일에 넣는다 |
+| JS | 2.7KB | ≤ 13KB | **2.7KB (증가 0)** — 모션 전량 CSS, 스크롤 리빌도 JS 0줄 |
+| 이미지 | 0KB | **0KB 유지** | **0KB** — 노이즈는 인라인 SVG data-URI 약 0.26KB(CSS에 포함), 아이콘은 인라인 SVG |
+| **스크롤 중 드롭 프레임** | — | **0%** | 무한 반복·패럴랙스·가변축 애니메이션 0건, 애니메이션 속성 `opacity`/`transform`만 |
+| `backdrop-filter` 요소 수 | 0 | ≤ 2 (헤더 1 허용) | **0개** (보수 적용) |
+| `mix-blend-mode` 요소 수 | 0 | 정지 배경 한정 | **0개** (보수 적용) |
+
+> **designer 산정의 성격**: 위 "v2.0 설계가 쓰는 양"은 **측정값이 아니라 설계상 산정값**이다. 실제 수치는 **P4 구현 후 developer가 측정**하고 **P5에서 qa가 재확인**한다. designer는 측정하지 않았다.
+
+---
+
+## 1-OLD. ⛔ [SUPERSEDED] v1.1 토큰 — 참조 금지 (이력 보존용)
+
+> 아래 `### 1.1` ~ `### 1.6`의 소제목 번호는 **v1.1 당시 번호**다. **정본은 위 §1(v2.0)이다.**
+> 이 절을 남겨 둔 이유는 ① 무엇이 바뀌었는지 추적 ② §1.2의 14px 예외 표·200% 확대 표·z-index 구현 조건처럼 **v2.0이 "변경 없음"으로 승계한 규칙 본문**을 다시 쓰지 않기 위해서다.
+> **개발·QA는 이 절의 값을 쓰지 않는다.**
 
 ### 1.1 컬러
 
@@ -1632,6 +2364,7 @@ v1.0 §3은 2차 27종의 **목록과 원칙**만 가진 "예고"였다. v1.1에
 
 | 버전 | 일자 | 작성자 | 내용 | 관련 리뷰/CR |
 |---|---|---|---|---|
+| **2.0** | **2026-09-13** | **designer** | **CR-002 디자인 고도화 — §1 토큰 전면 개정 (v1.1 §1은 §1-OLD로 폐기 표시, §2·§3 컴포넌트 46종은 구조·상태·접근성 규칙 무변경).** ① 컬러 16종 개정 + 신규 7종(clay·clay-subtle·ink-2·surface-alt2·navy-deep·on-navy-caption·sky) — **면 4층 체계**(L0 흰색 / L1 모래 / L2 스톤 / L3 딥) ② 그라데이션 3종 신설 + **합성 최종 결과 기준 대비 전건 계산**(노이즈 opacity .04 합성 최악값 포함) ③ 타이포 스케일 전량 상향(display 74px 신설, h1 46→52, h2 32→40, 본문 16→17/15→16) + **가변 폰트 미채택 확정 · 굵기 2단(400·700) 유지 회신**(TKT-DEV-001 §C) ④ 간격 — `--space-14` 96→88px, `--space-16`(120px)·`--sec-pad`·`--hero-pad` 신설, **모바일 컨테이너 패딩 16px 유지(캘린더 45.14px 보호)** ⑤ radius 5단 재정의 + `--radius-xs`·`--radius-xl` 신설(밀도 영역 실질 8px 유지) ⑥ **shadow 규칙 완화** — `--shadow-soft`·`--shadow-lift` 신설, **1차 소개형 카드 한정 · 화면당 12개 이하 · 2차 데이터 영역 제외** ⑦ 모션 6종 + **LCP 보호 규칙**·`--motion-scroll`/`--motion-parallax-distance`/`--motion-kinetic` 신설·`animation-timeline: none !important` ⑧ **§1.9 전송 예산표** 신설 ⑨ §1.7 목업 축약명 대조표 · §1.8 v1.1→v2.0 토큰 대조표 전건. **TKT-DEV-001 금지선 A-1(11항) 위반 0건** — 마퀴(무한 반복)·패럴랙스·`backdrop-filter`·`mix-blend-mode`·가변축 애니메이션·제목용 한글 서체 추가를 전부 폐기했다 | `pm/requests/CR-002_design-modernization.md`, `shared/tickets/TKT-DEV-001_to-design_motion-perf-constraints.md`, `shared/reviews/CR-002_impact_developer.md` |
 | **1.1** | 2026-09-12 | designer | **2차 디자인 시스템 확장 (G3a 승인 후속 · 2차 선착수).** ① **§3 전면 개편** — v1.0의 "2차 확장 예고 27종"을 **승격 명세 16종**(CMP-040 월 캘린더 / 041 슬롯 카드·목록 / 042 데이터 표 + `<1024px` 카드 전환 / 043 상태 배지 4군 16상태 / 044 Select / 045 Radio·Segmented / 046 DateTime / 047 Tabs / 048 Modal·하단 시트 / 049 Dropdown / 050 Pagination / 053 Admin Shell / 055 세션 만료 배너 / 057 주 뷰 30분 그리드 / **067 관리자 월 뷰**(신규 ID) / **068 일 뷰**(신규 ID))로 승격하고, **1차 CMP 2종 확장**(017 다중·부분 선택 / 019 8~10항목 폼). 각 컴포넌트에 상태(기본·hover·focus-visible·active·disabled·오류·로딩·빈 상태)와 **대비 측정값** 기재 ② **§3.2 2차 공통 상태 4종 신설**(스켈레톤·빈 상태·불러오기 실패·부분 실패, 300ms 기준) ③ **§3.15 2차 토큰 확정** — 예약 5종 확정 + 신규 2종(`--week-row-h` 28px · `--time-axis-w` 64px) + CSS 추가 블록. **신규 컬러·radius·shadow·motion·breakpoint 0건, §1.6 기존 토큰 값 변경 0건(TR-10 충족)** ④ **정정 3건** — C-1 월 캘린더 좌우 패딩 12px → 컨테이너 16px(셀 폭 **45.14px**, REQ-N-006 ②-2 실측값과 일치. `--calendar-pad` 값은 유지하고 적용 대상을 관리자 밀도 그리드로 한정) / C-2 `--cell-min-h` 56 → **72px**(라벨 "잔여 9+" 실측 48.44px > 45.14px → 2줄 배치, D-4 흡수안) / C-3 `--week-col-min-w` 하한 우려 **해소**(1024px 실측 118.86 → **124.57px**, developer R1 #11 닫힘) ⑤ §1.2 최소 크기 예외에 **상태 배지 12px(관리자 한정)** 행 추가 ⑥ §4.1 **대비 조합 11건 추가**(#28~#38), §4.2 격자 예외 값 갱신 + 주 뷰 행 신설 ⑦ §7 사용 원칙 **2차 6조항 추가** ⑧ §8 D-4 해소 · D-3 기본값 실행 · **D-8·D-9 신설** ⑨ 미게시 월을 **셀 상태가 아닌 빈 상태 블록**으로 규정해 "준비 중" 문구 충돌 해소 | 2차 범위 확정(PM 2026-09-12) · `planning/02_storyboard-admin.md` v1.0 · `interviews/2026-09-12_booking-rules.md` v1.2 · REQ-C-L-001 v0.7 · developer R1 #11 · `shared/tickets/TKT-DSN-001_to-planning_calendar-cell-label-width.md` |
 | **1.0** | 2026-09-12 | designer / PMO | **G3a 게이트 승인 기준선** (내용은 v0.2와 동일, status `approved` · version 1.0 전환) | `pm/gates/` G3a |
 | 0.2 | 2026-09-12 | designer | **R1 교차 검토 반영(planner 수정 요청 · developer 조건부 승인).** ① **Must** — CMP-003에 `≥1280px` **헤더 주 CTA 상태 3종(H1·H2·H3)** 신설: 고정 바와 동일한 판단 축(G-6 ①·②)을 적용해 자기 참조 시 "전화 문의" 대체 / 대표 전화 `[TBD]`면 미노출, 선택 근거·`aria-current` 처리 명문화 ② CMP-007에 **S1 보조 규칙(대표 전화 미확정 → 좌측 버튼 미렌더·우측 전폭)** 을 전 화면 공통으로 1회만 정의 ③ G-11 조건식 `and (max-width: 400px)` 병기(§1.6·§4.4) + 해당 구간 `--anchor-offset` 해제 ④ `:focus-visible`의 `border-radius` 삭제 + 선택자 풀어쓰기 + 스타일시트 말미 배치 규칙 ⑤ `ResizeObserver` 갱신 대상에 **헤더** 추가 + 비노출 구간 `removeProperty` ⑥ **폰트 파일 구성 확정**(static 400/700 + `unicode-range` 분할 subset · 500 미사용 · 폴백 메트릭 보정 필수 + 수용 기준) 및 "Variable은 weight를 덜 써도 작아지지 않는다" 전제 정정 ⑦ 행간·자간 변수 5개 추가 ⑧ CMP-005 `<details>` 정본 확정(`aria-expanded` 수동 금지, JS 역할 3가지 한정) ⑨ CMP-008 `<main id="main" tabindex="-1">` 확정 ⑩ **파비콘 4종·OG 1종 납기·미제작 시 처리 확정** ⑪ z-index 구현 조건 2줄 · D-2 해소 ⑫ CMP-004/005 weight 500 → 400 ⑬ 이동값 `--motion-distance` 참조 통일 · reduce 스피너 주석 ⑭ `--week-col-min-w` 2차 재확인 메모 ⑮ D-7 신설 | `shared/reviews/P3_design-docs_planner_r1.md` #1~#3·#8 · `shared/reviews/P3_design-docs_developer_r1.md` #1~#13 |

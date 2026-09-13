@@ -3,227 +3,146 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SCR-002 요가 강사 소개 · 강남 요가패스 페이지 목업 (1차)</title>
+<title>SCR-002 요가 강사 소개 · 강남 요가패스 (디자인 목업 v2.0)</title>
+<meta name="color-scheme" content="light">
+<link rel="stylesheet" href="yp.css">
 <!--
-  design/mockups/scr-002.html · P3 1차 페이지 목업 (v0.1 · 2026-09-12 · designer)
-  - 외부 의존 0. 명세: design/03_page-design.md §3
-  - 인원 경계값(0·1·3·12명) 레이아웃을 함께 표시한다. 사진 0장 → 이니셜 플레이스홀더(인물 스톡 금지).
+  design/mockups/scr-002.html · P3 회귀(CR-002) 화면 목업 v2.0 · 2026-09-13 · designer
+  · 외부 도메인·CDN·웹폰트·이미지 파일 미로드. 같은 폴더의 yp.css 만 읽는다.
+  · 사진 0장 → 이니셜 아바타(CMP-027). 인물 스톡 사진으로 대체하지 않는다.
+  · 인원 경계값(0명 빈 상태 / 1명 / 다수)을 아래에서 함께 확인할 수 있다.
 -->
 <style>
-*{box-sizing:border-box} html,body{margin:0}
-body{background:#EEF1F5;color:#16263A;font-family:Pretendard,"Pretendard Variable",-apple-system,"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif}
-.mk-meta{background:#16263A;color:#fff;padding:20px 24px}
-.mk-meta h1{margin:0 0 6px;font-size:20px}
-.mk-meta p{margin:4px 0 0;font-size:13px;line-height:1.75;color:#C9D6E4;max-width:1120px}
-.mk-meta code{background:#22374F;padding:1px 5px;border-radius:4px}
-.mk-label{max-width:1320px;margin:30px auto 10px;padding:0 16px;font-size:14px;font-weight:700;color:#33445A}
-.mk-label span{display:block;font-weight:500;color:#5A6B7D;margin-top:3px;font-size:12.5px;line-height:1.6}
-.mk-scroll{overflow-x:auto;padding:0 16px 4px}
-.mk-frame{width:1280px;margin:0 auto;background:#fff;border:1px solid #C9D3DF;border-radius:6px;overflow:hidden}
-.mk-phones{max-width:1320px;margin:0 auto;padding:0 16px;display:flex;gap:24px;flex-wrap:wrap}
-.mk-phone{width:360px;height:700px;overflow:auto;background:#fff;border:1px solid #C9D3DF;border-radius:6px}
-.mk-note{max-width:1320px;margin:26px auto 60px;padding:18px;background:#fff;border:1px solid #C9D3DF;border-radius:6px;font-size:13px;line-height:1.85;color:#33445A}
-.mk-note b{color:#16263A} .mk-note ul{margin:8px 0 0;padding-left:18px}
-
-.yp{--color-primary:#0B4F9E;--color-primary-subtle:#F0F5FB;--color-navy:#0A2540;--color-ink:#16263A;
-  --color-muted:#5A6B7D;--color-border-strong:#7E8FA3;--color-border:#DDE4EC;--color-on-navy-muted:#B9C9DC;
-  --color-warning:#8A5200;--color-warning-bg:#FAF0E1;--color-neutral-bg:#EEF1F5;--color-surface-alt:#F7F9FC;
-  --fs-h1:27px;--lh-h1:1.3;--fs-h2:22px;--fs-h3:17px;--fs-lead:15px;--fs-body:15px;--fs-body-sm:14px;
-  --fs-label:15px;--container-max:1200px;--container-pad:16px;--grid-gutter:16px;
-  --radius-sm:6px;--radius-md:8px;--radius-lg:12px;--radius-pill:999px;
-  --header-h:64px;--fixed-bar-h:60px;--sec-pad:40px;
-  color:var(--color-ink);font-size:var(--fs-body);line-height:1.7;background:#fff}
-.yp.vp-1280{--fs-h1:46px;--lh-h1:1.25;--fs-h2:32px;--fs-h3:18px;--fs-lead:18px;--fs-body:16px;
-  --fs-body-sm:15px;--fs-label:16px;--container-pad:40px;--grid-gutter:24px;--header-h:72px;
-  --sec-pad:56px;--fixed-bar-h:0px}
-.yp h1,.yp h2,.yp h3{margin:0;font-weight:700;letter-spacing:-.015em;line-height:1.3}
-.yp p{margin:0} .yp a{color:var(--color-primary)}
-.yp .wrap{max-width:var(--container-max);margin:0 auto;padding-inline:var(--container-pad)}
-.yp .muted{color:var(--color-muted)}
-.yp .tbd{color:var(--color-warning);font-weight:700;font-size:13.5px;background:var(--color-warning-bg);border-radius:4px;padding:1px 6px}
-.yp .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;
-  border-radius:var(--radius-md);border:1px solid transparent;font-size:var(--fs-label);font-weight:700;text-decoration:none;cursor:default}
-.yp .btn-lg{min-height:52px;padding:0 24px} .yp .btn-sm{min-height:44px;padding:0 14px}
-.yp .btn-p{background:var(--color-primary);color:#fff}
-.yp .btn-s{background:#fff;color:var(--color-primary);border-color:var(--color-border-strong)}
-.yp .btn-icon{min-width:44px;min-height:44px;padding:0;background:#fff;border-color:var(--color-border-strong);color:var(--color-primary)}
-.yp .btn svg{width:20px;height:20px} .yp .btn-block{width:100%}
-.yp .hdr{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--color-border);z-index:20}
-.yp .hdr .wrap{display:flex;align-items:center;gap:24px;min-height:var(--header-h)}
-.yp .logo{display:flex;align-items:center;gap:9px;color:var(--color-navy);text-decoration:none;max-width:140px}
-.yp .logo svg{width:30px;height:30px;flex:none}
-.yp .logo b{font-size:17px;letter-spacing:.09em;line-height:1.1;display:block}
-.yp .logo small{display:block;font-size:9.5px;letter-spacing:.16em;font-weight:500;color:var(--color-muted);margin-top:2px}
-.yp .gnb{display:flex;gap:4px;margin-left:auto}
-.yp .gnb a{display:flex;align-items:center;min-height:44px;padding:0 12px;border-radius:6px;font-size:15px;font-weight:500;color:var(--color-ink);text-decoration:none}
-.yp .gnb a[aria-current]{color:var(--color-primary);font-weight:700;box-shadow:inset 0 -2px 0 var(--color-primary)}
-.yp .hdr-right{display:flex;align-items:center;gap:8px;margin-left:auto}
-.yp .hdr-tel{font-size:15px;font-weight:700;color:var(--color-ink);text-decoration:none}
-.yp .pagehead{padding:32px 0 24px;border-bottom:1px solid var(--color-border)}
-.yp.vp-1280 .pagehead{padding:56px 0 32px}
-.yp .pagehead h1{font-size:var(--fs-h1);line-height:var(--lh-h1)}
-.yp .pagehead .lead{margin-top:12px;color:var(--color-muted);font-size:var(--fs-lead)}
-.yp .sec{padding-block:var(--sec-pad);border-bottom:1px solid var(--color-border)}
-.yp .grid{display:grid;gap:var(--grid-gutter)}
-.yp.vp-1280 .g3{grid-template-columns:repeat(3,1fr)}
-.yp.vp-1280 .g2c{grid-template-columns:repeat(2,1fr);max-width:800px;margin-inline:auto}
-.yp.vp-1280 .g1c{max-width:480px;margin-inline:auto}
-.yp .card{border:1px solid var(--color-border);border-radius:var(--radius-lg);background:#fff;overflow:hidden}
-.yp .avatar{aspect-ratio:1/1;background:var(--color-primary-subtle);border-bottom:1px solid var(--color-border);
-  display:flex;align-items:center;justify-content:center;color:var(--color-primary);font-weight:700;font-size:34%}
-.yp .avatar span{font-size:56px}
-.yp .card .body{padding:20px}
-.yp.vp-1280 .card .body{padding:24px}
-.yp .card h3{font-size:var(--fs-h3)}
-.yp .card .role{font-size:var(--fs-body-sm);color:var(--color-primary);font-weight:700;margin-top:4px}
-.yp .card .career{font-size:var(--fs-body-sm);color:var(--color-muted);margin-top:10px;
-  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.yp .more{display:inline-flex;align-items:center;min-height:44px;color:var(--color-primary);font-weight:700;
-  font-size:var(--fs-body-sm);text-decoration:underline;background:none;border:0;padding:0;cursor:default}
-.yp .empty{text-align:center;padding:40px 24px;background:var(--color-surface-alt);
-  border:1px solid var(--color-border);border-radius:var(--radius-lg)}
-.yp .empty svg{width:40px;height:40px;color:var(--color-border-strong)}
-.yp .empty h3{font-size:var(--fs-h3);margin:14px 0 6px}
-.yp .empty p{font-size:var(--fs-body-sm);color:var(--color-muted);margin-bottom:16px}
-.yp .band{background:var(--color-primary-subtle);border-top:1px solid var(--color-border);
-  border-bottom:1px solid var(--color-border);padding-block:var(--sec-pad);text-align:center}
-.yp .band h2{font-size:var(--fs-h2)}
-.yp .band p{margin-top:10px;color:var(--color-muted)}
-.yp .cta{display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap}
-.yp .ftr{background:var(--color-navy);color:#fff;padding-block:40px 32px;font-size:14px;line-height:1.9}
-.yp .ftr .wrap{display:grid;gap:24px}
-.yp.vp-1280 .ftr .wrap{grid-template-columns:1.4fr 1fr 1fr 1fr}
-.yp .ftr a{color:#fff;text-decoration:none;display:block;min-height:32px}
-.yp .ftr .ft-muted{color:var(--color-on-navy-muted)}
-.yp .ftr h4{font-size:14px;margin:0 0 10px} .yp .ftr .strong{font-weight:700}
-.yp .barwrap{position:sticky;bottom:0;z-index:30}
-.yp .bar{display:flex;gap:8px;padding:8px 12px;background:#fff;border-top:1px solid var(--color-border)}
-.yp .bar .btn{flex:1 1 0;min-height:44px} .yp .bar .btn:first-child{flex:0 0 40%}
-.yp .bodypad{height:calc(var(--fixed-bar-h) + 16px)}
+.pcard{padding:0;overflow:hidden}
+.pcard .body{padding:22px 24px 26px}
+.pcard h3{font-size:var(--fs-h3);letter-spacing:-.018em}
+.pcard .role{display:inline-flex;align-items:center;gap:7px;margin-top:8px;font-size:13px;font-weight:700;
+  color:var(--c-primary);background:var(--c-primary-tint);border-radius:var(--r-pill);padding:5px 12px}
+.pcard p{margin-top:12px}
+.pcard .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.pcard .tags span{font-size:12.5px;font-weight:700;color:var(--c-ink-2);background:var(--c-stone);
+  border:1px solid var(--c-line);border-radius:var(--r-sm);padding:4px 9px}
+.avatar{border-radius:0;border:0;border-bottom:1px solid var(--c-line)}
+.empty{text-align:center;border:1px dashed var(--c-line-strong);border-radius:var(--r-xl);padding:56px 28px;
+  background:var(--c-sand)}
+.empty .ico{margin:0 auto 20px}
+.empty h3{font-size:var(--fs-h3)}
+.empty p{margin-top:10px;color:var(--c-muted);max-width:30em;margin-inline:auto}
+.solo{display:grid;gap:28px}
+@media (min-width:768px){.solo{grid-template-columns:300px 1fr;align-items:start;gap:40px}}
+.solo .avatar{border-radius:var(--r-xl);border:1px solid var(--c-line)}
 </style>
 </head>
 <body>
 
-<div class="mk-meta">
-  <h1>SCR-002 요가 강사 소개 — 1차 페이지 목업</h1>
-  <p>명세 <code>design/03_page-design.md</code> §3 · 토큰 <code>design/03_design-system.md</code> §1.6. 외부 의존 0.
-  <br>· 강사 사진 <b>0장</b> — 이니셜 플레이스홀더(<code>aria-hidden="true"</code>, 장식)로 표시한다. <b>인물 스톡 사진 대체 금지</b>(REQ-F-022).
-  <br>· 이름·담당 수업·경력은 전부 <code>[TBD: 고객 확인 필요 — T-C]</code>다. 실제 사람처럼 보이는 이름을 쓰지 않았다.
-  <br>· 인원 경계값 <b>0 · 1 · 3 · 12명</b>에서 빈 칸이 생기지 않는 레이아웃을 함께 그렸다(REQ-F-021 경계값 검증 대상).</p>
-</div>
-
-<div class="mk-label">① 데스크톱 <code>≥1280px</code> · 강사 3명
-  <span>3열 · gap 24px · 이미지 1:1 · 카드 radius 12px(보정 2) · 그림자 0 · 하단 고정 바 미노출</span></div>
-<div class="mk-scroll"><div class="mk-frame">
-<div class="yp vp-1280">
-  <header class="hdr"><div class="wrap">
-    <a class="logo" href="#"><svg viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"><path d="M7.5 33.5a16.5 16.5 0 0 1 33 0"/><path d="M6 40.5h36"/></g><circle cx="24" cy="12" r="5.5" fill="currentColor"/></svg><span><b>YOGAPASS</b><small>강남 요가 스튜디오</small></span></a>
-    <nav class="gnb" aria-label="주 메뉴"><a href="#">홈</a><a href="#" aria-current="page">강사 소개</a><a href="#">오시는 길</a><a href="#">문의하기</a></nav>
-    <div class="hdr-right"><a class="hdr-tel" href="#"><span class="tbd">[TBD: 대표 전화]</span></a><a class="btn btn-p" href="#">문의하기</a></div>
-  </div></header>
-  <main>
-    <div class="wrap"><div class="pagehead"><h1>요가 강사 소개</h1><p class="lead">요가패스에서 수업을 진행하는 강사를 소개합니다.</p></div></div>
-    <section class="sec"><div class="wrap"><div class="grid g3">
-      <article class="card"><div class="avatar" aria-hidden="true"><span>강</span></div><div class="body">
-        <h3>강사 이름 <span class="tbd">[TBD — T-C]</span></h3><p class="role">담당 수업 [TBD]</p>
-        <p class="career">자격·경력 [TBD] / 자격·경력 [TBD] / 자격·경력 [TBD] / 네 번째 줄부터는 접힌다 [TBD]</p>
-        <button class="more" aria-expanded="false">더 보기</button></div></article>
-      <article class="card"><div class="avatar" aria-hidden="true"><span>이</span></div><div class="body">
-        <h3>강사 이름 <span class="tbd">[TBD — T-C]</span></h3><p class="role">담당 수업 [TBD]</p>
-        <p class="career">자격·경력 [TBD] / 자격·경력 [TBD]</p></div></article>
-      <article class="card"><div class="avatar" aria-hidden="true"><span>박</span></div><div class="body">
-        <h3>강사 이름 <span class="tbd">[TBD — T-C]</span></h3><p class="role">담당 수업 [TBD]</p>
-        <p class="career">자격·경력 [TBD]</p></div></article>
-    </div>
-    <p class="muted" style="margin-top:16px;font-size:14px">※ 사진이 실제로 있을 때만 <code>alt="{이름} 강사"</code>. 이니셜 블록은 장식이므로 대체 텍스트를 주지 않는다(카드 안에 이름이 텍스트로 있다).</p>
-    </div></section>
-    <section class="band"><div class="wrap"><h2>마음에 드는 수업이 있으신가요?</h2>
-      <p>궁금한 점을 남겨주시면 강사와 일정을 안내해 드립니다.</p>
-      <div class="cta"><a class="btn btn-lg btn-p" href="#">문의하기</a><a class="btn btn-lg btn-s" href="#">전화 문의</a></div></div></section>
-  </main>
-  <footer class="ftr"><div class="wrap">
-    <div><p class="ft-muted">상호·주소·전화·운영시간 <span class="tbd">[TBD]</span></p></div>
-    <div><h4>메뉴</h4><a href="#">홈</a><a href="#">요가 강사 소개</a><a href="#">오시는 길</a><a href="#">문의하기</a></div>
-    <div><h4>안내</h4><a href="#" class="strong">개인정보 처리방침</a></div>
-    <div><h4>소셜</h4><p class="ft-muted" style="font-size:13px">계정 미확인 → 섹션 미노출</p></div>
-  </div></footer>
-</div>
+<div class="mk"><div class="wrap">
+  <b>SCR-002 요가 강사 소개</b>
+  <span>디자인 목업 v2.0 · 방향안 ⓐ · 강사 정보 미수령 → 전부 [TBD] · 인물 스톡 사진 사용 금지</span>
+  <span class="nav"><a href="index.html">목업 전체</a><a href="scr-001.html">메인</a></span>
 </div></div>
 
-<div class="mk-label">② 인원 경계값 — <code>≥1280px</code>에서 1명 / 2명 / 0명
-  <span>빈 칸 방치 금지 — 1명은 최대 폭 480px 중앙, 2명은 2열 중앙(3열 그리드에 빈 칸을 남기지 않는다), 0명은 빈 상태 블록 + 화면 유지</span></div>
-<div class="mk-scroll"><div class="mk-frame">
-<div class="yp vp-1280"><main>
-  <section class="sec"><div class="wrap">
-    <h2 style="font-size:20px;margin-bottom:20px">강사 1명</h2>
-    <div class="grid g1c"><article class="card"><div class="avatar" aria-hidden="true"><span>강</span></div><div class="body">
-      <h3>강사 이름 <span class="tbd">[TBD]</span></h3><p class="role">담당 수업 [TBD]</p><p class="career">자격·경력 [TBD]</p></div></article></div>
-  </div></section>
-  <section class="sec"><div class="wrap">
-    <h2 style="font-size:20px;margin-bottom:20px">강사 2명</h2>
-    <div class="grid g2c">
-      <article class="card"><div class="avatar" aria-hidden="true"><span>강</span></div><div class="body"><h3>강사 이름 <span class="tbd">[TBD]</span></h3><p class="role">담당 수업 [TBD]</p></div></article>
-      <article class="card"><div class="avatar" aria-hidden="true"><span>이</span></div><div class="body"><h3>강사 이름 <span class="tbd">[TBD]</span></h3><p class="role">담당 수업 [TBD]</p></div></article>
-    </div>
-  </div></section>
-  <section class="sec"><div class="wrap">
-    <h2 style="font-size:20px;margin-bottom:20px">강사 0명 (데이터 미수령) — CMP-026 빈 상태</h2>
-    <div class="empty" style="max-width:640px;margin-inline:auto">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
-      <h3>강사 소개는 공개되면 안내드립니다.</h3>
-      <p>자세한 내용은 전화로 문의해 주세요.</p>
-      <a class="btn btn-s" href="#">전화 문의</a>
-    </div>
-    <p class="muted" style="margin-top:16px;font-size:14px;text-align:center">※ <b>"준비 중"이라는 표현을 쓰지 않는다</b>(§5.0 M-5). 오픈 시점에는 REQ-N-023 ②("강사 1명 이상")로 해소되어야 한다.</p>
-  </div></section>
-</main></div>
-</div></div>
+<a class="skip" href="#main">본문 바로가기</a>
 
-<div class="mk-label">③ 모바일 <code>&lt;768px</code> (360px)
-  <span>1열 세로 카드 · 사진 상단 1:1 · 하단 고정 바 2분할 노출 + 본문 하단 여백 <code>60 + safe-area + 16px</code></span></div>
-<div class="mk-phones">
-  <div class="mk-phone"><div class="yp">
-    <header class="hdr"><div class="wrap" style="gap:8px">
-      <a class="logo" href="#"><svg viewBox="0 0 48 48" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"><path d="M7.5 33.5a16.5 16.5 0 0 1 33 0"/><path d="M6 40.5h36"/></g><circle cx="24" cy="12" r="5.5" fill="currentColor"/></svg><span><b>YOGAPASS</b><small>강남 요가</small></span></a>
-      <div class="hdr-right">
-        <a class="btn btn-icon" href="#" aria-label="전화 문의"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg></a>
-        <button class="btn btn-icon" aria-label="메뉴 열기" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+<header class="hdr"><div class="wrap">
+  <a class="logo" href="scr-001.html"><svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="none" stroke="#0B4F9E" stroke-width="2.2"/><path d="M9 25c5.5-9 16.5-9 22 0" fill="none" stroke="#A0522D" stroke-width="2.4" stroke-linecap="round"/><circle cx="20" cy="15" r="3.1" fill="#0B4F9E"/></svg><span><b>YOGAPASS</b><small>GANGNAM</small></span></a>
+  <nav class="gnb" aria-label="주 메뉴">
+    <a href="scr-001.html">홈</a><a href="scr-001.html#adv">스튜디오 소개</a><a href="scr-002.html" aria-current="page">강사 소개</a><a href="scr-003.html">오시는 길</a>
+  </nav>
+  <div class="hdr-r">
+    <a class="tel-txt" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 5c0 8.3 6.7 15 15 15v-3.2l-4-1.6-2 2a15.6 15.6 0 0 1-6.2-6.2l2-2L7.2 5H4z"/></svg>[TBD: 대표 전화]</a>
+    <a class="iconbtn tel-ico" href="#" aria-label="전화 걸기 (대표 전화 [TBD])"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 5c0 8.3 6.7 15 15 15v-3.2l-4-1.6-2 2a15.6 15.6 0 0 1-6.2-6.2l2-2L7.2 5H4z"/></svg></a>
+    <button class="iconbtn ham" type="button" aria-label="메뉴 열기" aria-expanded="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+    <a class="btn btn-p hcta" href="scr-003.html#contact">문의하기</a>
+  </div>
+</div></header>
+
+<main id="main">
+
+<section class="phead"><div class="wrap">
+  <span class="eyebrow"><span class="dot"></span>INSTRUCTORS</span>
+  <h1>함께 수업하는<br>사람들</h1>
+  <p class="lead">어떤 수업을 맡고 있는지, 어떤 방식으로 가르치는지 먼저 알려드립니다. 처음 오신 분은 상담에서 맞는 강사를 함께 정할 수 있습니다.</p>
+</div></section>
+
+<section class="sec"><div class="wrap">
+  <div class="cards c3">
+    <article class="card pcard rv">
+      <div class="avatar"><span>YP</span><span class="slot">P-3 · 1:1 · 최소 800×800</span></div>
+      <div class="body"><h3>[TBD: 강사명]</h3><span class="role">[TBD: 담당 수업]</span>
+        <p>[TBD: 강사 소개 2~3문장. 지도 방식, 경력, 처음 오는 분에게 전하고 싶은 말.]</p>
+        <div class="tags"><span>[TBD: 자격]</span><span>[TBD: 경력]</span></div></div>
+    </article>
+    <article class="card pcard rv">
+      <div class="avatar"><span>YP</span><span class="slot">P-3 · 1:1 · 최소 800×800</span></div>
+      <div class="body"><h3>[TBD: 강사명]</h3><span class="role">[TBD: 담당 수업]</span>
+        <p>[TBD: 강사 소개 2~3문장. 지도 방식, 경력, 처음 오는 분에게 전하고 싶은 말.]</p>
+        <div class="tags"><span>[TBD: 자격]</span><span>[TBD: 경력]</span></div></div>
+    </article>
+    <article class="card pcard rv">
+      <div class="avatar"><span>YP</span><span class="slot">P-3 · 1:1 · 최소 800×800</span></div>
+      <div class="body"><h3>[TBD: 강사명]</h3><span class="role">[TBD: 담당 수업]</span>
+        <p>[TBD: 강사 소개 2~3문장. 지도 방식, 경력, 처음 오는 분에게 전하고 싶은 말.]</p>
+        <div class="tags"><span>[TBD: 자격]</span><span>[TBD: 경력]</span></div></div>
+    </article>
+  </div>
+</div></section>
+
+<section class="sec sec-sand"><div class="wrap">
+  <div class="sh rv"><span class="eyebrow eyebrow-blue"><span class="dot"></span>경계값 1</span><h2>강사가 1명일 때</h2>
+    <p>1명이면 3열 그리드가 허전해지므로 가로 2단 상세 배치로 전환합니다.</p></div>
+  <div class="solo rv">
+    <div class="avatar" style="aspect-ratio:1"><span>YP</span><span class="slot">P-3 · 1:1</span></div>
+    <div>
+      <h3 style="font-size:var(--fs-h2);letter-spacing:-.026em">[TBD: 강사명]</h3>
+      <span class="role" style="display:inline-flex;align-items:center;gap:7px;margin-top:12px;font-size:13px;font-weight:700;color:var(--c-primary);background:var(--c-primary-tint);border-radius:var(--r-pill);padding:6px 14px">[TBD: 담당 수업]</span>
+      <p class="muted" style="margin-top:18px">[TBD: 강사 소개 3~5문장.]</p>
+      <div class="tags" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:18px">
+        <span style="font-size:12.5px;font-weight:700;color:var(--c-ink-2);background:#fff;border:1px solid var(--c-line);border-radius:var(--r-sm);padding:5px 10px">[TBD: 자격]</span>
+        <span style="font-size:12.5px;font-weight:700;color:var(--c-ink-2);background:#fff;border:1px solid var(--c-line);border-radius:var(--r-sm);padding:5px 10px">[TBD: 경력]</span>
       </div>
-    </div></header>
-    <main>
-      <div class="wrap"><div class="pagehead"><h1>요가 강사 소개</h1><p class="lead">요가패스에서 수업을 진행하는 강사를 소개합니다.</p></div></div>
-      <section class="sec"><div class="wrap"><div class="grid">
-        <article class="card"><div class="avatar" aria-hidden="true"><span>강</span></div><div class="body">
-          <h3>강사 이름 <span class="tbd">[TBD — T-C]</span></h3><p class="role">담당 수업 [TBD]</p>
-          <p class="career">자격·경력 [TBD] / 자격·경력 [TBD] / 자격·경력 [TBD] / 네 번째 줄 [TBD]</p>
-          <button class="more" aria-expanded="false">더 보기</button></div></article>
-        <article class="card"><div class="avatar" aria-hidden="true"><span>이</span></div><div class="body">
-          <h3>강사 이름 <span class="tbd">[TBD — T-C]</span></h3><p class="role">담당 수업 [TBD]</p>
-          <p class="career">자격·경력 [TBD]</p></div></article>
-      </div></div></section>
-      <section class="band"><div class="wrap"><h2>마음에 드는 수업이 있으신가요?</h2>
-        <p>궁금한 점을 남겨주시면 강사와 일정을 안내해 드립니다.</p>
-        <div class="cta"><a class="btn btn-lg btn-p btn-block" href="#">문의하기</a><a class="btn btn-lg btn-s btn-block" href="#">전화 문의</a></div></div></section>
-    </main>
-    <footer class="ftr"><div class="wrap">
-      <div><p class="ft-muted">상호·주소·전화 <span class="tbd">[TBD]</span></p></div>
-      <div><a href="#">홈</a><a href="#">요가 강사 소개</a><a href="#">오시는 길</a><a href="#" class="strong">개인정보 처리방침</a></div>
-    </div></footer>
-    <div class="bodypad"></div>
-    <div class="barwrap"><div class="bar">
-      <a class="btn btn-sm btn-s" href="#">전화 문의</a><a class="btn btn-sm btn-p" href="#">문의하기</a>
-    </div></div>
-  </div></div>
-</div>
+    </div>
+  </div>
+</div></section>
 
-<div class="mk-note">
-  <b>이 목업에서 확인할 것</b>
-  <ul>
-    <li><b>사진 0장에서 성립</b> — 이니셜 아바타가 1:1 박스를 채운다. 사진이 들어오면 같은 박스에 <code>object-fit: cover; object-position: 50% 28%</code>로 교체되며 레이아웃은 바뀌지 않는다.</li>
-    <li><b>인원 경계값</b> — 0·1·2·3·12명 어디서도 빈 칸이 남지 않는다. 1~2명은 그리드 열 수를 인원에 맞추고 컨테이너를 중앙 정렬한다.</li>
-    <li><b>경력 접기</b> — 3줄 초과 시 "더 보기"(<code>aria-expanded</code>). 접기 버튼도 44px 이상.</li>
-    <li><b>빈 상태 문구</b> — "준비 중"을 쓰지 않고 "공개되면 안내드립니다"를 쓴다. 자동 검색 패턴(M-5)의 오탐을 피하면서 REQ-N-023 ②로 오픈 전에 해소된다.</li>
-  </ul>
+<section class="sec"><div class="wrap">
+  <div class="sh rv"><span class="eyebrow eyebrow-blue"><span class="dot"></span>경계값 0</span><h2>강사 정보가 아직 없을 때</h2>
+    <p>"준비 중"이라고 쓰지 않습니다. 다음에 할 수 있는 행동을 함께 제시합니다.</p></div>
+  <div class="empty rv" role="status">
+    <div class="ico" style="background:var(--c-clay-tint);color:var(--c-clay)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M17 20v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/><circle cx="10" cy="7" r="3.4"/><path d="M21 20v-2a4 4 0 0 0-3-3.8"/></svg></div>
+    <h3>강사 소개가 아직 등록되지 않았습니다</h3>
+    <p>어떤 강사에게 배울 수 있는지 전화나 문의로 안내드립니다.</p>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:24px">
+      <a class="btn btn-p" href="scr-003.html#contact">문의 남기기</a>
+      <a class="btn btn-s" href="scr-003.html">오시는 길 보기</a>
+    </div>
+  </div>
+</div></section>
+
+<section class="band"><div class="wrap">
+  <span class="eyebrow" style="background:rgba(127,180,232,.16);color:var(--c-sky)"><span class="dot"></span>START HERE</span>
+  <h2 style="margin-top:22px">어떤 수업이<br>맞을지 함께 정할까요</h2>
+  <p>처음이라면 상담에서 강사와 수업을 같이 골라 드립니다.</p>
+  <div class="cta">
+    <a class="btn btn-g btn-lg" href="scr-003.html#contact">문의 남기기<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></a>
+    <a class="btn btn-lg btn-line" href="#">전화로 문의 <span style="font-weight:400;opacity:.7">[TBD]</span></a>
+  </div>
+</div></section>
+
+</main>
+
+<footer class="ft on-deep"><div class="wrap">
+  <div>
+    <a class="logo" href="scr-001.html"><svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="none" stroke="#7FB4E8" stroke-width="2.2"/><path d="M9 25c5.5-9 16.5-9 22 0" fill="none" stroke="#E0A17E" stroke-width="2.4" stroke-linecap="round"/><circle cx="20" cy="15" r="3.1" fill="#7FB4E8"/></svg><span><b style="color:#fff">YOGAPASS</b><small style="color:#8C9CAE">GANGNAM</small></span></a>
+    <p style="margin-top:16px;line-height:1.8">[TBD: 상호]<br>[TBD: 주소]<br>[TBD: 운영시간]</p>
+  </div>
+  <nav aria-label="사이트 메뉴"><h4>메뉴</h4><a href="scr-001.html">홈</a><a href="scr-002.html">강사 소개</a><a href="scr-003.html">오시는 길</a><a href="scr-003.html#contact">문의하기</a></nav>
+  <nav aria-label="안내"><h4>안내</h4><a href="scr-006.html">개인정보 처리방침</a><a href="#">[TBD: 대표 전화]</a></nav>
+  <p class="copy">© 2026 [TBD: 상호]. 이 화면은 디자인 목업이며 표시된 값은 모두 예시입니다.</p>
+</div></footer>
+
+<div class="fbar">
+  <a class="btn btn-s" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 5c0 8.3 6.7 15 15 15v-3.2l-4-1.6-2 2a15.6 15.6 0 0 1-6.2-6.2l2-2L7.2 5H4z"/></svg>전화</a>
+  <a class="btn btn-p" href="scr-003.html#contact">문의하기</a>
 </div>
 
 </body>

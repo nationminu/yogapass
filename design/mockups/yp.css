@@ -1,0 +1,333 @@
+/* ============================================================
+   강남 요가패스 — 화면 목업 공용 스타일시트 (v2.0 · 2026-09-13 · designer)
+   방향안 ⓐ "고요한 신뢰" 토큰 기준. 단일 기준은 design/03_design-system.md v2.0 §1.
+
+   · 이 파일은 mockups/ 폴더 안의 scr-*.html 이 같은 폴더에서 <link> 로 읽는다.
+     외부 도메인·CDN·웹폰트를 일절 로드하지 않는다. HTML 을 옮길 때는 이 파일도 같이 옮긴다.
+   · 실제 사이트 CSS 가 아니라 목업용이다. P4 구현은 디자인 시스템 문서의 토큰 정의를 정본으로 삼는다.
+   ============================================================ */
+
+/* ---------------- 1. 토큰 ---------------- */
+:root{
+  /* --- color (대비값은 design/03_design-system.md v2.0 §1.1 표) --- */
+  --c-ink:#17212E;            /* 16.23:1 on #fff */
+  --c-ink-2:#2B3949;          /* 11.77:1 */
+  --c-muted:#5B6472;          /*  5.98:1 */
+  --c-primary:#0B4F9E;        /*  8.00:1 */
+  --c-primary-deep:#08407F;   /* 10.24:1 */
+  --c-primary-press:#06336A;  /* 12.43:1 */
+  --c-primary-tint:#E8F0F9;
+  --c-clay:#A0522D;           /*  5.62:1 */
+  --c-clay-tint:#F6EAE2;
+  --c-sand:#FAF7F2;
+  --c-stone:#F1ECE3;
+  --c-line:#E2DAD0;           /* 1.38:1 — 장식 전용 */
+  --c-line-strong:#7E786B;    /*  4.39:1 — UI 경계 */
+  --c-deep:#0E1C2B;           /* 흰 글자 17.22:1 */
+  --c-deep-2:#0A1622;
+  --c-on-deep:#fff; --c-on-deep-muted:#AEBBC9; --c-sky:#7FB4E8; /* sky: 어두운 면 전용 7.87:1 */
+  --c-surface:#fff;
+  --c-success:#1B6E3C; --c-success-bg:#E7F4EC; --c-success-bd:#9FCBB1;
+  --c-warning:#8A5200; --c-warning-bg:#FAF0E1;
+  --c-error:#B3261E;   --c-error-bg:#FBEAE8;  --c-error-bd:#E8B3AE;
+  --c-neutral:#4F5B6B; --c-neutral-bg:#EEF1F5;
+
+  /* --- type --- */
+  /* 굵기 2단(400·700)만 쓴다 — 가변 폰트로 전환하지 않는다 (TKT-DEV-001 §C 회신) */
+  --ff:Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+  --fs-display:34px; --lh-display:1.12; --ls-display:-0.028em;
+  --fs-h1:30px; --fs-h2:24px; --fs-h3:18px; --fs-h4:16px;
+  --fs-lead:16px; --fs-body:16px; --fs-sm:15px; --fs-cap:14px; --fs-label:16px; --fs-eyebrow:12.5px; --fs-input:16px;
+  --ls-h:-0.022em;
+
+  /* --- space / shape / motion --- */
+  --pad:16px; --sec:64px; --hero-pad:40px; --maxw:1240px; --readw:100%; --formw:100%;
+  --r-xs:4px; --r-sm:8px; --r-md:12px; --r-lg:20px; --r-xl:32px; --r-pill:999px;
+  --sh-soft:0 1px 2px rgba(23,33,46,.04), 0 10px 28px -14px rgba(23,33,46,.16);
+  --sh-lift:0 2px 4px rgba(23,33,46,.05), 0 18px 40px -18px rgba(23,33,46,.24);
+  --sh-overlay:0 8px 28px rgba(14,28,43,.18);
+  --mo-fast:140ms; --mo-base:220ms; --mo-slow:280ms;
+  --ez:cubic-bezier(.16,.84,.44,1);
+  --mo-dist:16px;      /* 진입 이동량 상한 (TKT-DEV-001 A-13) */
+  --mo-lift:6px;
+  --mo-scroll:1;       /* 스크롤 연동 진폭 배율 (A-3) */
+  --mo-kinetic:1;      /* 키네틱 진폭 배율 (A-3) */
+  --touch:44px; --hdr:60px; --bar:62px;
+}
+@media (min-width:768px){:root{
+  --fs-display:54px; --lh-display:1.08; --fs-h1:40px; --fs-h2:32px; --fs-h3:19px; --fs-lead:18px; --fs-eyebrow:13px;
+  --pad:24px; --sec:88px; --hero-pad:72px; --hdr:68px;
+}}
+@media (min-width:1024px){:root{ --pad:32px; --readw:760px; --formw:660px; }}
+@media (min-width:1280px){:root{
+  --fs-display:74px; --lh-display:1.04; --fs-h1:52px; --fs-h2:40px; --fs-h3:20px; --fs-lead:20px; --fs-body:17px;
+  --pad:40px; --sec:120px; --hero-pad:104px; --hdr:76px; --bar:0px;
+}}
+
+/* ---------------- 2. 기본 ---------------- */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--hdr) + 16px)}
+body{margin:0;font-family:var(--ff);font-size:var(--fs-body);line-height:1.72;color:var(--c-ink);
+  background:var(--c-surface);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;
+  padding-bottom:calc(var(--bar) + env(safe-area-inset-bottom,0px))}
+h1,h2,h3,h4{margin:0;font-weight:700;line-height:1.25;letter-spacing:var(--ls-h)}
+p,ul,ol,dl{margin:0}
+a{color:var(--c-primary)}
+img,svg{display:block}
+.wrap{max-width:var(--maxw);margin:0 auto;padding-inline:var(--pad)}
+.sec{padding-block:var(--sec)}
+.sec-sand{background:var(--c-sand)}
+.sec-stone{background:var(--c-stone)}
+.muted{color:var(--c-muted)}
+.read{max-width:var(--readw)}
+:target{scroll-margin-top:calc(var(--hdr) + 16px)}
+
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,summary:focus-visible{
+  outline:3px solid var(--c-primary);outline-offset:2px}
+.on-deep a:focus-visible,.on-deep button:focus-visible{outline-color:#fff}
+
+.tbd{font-size:11.5px;font-weight:700;letter-spacing:.06em;color:var(--c-clay);background:var(--c-clay-tint);
+  border-radius:var(--r-xs);padding:2px 6px;vertical-align:2px;margin-left:4px;white-space:nowrap}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------------- 3. 목업 안내 바 (사이트 요소 아님) ---------------- */
+.mk{position:relative;z-index:80;background:var(--c-deep);color:#fff;font-size:13px;line-height:1.5}
+.mk .wrap{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding-block:9px}
+.mk b{font-weight:700}
+.mk span{color:var(--c-on-deep-muted)}
+.mk a{color:var(--c-sky);text-decoration:none;font-weight:700;border-bottom:1px solid rgba(127,180,232,.5)}
+.mk .nav{margin-left:auto;display:flex;gap:14px;flex-wrap:wrap}
+
+/* ---------------- 4. CMP-008 Skip / CMP-003 Header ---------------- */
+.skip{position:absolute;left:-9999px;top:0;z-index:90;background:#fff;color:var(--c-primary);
+  padding:12px 18px;border-radius:0 0 var(--r-md) 0;font-weight:700;box-shadow:var(--sh-overlay)}
+.skip:focus{left:0}
+
+/* backdrop-filter 미사용 — TKT-DEV-001 A-16 보수 적용(GPU 합성 비용 미측정). 불투명 면 + 1px 경계 */
+.hdr{position:sticky;top:0;z-index:60;background:var(--c-surface);border-bottom:1px solid var(--c-line)}
+.hdr .wrap{display:flex;align-items:center;gap:16px;min-height:var(--hdr)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--c-ink);flex:none;max-width:150px}
+.logo .mark{width:34px;height:34px;flex:none}
+.logo b{font-size:16px;letter-spacing:.14em;display:block;line-height:1.1;font-weight:700}
+.logo small{display:block;font-size:9.5px;letter-spacing:.22em;color:var(--c-muted);margin-top:3px;font-weight:700}
+.gnb{display:none;margin-left:26px;gap:2px}
+.gnb a{display:flex;align-items:center;min-height:var(--touch);padding:0 14px;border-radius:var(--r-sm);
+  font-size:15px;font-weight:700;color:var(--c-ink-2);text-decoration:none;position:relative;
+  transition:color var(--mo-fast) var(--ez),background var(--mo-fast) var(--ez)}
+.gnb a:hover{background:var(--c-stone);color:var(--c-primary)}
+.gnb a[aria-current]{color:var(--c-primary)}
+.gnb a[aria-current]::after{content:"";position:absolute;left:14px;right:14px;bottom:8px;height:2px;
+  background:var(--c-primary);border-radius:2px}
+.hdr-r{margin-left:auto;display:flex;align-items:center;gap:8px}
+.tel-txt{display:none;font-weight:700;font-size:15px;color:var(--c-ink);text-decoration:none;white-space:nowrap;
+  padding:0 8px;min-height:var(--touch);align-items:center;gap:7px}
+.iconbtn{display:inline-flex;align-items:center;justify-content:center;width:var(--touch);height:var(--touch);
+  border:1px solid var(--c-line-strong);border-radius:var(--r-md);background:#fff;color:var(--c-primary);cursor:pointer;
+  transition:background var(--mo-fast) var(--ez),border-color var(--mo-fast) var(--ez)}
+.iconbtn:hover{background:var(--c-primary-tint);border-color:var(--c-primary)}
+@media (min-width:768px){.gnb{display:flex}.hdr .ham{display:none}}
+@media (min-width:1280px){.tel-txt{display:inline-flex}.hdr .tel-ico{display:none}.hdr .hcta{display:inline-flex}}
+.hdr .hcta{display:none;min-height:46px;padding:0 20px;font-size:15px}
+
+/* ---------------- 5. CMP-001 Button / CMP-002 Link ---------------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:52px;padding:0 24px;
+  border-radius:var(--r-md);border:1.5px solid transparent;font:inherit;font-size:var(--fs-label);font-weight:700;
+  text-decoration:none;cursor:pointer;white-space:nowrap;
+  transition:background var(--mo-fast) var(--ez),transform var(--mo-fast) var(--ez),
+             box-shadow var(--mo-base) var(--ez),border-color var(--mo-fast) var(--ez),color var(--mo-fast) var(--ez)}
+.btn svg{width:19px;height:19px;flex:none}
+.btn-p{background:var(--c-primary);color:#fff;box-shadow:0 8px 20px -10px rgba(11,79,158,.75)}
+.btn-p:hover{background:var(--c-primary-deep);transform:translateY(-2px);box-shadow:0 14px 28px -12px rgba(11,79,158,.7)}
+.btn-p:active{background:var(--c-primary-press);transform:none}
+.btn-s{background:#fff;color:var(--c-primary);border-color:var(--c-line-strong)}
+.btn-s:hover{border-color:var(--c-primary);background:var(--c-primary-tint);transform:translateY(-2px)}
+.btn-g{background:#fff;color:var(--c-primary)}
+.btn-ghost{background:transparent;color:var(--c-primary);border-color:transparent}
+.btn-lg{min-height:58px;padding:0 30px;font-size:17px}
+.btn-sm{min-height:var(--touch);padding:0 16px;font-size:15px}
+.btn-block{width:100%}
+.btn[aria-disabled="true"]{background:var(--c-neutral-bg);color:var(--c-muted);border-color:#C4CDD8;
+  box-shadow:none;cursor:not-allowed;transform:none}
+
+.link{color:var(--c-primary);text-decoration:underline;text-underline-offset:3px;font-weight:700}
+.link-solo{display:inline-flex;align-items:center;gap:7px;color:var(--c-primary);text-decoration:none;font-weight:700;
+  min-height:var(--touch);font-size:var(--fs-body)}
+.link-solo svg{width:18px;height:18px;transition:transform var(--mo-base) var(--ez)}
+.link-solo:hover{text-decoration:underline;text-underline-offset:4px}
+.link-solo:hover svg{transform:translateX(4px)}
+
+/* ---------------- 6. CMP-012 Eyebrow ---------------- */
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 15px 7px 11px;border-radius:var(--r-pill);
+  background:var(--c-clay-tint);color:var(--c-clay);font-size:var(--fs-eyebrow);font-weight:700;letter-spacing:.13em}
+.eyebrow .dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.eyebrow-blue{background:var(--c-primary-tint);color:var(--c-primary)}
+
+/* ---------------- 7. CMP-024 Page Header ---------------- */
+.phead{position:relative;overflow:hidden;border-bottom:1px solid var(--c-line);
+  background:linear-gradient(160deg,#FAF7F2 0%,#F1ECE3 55%,#E8F0F9 100%)}
+/* mix-blend-mode 미사용 — TKT-DEV-001 A-17 보수 적용. 노이즈는 opacity .04 단독 */
+.phead::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.04;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:140px 140px}
+.phead .wrap{position:relative;z-index:1;padding-block:48px}
+.phead h1{font-size:var(--fs-h1);letter-spacing:-.03em;margin-top:18px;line-height:1.14;text-wrap:balance}
+.phead .lead{margin-top:16px;font-size:var(--fs-lead);color:var(--c-ink-2);max-width:36em;line-height:1.75}
+@media (min-width:768px){.phead .wrap{padding-block:72px}}
+@media (min-width:1280px){.phead .wrap{padding-block:96px}}
+
+/* ---------------- 8. 섹션 헤드 ---------------- */
+.sh{max-width:640px;margin-bottom:44px}
+.sh h2{font-size:var(--fs-h2);letter-spacing:-.028em;margin-top:16px;line-height:1.16;text-wrap:balance}
+.sh p{margin-top:14px;color:var(--c-muted);font-size:var(--fs-lead);line-height:1.75}
+.sh-row{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:44px;flex-wrap:wrap}
+.sh-row .sh{margin-bottom:0}
+
+/* ---------------- 9. CMP-010 Card / CMP-011 Icon Frame ---------------- */
+.cards{display:grid;gap:16px}
+@media (min-width:768px){.cards{grid-template-columns:repeat(2,1fr);gap:20px}}
+@media (min-width:1024px){
+  .cards.c3{grid-template-columns:repeat(3,1fr);gap:24px}
+  .cards.c4{grid-template-columns:repeat(4,1fr);gap:24px}
+}
+.card{background:#fff;border:1px solid var(--c-line);border-radius:var(--r-lg);padding:28px;box-shadow:var(--sh-soft);
+  transition:transform var(--mo-base) var(--ez),box-shadow var(--mo-base) var(--ez),border-color var(--mo-base) var(--ez)}
+@media (hover:hover){.card:hover{transform:translateY(calc(var(--mo-lift) * -1));box-shadow:var(--sh-lift);border-color:#D3C9BC}}
+.card h3{font-size:var(--fs-h3);letter-spacing:-.018em}
+.card p{margin-top:10px;color:var(--c-muted);font-size:var(--fs-sm);line-height:1.7}
+.ico{width:56px;height:56px;border-radius:50%;background:var(--c-primary-tint);color:var(--c-primary);
+  display:flex;align-items:center;justify-content:center;margin-bottom:20px;transition:transform var(--mo-base) var(--ez)}
+.ico svg{width:26px;height:26px}
+.card:hover .ico{transform:translateY(-3px) rotate(-4deg)}
+.card.clay .ico{background:var(--c-clay-tint);color:var(--c-clay)}
+
+/* 수업 유형 카드 */
+.lesson{display:flex;flex-direction:column;gap:14px;padding:0;overflow:hidden}
+.lesson .top{aspect-ratio:16/10;position:relative;background:linear-gradient(150deg,var(--c-primary-tint),var(--c-clay-tint));
+  display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--c-line)}
+.lesson .top svg{width:38%;max-width:96px;color:var(--c-primary);opacity:.85}
+.lesson .body{padding:0 24px 26px}
+.lesson h3{margin-bottom:8px}
+.levels{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--c-ink-2);
+  background:var(--c-stone);border:1px solid var(--c-line);border-radius:var(--r-pill);padding:5px 12px 5px 9px}
+.levels i{display:flex;gap:3px}
+.levels i b{width:7px;height:7px;border-radius:50%;background:var(--c-line-strong);display:block}
+.levels i b.on{background:var(--c-primary)}
+
+/* CMP-027 Initial Avatar */
+.person{text-align:left}
+.avatar{width:100%;aspect-ratio:1;border-radius:var(--r-lg);background:linear-gradient(155deg,var(--c-primary-tint),var(--c-clay-tint));
+  border:1px solid var(--c-line);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.avatar span{font-size:44px;font-weight:700;letter-spacing:.04em;color:var(--c-primary);opacity:.6}
+.slot{position:absolute;left:10px;bottom:10px;display:inline-flex;align-items:center;gap:6px;background:#fff;
+  border:1px dashed var(--c-line-strong);color:var(--c-muted);border-radius:var(--r-sm);padding:4px 9px;
+  font-size:11.5px;font-weight:700;line-height:1.4;white-space:nowrap}
+
+/* ---------------- 10. CMP-013 Callout ---------------- */
+.callout{display:flex;gap:14px;padding:18px 20px;border-radius:var(--r-md);border:1px solid;font-size:var(--fs-sm);line-height:1.7}
+.callout svg{width:20px;height:20px;flex:none;margin-top:2px}
+.callout b{display:block;margin-bottom:4px;font-size:var(--fs-body)}
+.co-info{background:var(--c-primary-tint);border-color:#BFD4EC;color:var(--c-ink)}
+.co-info svg{color:var(--c-primary)}
+.co-warn{background:var(--c-warning-bg);border-color:#E4C79A;color:var(--c-ink)}
+.co-warn svg{color:var(--c-warning)}
+.co-err{background:var(--c-error-bg);border-color:var(--c-error-bd);color:var(--c-ink)}
+.co-err svg{color:var(--c-error)}
+.co-ok{background:var(--c-success-bg);border-color:var(--c-success-bd);color:var(--c-ink)}
+.co-ok svg{color:var(--c-success)}
+
+/* ---------------- 11. CMP-014 Definition List ---------------- */
+.dl{border-top:1px solid var(--c-line)}
+.dl > div{display:grid;gap:4px;padding:18px 0;border-bottom:1px solid var(--c-line)}
+.dl dt{font-size:var(--fs-cap);font-weight:700;color:var(--c-muted);letter-spacing:.02em}
+.dl dd{margin:0;font-size:var(--fs-body);font-weight:700;color:var(--c-ink)}
+.dl dd .sub{display:block;font-weight:400;color:var(--c-muted);font-size:var(--fs-sm);margin-top:4px}
+@media (min-width:768px){.dl > div{grid-template-columns:132px 1fr;gap:20px;align-items:baseline}}
+
+/* ---------------- 12. 폼 (CMP-015~019) ---------------- */
+.form{max-width:var(--formw)}
+.field{margin-bottom:22px}
+.field > label{display:block;font-size:var(--fs-label);font-weight:700;margin-bottom:8px}
+.req{color:var(--c-error);font-weight:700;margin-left:3px}
+.hint{font-size:var(--fs-cap);color:var(--c-muted);margin-top:-2px;margin-bottom:8px;line-height:1.6}
+.input,.ta{width:100%;font:inherit;font-size:var(--fs-input);color:var(--c-ink);background:#fff;
+  border:1px solid var(--c-line-strong);border-radius:var(--r-md);padding:14px 16px;min-height:54px;
+  transition:border-color var(--mo-fast) var(--ez),box-shadow var(--mo-fast) var(--ez)}
+.ta{min-height:150px;resize:vertical;line-height:1.7}
+.input::placeholder,.ta::placeholder{color:var(--c-muted)}
+.input:hover,.ta:hover{border-color:var(--c-primary)}
+.input:focus,.ta:focus{border-color:var(--c-primary);box-shadow:0 0 0 3px rgba(11,79,158,.16)}
+.input[aria-invalid="true"],.ta[aria-invalid="true"]{border-color:var(--c-error);border-width:2px;background:#FFFBFB}
+.err{display:flex;align-items:flex-start;gap:6px;margin-top:8px;color:var(--c-error);font-size:var(--fs-cap);font-weight:700}
+.err svg{width:16px;height:16px;flex:none;margin-top:2px}
+.counter{text-align:right;font-size:var(--fs-cap);color:var(--c-muted);margin-top:6px}
+.check{display:flex;gap:12px;align-items:flex-start;min-height:var(--touch);padding:8px 0;cursor:pointer}
+.check input{width:24px;height:24px;flex:none;margin:2px 0 0;accent-color:var(--c-primary)}
+.check span{font-size:var(--fs-sm);line-height:1.65}
+
+/* ---------------- 13. CMP-023 Anchor Chip ---------------- */
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:7px;min-height:var(--touch);padding:0 16px;border-radius:var(--r-pill);
+  border:1px solid var(--c-line-strong);background:#fff;color:var(--c-ink-2);font-size:15px;font-weight:700;
+  text-decoration:none;transition:all var(--mo-fast) var(--ez)}
+.chip:hover{border-color:var(--c-primary);color:var(--c-primary);background:var(--c-primary-tint)}
+.chip[aria-current]{background:var(--c-primary);border-color:var(--c-primary);color:#fff}
+
+/* ---------------- 14. CMP-025 CTA Band ---------------- */
+.band{background:var(--c-deep);color:#fff;position:relative;overflow:hidden}
+.band::before{content:"";position:absolute;width:620px;height:620px;right:-180px;top:-260px;border-radius:50%;
+  background:radial-gradient(circle,rgba(127,180,232,.24),transparent 66%)}
+.band::after{content:"";position:absolute;width:520px;height:520px;left:-200px;bottom:-280px;border-radius:50%;
+  background:radial-gradient(circle,rgba(160,82,45,.22),transparent 66%)}
+.band .wrap{position:relative;z-index:1;padding-block:var(--sec);text-align:center}
+.band h2{font-size:var(--fs-display);line-height:var(--lh-display);letter-spacing:var(--ls-display);font-weight:700;text-wrap:balance}
+.band p{margin:18px auto 0;color:var(--c-on-deep-muted);font-size:var(--fs-lead);max-width:30em}
+.band .cta{display:flex;gap:12px;justify-content:center;margin-top:32px;flex-wrap:wrap}
+.band .cta .btn{flex:1 1 100%}
+.band .btn-line{border-color:rgba(255,255,255,.42);color:#fff}
+.band .btn-line:hover{background:rgba(255,255,255,.1);border-color:#fff}
+@media (min-width:520px){.band .cta .btn{flex:0 0 auto}}
+
+/* ---------------- 15. CMP-006 Footer ---------------- */
+.ft{background:var(--c-deep-2);color:var(--c-on-deep-muted);font-size:var(--fs-sm)}
+.ft .wrap{padding-block:48px 36px;display:grid;gap:30px}
+.ft h4{color:#fff;font-size:14px;letter-spacing:.06em;margin-bottom:12px}
+.ft a{color:var(--c-on-deep-muted);text-decoration:none;display:flex;align-items:center;min-height:var(--touch)}
+.ft a:hover{color:#fff;text-decoration:underline}
+.ft .copy{border-top:1px solid #1C2E42;padding-top:20px;font-size:13px;color:#8C9CAE;line-height:1.7}
+@media (min-width:768px){.ft .wrap{grid-template-columns:1.5fr 1fr 1fr}.ft .copy{grid-column:1/-1}}
+
+/* ---------------- 16. CMP-007 Bottom Fixed Bar ---------------- */
+.fbar{position:fixed;left:0;right:0;bottom:0;z-index:70;background:var(--c-surface);
+  border-top:1px solid var(--c-line);display:flex;gap:8px;
+  padding:7px var(--pad) calc(7px + env(safe-area-inset-bottom,0px))}
+.fbar .btn{min-height:var(--touch);flex:1;font-size:15.5px;padding:0 12px;box-shadow:none}
+.fbar .btn-s{flex:0 0 40%}
+@media (min-width:1280px){.fbar{display:none}}
+
+/* ---------------- 17. 모션 ----------------
+   · 스크롤 연동 진입 리빌만 쓴다. 패럴랙스·무한 반복 모션은 쓰지 않는다(A-5·A-7).
+   · 종료 상태가 그대로 정상 화면이다 → Firefox 155(animation-timeline 미지원)에서 폴백 비용 0.
+   · 히어로의 h1 · lead · 주 CTA 에는 .rv 를 붙이지 않는다 (LCP 보호). */
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    .rv{animation:rise linear both;animation-timeline:view();animation-range:entry 5% cover 26%}
+    @keyframes rise{
+      from{opacity:.001;transform:translateY(calc(var(--mo-dist) * var(--mo-scroll)))}
+      to{opacity:1;transform:none}
+    }
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  :root{--mo-dist:0px;--mo-lift:0px;--mo-scroll:0;--mo-kinetic:0}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;
+    transition-duration:.01ms!important;scroll-behavior:auto!important;
+    /* 시간이 아니라 스크롤 위치로 진행되는 애니메이션은 duration 으로 꺼지지 않는다 (A-3) */
+    animation-timeline:none!important}
+}
+
+/* ---------------- 18. G-11 400% 확대 (1280px 400% ≈ 320px 상당) ---------------- */
+@media (max-height:420px) and (max-width:400px){
+  .hdr{position:static}
+  .fbar{position:static}
+  body{padding-bottom:0}
+}

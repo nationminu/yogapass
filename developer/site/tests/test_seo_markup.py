@@ -194,3 +194,70 @@ class StaticAssetHygieneTests(TestCase):
         rules = (Path(settings.BASE_DIR) / ".dockerignore").read_text("utf-8").splitlines()
         self.assertIn("assets-work/", rules)
         self.assertIn("*.TEMP-*", rules)
+
+
+class ViewportMetaTests(TestCase):
+    """DEF-011 — G-9 3단 구현 중 ①(viewport 메타)이 전 화면에 있어야 한다.
+
+    근거: REQ-F-003 ⑤-1(Must · 정적 확인 필수 — "전 화면 `<head>` 에
+    `interactive-widget=resizes-content` 포함, 누락 0건"), 요구사항 §3.0 G-9,
+    `design/03_page-design.md` §2.5.
+    ②(WebKit `visualViewport` 폴백)·③(`scroll-padding-bottom`)도 함께 본다 —
+    셋 중 하나만 빠져도 G-9 는 성립하지 않는다.
+    """
+
+    #: 정본 문자열. 순서·공백까지 이 값이다(`templates/base.html`).
+    VIEWPORT = "width=device-width, initial-scale=1, interactive-widget=resizes-content"
+    ALL_PATHS = [*INDEXED, *NOINDEX]
+
+    def viewport_of(self, path: str) -> str | None:
+        match = re.search(r'<meta name="viewport" content="([^"]*)"', body_of(self.client, path))
+        return match.group(1) if match else None
+
+    def test_every_screen_has_interactive_widget_token(self):
+        """누락 0건 — 빠진 화면을 전부 모아서 보고한다(REQ-F-003 ⑤-1)."""
+        missing = [
+            path
+            for path in self.ALL_PATHS
+            if "interactive-widget=resizes-content" not in (self.viewport_of(path) or "")
+        ]
+        self.assertEqual(missing, [], f"viewport 메타에 G-9 ① 토큰이 없는 화면: {missing}")
+
+    def test_viewport_content_matches_canonical_string(self):
+        for path in self.ALL_PATHS:
+            with self.subTest(path=path):
+                self.assertEqual(self.viewport_of(path), self.VIEWPORT)
+
+    def test_only_one_viewport_meta_per_page(self):
+        """두 개가 있으면 뒤엣것이 이깁니다 — 토큰 없는 쪽이 이기는 사고를 막는다."""
+        for path in self.ALL_PATHS:
+            with self.subTest(path=path):
+                found = re.findall(r'<meta name="viewport"', body_of(self.client, path))
+                self.assertEqual(len(found), 1, f"{path} viewport 메타 {len(found)}개")
+
+    def test_standalone_error_templates_also_carry_the_token(self):
+        """viewport 메타를 직접 선언하는 템플릿(base.html · 점검 안내)을 전부 훑는다.
+
+        `{% extends %}` 로 base 를 상속하지 않는 독립 화면이 늘어나도 자동으로 대상이 된다.
+        """
+        templates_dir = Path(settings.BASE_DIR) / "templates"
+        standalone = [
+            p
+            for p in templates_dir.rglob("*.html")
+            if "{% extends" not in p.read_text("utf-8")
+            and '<meta name="viewport"' in p.read_text("utf-8")
+        ]
+        self.assertTrue(standalone, "독립 오류 템플릿을 찾지 못했다")
+        for path in standalone:
+            with self.subTest(template=path.name):
+                self.assertIn(f'content="{self.VIEWPORT}"', path.read_text("utf-8"))
+
+    def test_webkit_fallback_and_scroll_padding_are_in_the_bundle(self):
+        """G-9 ②③ — 번들에 남아 있는지 같이 본다(DEF-011 티켓 기대 결과 ②③)."""
+        base_dir = Path(settings.BASE_DIR)
+        script = (base_dir / "static" / "js" / "viewport.js").read_text("utf-8")
+        self.assertIn("visualViewport", script)
+        self.assertIn("data-vk-fallback", script)
+
+        css = (base_dir / "static" / "css" / "tokens.css").read_text("utf-8")
+        self.assertRegex(css, r"scroll-padding-bottom:\s*var\(--scroll-pad-bottom\)")

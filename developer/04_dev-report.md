@@ -1,21 +1,26 @@
 ---
 doc_id: DEV-REPORT
-title: 개발 보고서 — 1차 구현(3단계) + P5 1차 결함 수정(DEF-001~010)
+title: 개발 보고서 — 1차 구현(3단계) + P5 결함 수정(DEF-001~010 · DEF-011)
 phase: P4
 owner: developer
-version: 0.4
+version: 0.5
 status: draft
 reviewers: [designer, planner]
-inputs: [developer/04_tech-design.md, planning/02_requirements.md, planning/02_storyboard.md, design/03_design-system.md, design/03_page-design.md, design/mockups/, shared/tickets/TKT-DSN-002_to-developer_favicon-og-raster.md, shared/reviews/P4a_tech-design_devops_r2.md, shared/reviews/P4a_tech-design_qa_r2.md, qa/05_test-report.md, shared/tickets/DEF-001_meta-title-description-mismatch.md, shared/tickets/DEF-002_duplicate-id-html-validation.md, shared/tickets/DEF-003_csp-blocks-inline-style-home.md, shared/tickets/DEF-004_reflow-320px-horizontal-scroll.md, shared/tickets/DEF-005_touch-target-and-font-minimum.md, shared/tickets/DEF-006_bottom-padding-without-fixed-bar.md, shared/tickets/DEF-007_rollback-guard-untagged-image.md, shared/tickets/DEF-008_clock-offset-not-applied-to-token-expiry.md, shared/tickets/DEF-009_privacy-collected-items-vs-schema.md, shared/tickets/DEF-010_temp-source-file-in-prod-image.md]
+inputs: [developer/04_tech-design.md, planning/02_requirements.md, planning/02_storyboard.md, design/03_design-system.md, design/03_page-design.md, design/mockups/, shared/tickets/TKT-DSN-002_to-developer_favicon-og-raster.md, shared/reviews/P4a_tech-design_devops_r2.md, shared/reviews/P4a_tech-design_qa_r2.md, qa/05_test-report.md, shared/tickets/DEF-001_meta-title-description-mismatch.md, shared/tickets/DEF-002_duplicate-id-html-validation.md, shared/tickets/DEF-003_csp-blocks-inline-style-home.md, shared/tickets/DEF-004_reflow-320px-horizontal-scroll.md, shared/tickets/DEF-005_touch-target-and-font-minimum.md, shared/tickets/DEF-006_bottom-padding-without-fixed-bar.md, shared/tickets/DEF-007_rollback-guard-untagged-image.md, shared/tickets/DEF-008_clock-offset-not-applied-to-token-expiry.md, shared/tickets/DEF-009_privacy-collected-items-vs-schema.md, shared/tickets/DEF-010_temp-source-file-in-prod-image.md, shared/tickets/DEF-011_viewport-interactive-widget-missing.md]
 updated: 2026-09-13
 ---
 
 # 개발 보고서 (초안) — 1차 구현 3단계 + **P5 1차 결함 수정**
 
-> **이 문서의 상태**: `draft`. 1차 구현 **14개 작업 중 작업 1~13 + 작업 14 일부**를 마치고, **P5 1차 검증 결함(DEF-001~010)을 전건 수정**한 시점의 보고다.
+> **이 문서의 상태**: `draft`. 1차 구현 **14개 작업 중 작업 1~13 + 작업 14 일부**를 마치고, **P5 1차 검증 결함(DEF-001~010)** 과 **2차 검증 결함(DEF-011)** 을 전건 수정한 시점의 보고다.
 > **규칙**: 이 문서에는 **직접 실행해 확인한 것만** 적는다. 실행하지 않은 항목은 "미확인"으로 적고 "완료"로 쓰지 않는다.
-> 설계 근거는 `developer/04_tech-design.md` **v0.5**, 실행 절차는 `developer/site/README.md`.
-> v0.1(1단계) 대비 달라진 곳은 **▲**, v0.3(3단계)에서 새로 한 것은 **★**, **v0.4(P5 결함 수정)에서 한 것은 ★★** 로 표시했다.
+> 설계 근거는 `developer/04_tech-design.md` **v0.6**, 실행 절차는 `developer/site/README.md`.
+> v0.1(1단계) 대비 달라진 곳은 **▲**, v0.3(3단계)에서 새로 한 것은 **★**, **v0.4(P5 1차 결함 수정)에서 한 것은 ★★** 로 표시했다.
+>
+> **★★★ 이번 판(v0.5)의 핵심 3줄 — P5 2차 결함 DEF-011(Major) 1건 수정**
+> 1. **G-9 ①(viewport 메타 `interactive-widget=resizes-content`)을 `templates/base.html` 에 넣었다.** 전 화면이 base 를 상속하므로 **5화면 전건 반영**(누락 0건 — 운영 미리보기 응답 HTML·런타임 DOM 양쪽에서 확인). base 를 상속하지 않는 `templates/errors/maintenance.html` 도 같은 문자열로 맞췄다.
+> 2. **결함의 원인은 설계 공백이었다** — 기술 설계서가 G-9 ②(§10.5)·③(디자인 문서)만 다루고 **①을 어디에도 적지 않았다**. 설계서 **§9.1에 3단 구현 표를 신설**해 메타 문자열을 정본으로 고정했다(설계서 v0.6).
+> 3. **회귀 테스트 5건 + 런타임 점검 1항목을 추가**했다(자동 테스트 80 → **85건**). qa 인계 건으로 `layout-check.js` 가 **`/nope` 의 자기 404 를 위반으로 세던 문제**도 함께 고쳤다(하위 리소스 404 는 그대로 위반 — 음성 확인 완료).
 >
 > **★★ 이번 판(v0.4)의 핵심 3줄**
 > 1. **DEF-001~010 을 전건 수정**했다(미수정·`rejected` 제안 **0건**). 판정 기준이 있는 것은 **승인 산출물의 문자열·수치를 그대로** 따랐다(IA §6.2·§6.3, REQ-N-006, REQ-F-003 ②).
@@ -324,7 +329,7 @@ updated: 2026-09-13
 
 | 파일 | 건수 | 막는 결함 |
 |---|---|---|
-| `tests/test_seo_markup.py` | 21 | **DEF-001**(IA 표 문자열 일치·길이·유일성·키워드·**DB 값 무관**·JSON-LD) · **DEF-002**(중복 id·접근 이름) · **DEF-003**(인라인 style 0) · **DEF-006**(고정 바 유무 ↔ 하단 여백) · **DEF-010**(static 작업 파일·`.dockerignore`) |
+| `tests/test_seo_markup.py` | 21 | **DEF-001**(IA 표 문자열 일치·길이·유일성·키워드·**DB 값 무관**·JSON-LD) · **DEF-002**(중복 id·접근 이름) · **DEF-003**(인라인 style 0) · **DEF-006**(고정 바 유무 ↔ 하단 여백) · **DEF-010**(static 작업 파일·`.dockerignore`) *(v0.5에서 `ViewportMetaTests` 5건이 더 붙어 26건이 된다 — §4.4)* |
 | `tests/test_privacy_policy.py` | 3 | **DEF-009**(PII 컬럼 ↔ 처리방침 표 양방향 대조) |
 | `tests/test_inquiry.py`(추가분) | 3 | **DEF-008**(오프셋으로 만료 유발 / TTL 안이면 정상 / **마스터 스위치 꺼지면 무영향**) |
 | `tests/browser/layout-check.js`(신규 도구) | — | **DEF-003·004·005·006** — 5화면 × 4뷰포트에서 가로 스크롤·터치 타깃·글꼴 하한·인라인 style·콘솔 오류·헤더 높이 증가·고정 바 대비 여백을 한 번에 측정(위반 시 종료 코드 1) |
@@ -347,6 +352,61 @@ updated: 2026-09-13
 
 ---
 
+## ★★★ 4.4 P5 2차 결함 수정 실행 확인 (2026-09-13 · DEF-011)
+
+> **범위**: qa 2차 검증에서 발행된 **DEF-011(Major) 1건**과, 같은 티켓에 딸려온 **qa 인계 메모 1건**(`layout-check.js` 의 `/nope` 자기 404 계수).
+> 실행 환경: 로컬 개발 스택 `:8000`(바인드 마운트) + **운영 미리보기 `:8001`** — prod 이미지 **`yogapass-app:0.1.0-fix2`**, `DJANGO_SETTINGS_MODULE=config.settings.production`, `DJANGO_DEBUG=0`, gunicorn + WhiteNoise.
+> 미리보기 기동: `.env.prodcheck`(`.env` 를 `sed` 로 변형 — `DJANGO_ENV=production` · `DJANGO_DEBUG=0` · **`DJANGO_SETTINGS_MODULE=config.settings.production`** · `APP_PORT=8001` · `COMPOSE_PROFILES=` · `APP_VERSION=0.1.0-fix2` · `SITE_BASE_URL=http://localhost:8001`)
+> → `ENV_FILE=.env.prodcheck docker compose -f compose.yaml -f compose.prod.yaml -p yogapass-prodcheck --env-file .env.prodcheck up -d --build` → `migrate` → `seed_content`.
+> ⚠ **§4.2 의 주의 그대로 재현됐다** — `DJANGO_SETTINGS_MODULE` 을 바꾸지 않으면 미리보기가 local 설정으로 떠서 `/nope` 가 **Django 디버그 404 화면**(SCR-008 아님)으로 나온다. 처음 기동에서 실제로 그렇게 떴고, 그 줄을 고쳐 다시 올린 뒤 판정했다.
+
+### 4.4.1 원인
+
+| 층 | 사실 |
+|---|---|
+| 직접 원인 | `templates/base.html` 8행의 viewport `content` 에 **`interactive-widget=resizes-content` 가 없었다.** 전 화면이 이 파일을 상속하므로 **5화면 전건 누락**이었다 |
+| 근본 원인 | **기술 설계서에 ①이 적혀 있지 않았다.** G-9 는 3단 구현인데 v0.5까지 설계서는 ②를 §10.5(WebKit 검증 수단)에, ③을 §9.1 토큰 계산식 근처에만 두고 **①(메타 문자열)은 어느 절에도 없었다**. 디자인 문서(`design/03_page-design.md` §2.5)에만 있는 명세를 구현이 놓쳤고, **1차 TC-009 도 폴백 스크립트와 `--fixed-bar-h` 만 봐서 함께 놓쳤다** |
+| 왜 관측되지 않았나 | 유일한 폼 화면 `/location` 이 **S3(자기 참조 + 대표 전화 `[TBD]`)라 고정 바를 렌더하지 않는다.** 가릴 바가 없어 현재 빌드에서는 겹침이 발생하지 않는다 — **대표 전화(T-E) 확정 즉시 S2 로 바뀌며 실제 결함이 된다**(티켓 완화 정황과 동일 판단) |
+
+### 4.4.2 조치
+
+| # | 파일 | 내용 |
+|---|---|---|
+| 1 | `developer/site/templates/base.html` | viewport 메타를 **`width=device-width, initial-scale=1, interactive-widget=resizes-content`** 로 교체 + 근거 주석(`{% comment %}` — `{# … #}` 는 렌더에 노출된다, §6 #2) |
+| 2 | `developer/site/templates/errors/maintenance.html` | base 를 **상속하지 않는 유일한 화면**이라 같은 문자열로 맞췄다. 점검 안내는 1차 공개 화면이 아니지만 "전 화면 누락 0건"을 파일 단위로 성립시킨다 |
+| 3 | `developer/site/static/js/viewport.js` | 코드 변경 없음. **머리 주석만** 고쳤다 — 이 파일은 G-9 3단 중 **②만** 담당하고, `isWebKit` 가드는 **①이 있는 전제에서만 옳다**는 것을 남겼다(①을 지우면 Chromium 무방비) |
+| 4 | `developer/04_tech-design.md` **v0.6** | **§9.1에 G-9 3단 구현 표 신설** — 단별 구현 위치·정본 문자열·담당 브라우저·판정 수단. 설계 공백(근본 원인)을 메운 것이 이번 수정의 본체다 |
+| 5 | `developer/site/tests/test_seo_markup.py` | 회귀 테스트 **5건**(`ViewportMetaTests`) |
+| 6 | `developer/site/tests/browser/layout-check.js` | 런타임 DOM 점검 ⑥ 추가 + **qa 인계 건**(자기 404 계수) 수정 |
+
+### 4.4.3 실행 확인
+
+| # | 항목 | 명령 | 결과 |
+|---|---|---|---|
+| 70 | **응답 HTML 5화면**(운영 미리보기) | `for p in / /instructors /location /privacy /nope; do curl -s -w '%{http_code}' :8001$p \| grep -oE '<meta name="viewport" content="[^"]*">'; done` | **5/5 모두** `width=device-width, initial-scale=1, interactive-widget=resizes-content` · 상태 코드 `200 200 200 200 **404**`(`/nope` 는 SCR-008 화면) — **누락 0건** |
+| 71 | **런타임 DOM 5화면 × 4뷰포트** | `BASE=http://localhost:8001 NODE_PATH=../../qa/tools/node_modules node tests/browser/layout-check.js` | **20행 전부 `G-9메타: 있음`** · **✓ 위반 0건**(종료 코드 0). 가로 스크롤·터치 타깃·글꼴·인라인 style·헤더 높이·고정 바 여백도 종전과 동일하게 0건 |
+| 72 | **G-9 ②③ 번들 잔존** | `curl -s :8001/static/js/viewport.<hash>.js \| grep -c 'visualViewport\|data-vk-fallback'` · `curl -s :8001/static/css/tokens.<hash>.css \| grep -oE 'scroll-padding-bottom:[^;]*;'` | `visualViewport` **2건** · `data-vk-fallback` **2건** · `scroll-padding-bottom: var(--scroll-pad-bottom);` — **③까지 3단 전부 번들에 존재**(REQ-F-003 ⑤-1 후단) |
+| 73 | 회귀 테스트 **음성 확인** | 메타에서 토큰만 뺀 상태로 `manage.py test tests.test_seo_markup.ViewportMetaTests` | **FAIL 3건** — `viewport 메타에 G-9 ① 토큰이 없는 화면: ['/', '/instructors', '/location', '/privacy', '/nope']` 로 **5화면을 모아서 보고**. 되돌린 뒤 재실행 **5건 OK** → 테스트가 실제로 이 결함을 잡는다 |
+| 74 | 자동 테스트 전체 | `manage.py test`(`config.settings.test`) | **Ran 85 tests … OK** (80 → 85, **+5**) |
+| 75 | 린트·포맷 | `ruff check .` / `ruff format --check .` | `All checks passed!` / `88 files already formatted` |
+| 76 | 운영 이미지 빌드 | `… -f compose.prod.yaml up -d --build` | **성공** — `yogapass-app:0.1.0-fix2`, app·db·scheduler 기동 |
+
+### 4.4.4 함께 처리한 qa 인계 건 — `layout-check.js` 의 `/nope` 자기 404
+
+| 항목 | 내용 |
+|---|---|
+| 문제 | `/nope` 는 **사양상 404 로 응답**하는 화면(SCR-008)인데, 브라우저가 그 응답 자체를 `Failed to load resource: … status of 404` 로 콘솔에 찍는다. 도구가 이를 "콘솔 오류"로 세어 **위반 2건**(320·360px)으로 판정했다 — 구현 결함이 아니다 |
+| 조치 | 콘솔 오류를 `{text, url}` 로 모으고, **문서 응답이 404 이고 메시지의 출처 URL 이 문서 URL 과 같은 것만** 제외한다. 제외 건수는 출력에 `(자기404 n건 제외)` 로 남긴다 |
+| 왜 "1건"이 아니라 전건 제외인가 | 도구는 ⑤(헤더 높이 재측정)에서 뷰포트를 다시 설정하는데, **`isMobile` 이 바뀌면 puppeteer 가 페이지를 다시 읽는다.** 그래서 320·360px 에서는 같은 자기 404 가 **2번** 찍힌다(실측: 320·360px `자기404 2건`, 768·1280px `1건`). "첫 1건만 제외" 로는 남은 1건이 위반으로 남았다 |
+| 안전장치 | 판정은 **자르지 않은 원문**으로 한다(표시만 100자로 자른다 — 잘린 문자열에서 "404" 가 사라지면 판정이 바뀐다). **하위 리소스의 404 는 그대로 위반**이다 — 음성 확인: `/nope` 에 없는 이미지(`/static/img/missing-on-purpose.png`)를 주입하니 **자기404 1건 제외 · 남은 위반 1건**(주입한 이미지)으로 판정됐다 |
+| 결과 | 수정 후 전체 실행 **✓ 위반 0건 · 종료 코드 0** |
+
+> **이번 수정에서 드러난 그 밖의 불일치 — 처리 1건 · 미처리 0건**
+> - 처리: `templates/errors/maintenance.html` 이 **base 를 상속하지 않아 메타를 따로 들고 있었다**(위 표 #2). 같은 누락이 다시 생길 수 있어 `ViewportMetaTests.test_standalone_error_templates_also_carry_the_token` 이 **viewport 메타를 직접 선언하는 템플릿 전부**를 훑도록 했다 — 독립 화면이 늘어나도 자동으로 대상이 된다.
+> - **처리하지 않은 것**: `viewport.js` 의 `if (!isWebKit) return;` **가드는 그대로 두었다.** ①이 들어온 지금 Chromium 경로는 메타가 담당하고, 폴백을 Chromium 에도 켜면 **메타에 의한 리사이즈와 `translateY` 보정이 겹쳐 고정 바가 두 번 밀린다.** 설계 §9.1 표의 "담당 브라우저" 란에 이 판단을 적었다.
+
+---
+
 ## 5. 자체 테스트
 
 | 파일 | 건수 | 내용 |
@@ -356,7 +416,8 @@ updated: 2026-09-13
 | ★ `tests/test_inquiry.py` | 25 | **응답 형태 7종 전건** + 경계값 + 아웃박스 본문 + 사용량 알림 + honeypot 화면 동일성 + 필수 표시 3중 + 동의 문구 + `<noscript>` + 지도 버튼 조건부 렌더 + ★ **만료 5건**(부재·만료·변조·재제출 성공·검증 우선) + ★ **동시 이중 제출 1건** |
 | ★★ `tests/test_seo_markup.py` | 21 | **P5 결함 회귀** — title·description 이 IA 표와 문자열 일치·50~90자·유일·키워드·**DB 값 무관** / 구조화 데이터 2종 / **중복 id 0·접근 이름** / **인라인 style 0** / 고정 바 유무 ↔ 하단 여백 / static 작업 파일 0 |
 | ★★ `tests/test_privacy_policy.py` | 3 | **P5 결함 회귀** — 개인정보 컬럼(`PII_FIELDS`) ↔ 처리방침 수집 항목 표 양방향 대조 |
-| **합계** | ★★ **80** | `manage.py test` **전건 통과** (v0.3 53건 → **80건**, P5 결함 회귀 27건 추가) |
+| ★★★ `tests/test_seo_markup.py` `ViewportMetaTests`(추가분) | 5 | **DEF-011 회귀** — 전 화면 viewport 메타에 G-9 ① 토큰 존재(누락 0건) · 문자열 정본 일치 · 화면당 메타 1개 · 독립 오류 템플릿도 동일 · 번들에 ②(`visualViewport`·`data-vk-fallback`)·③(`scroll-padding-bottom`) 존재 |
+| **합계** | ★★★ **85** | `manage.py test` **전건 통과** (v0.3 53건 → v0.4 80건 → **85건**, DEF-011 회귀 5건 추가) |
 
 - 린트: `ruff check .` 통과(규칙 `E,F,W,I,UP,B,DJ,S`).
 - 정적 자산 크기(참고): 페이지 CSS brotli 합계 **약 12KB**, 폰트 선언 `fonts.css` brotli **10.3KB**, JS 합계 **13KB(비압축, 4파일)**. 최종 측정은 작업 11.
@@ -422,6 +483,10 @@ updated: 2026-09-13
   2. **회귀로 함께 봐야 하는 것**: 전 화면 헤더·푸터(로고·GNB·푸터 링크 크기 변경) · 앵커 이동 위치(`#contact`·`#map`, `--header-h` 사용처) · `/privacy` 표 카드 전환(p2 행 2개 증가) · 알림 메일 제목의 상호 표기 · 문의 폼 ①⑤(오프셋 없는 정상 환경)
   3. **운영 미리보기를 다시 만들 때**: `.env.prodcheck` 의 `DJANGO_SETTINGS_MODULE` 도 `config.settings.production` 으로 바꿔야 한다(§4.2 머리말 주의)
   4. **판정 보류를 부탁하는 것**: §4.3 확인 요청 ①②③(로고·푸터·GNB 의 클릭 영역 처리와 인접 간격 해석) — designer·planner 확인 결과에 따라 값이 달라질 수 있다
+- ★★★ **3차 검증(DEF-011 재검증) 요청 범위** — 자세한 확인 명령·결과는 §4.4
+  1. **DEF-011**: TC-009 · TC-091 — **정적 확인(REQ-F-003 ⑤-1)만으로 닫을 수 있다**(티켓 요청 3). 5화면 응답 HTML·런타임 DOM 의 `meta[name="viewport"]` 에 `interactive-widget=resizes-content` 존재(누락 0건) + 번들의 ②③ 잔존. **⑤-2(실기기 동작)는 기기 미확보로 이번에도 "미검증"** 이다(REQ-F-003 ⑤-4 · `developer/site/qa/webkit_checklist.md`)
+  2. **회귀로 함께 봐야 하는 것**: 메타 변경은 **레이아웃에 영향을 줄 수 있다**(뷰포트 해석 변경). 5화면 × 320/360/768/1280px 에서 가로 스크롤·고정 바 위치·앵커 이동(`#contact`·`#map`)을 한 번 더 본다 — 제작 측 `layout-check.js` 실행은 **위반 0건**이었다(§4.4 #71)
+  3. **도구 변경 인지**: `tests/browser/layout-check.js` 가 **`/nope` 의 자기 404 를 더 이상 위반으로 세지 않는다**(출력에 `(자기404 n건 제외)` 표시). 하위 리소스 404 는 그대로 위반이다 — qa 1차 판정과 기준이 달라지는 지점이니 확인 바란다(§4.4.4)
 
 ---
 
@@ -430,6 +495,7 @@ updated: 2026-09-13
 | ID | 내용 | 상태 |
 |---|---|---|
 | TKT-DSN-002 | 파비콘·OG 래스터 변환 요청 | ★ **처리 완료(임시본 포함)** — 래스터 **5종 산출**(`og-image.png` 은 임시본 + 교체 절차 명시) · `favicon.svg` XML 오류 1건 회신 (§7) |
+| DEF-011 | viewport 메타의 `interactive-widget=resizes-content` 누락(Major) | ★★★ **수정 완료 → `status: resolved`** — 티켓 "조치" 절에 원인·조치·수정 파일·영향 범위 기입 (§4.4). `closed` 전환은 qa 재검증 후 |
 | — | 이번 작업에서 신규 발행한 티켓 없음 | designer 확인 요청 2건(경력 접기 기준 · macOS 폰트 메트릭)은 **P4-④ 디자인 검토에서 함께 다루는 편이 빠르다고 보고** 티켓을 따로 발행하지 않았다 |
 
 ---
@@ -438,6 +504,7 @@ updated: 2026-09-13
 
 | 버전 | 일자 | 작성자 | 내용 | 관련 리뷰/CR |
 |---|---|---|---|---|
+| **0.5** | **2026-09-13** | developer | **P5 2차 결함 수정 — DEF-011(Major) 1건 + qa 인계 건 1건.** ① **G-9 ①(viewport 메타 `interactive-widget=resizes-content`)을 `templates/base.html` 에 추가** → 5화면 전건 반영(응답 HTML·런타임 DOM 양쪽 확인, 누락 0건). base 를 상속하지 않는 `errors/maintenance.html` 도 동일하게 맞췄다 ② **근본 원인인 설계 공백을 메웠다** — 기술 설계서 **§9.1에 G-9 3단 구현 표 신설**(설계서 v0.6): 단별 구현 위치·정본 문자열·담당 브라우저·판정 수단. `viewport.js` 의 `isWebKit` 가드가 ①을 전제로 한다는 것도 코드 주석에 남겼다 ③ **회귀 테스트 5건 추가**(`ViewportMetaTests` — 누락 0건·문자열 정본·화면당 1개·독립 템플릿·②③ 번들 잔존). 토큰을 뺀 상태에서 실패하는 것까지 확인(§4.4 #73). 자동 테스트 80 → **85건** ④ **qa 인계 건**: `layout-check.js` 가 `/nope` 의 **자기 404 를 위반으로 세던 문제** 수정(문서 URL 과 같은 출처의 404 만 제외, 하위 리소스 404 는 그대로 위반 — 음성 확인 완료) + **런타임 viewport 메타 점검 ⑥ 추가** → 전체 실행 **위반 0건**. §4.4 신설 | `shared/tickets/DEF-011_viewport-interactive-widget-missing.md`, `qa/05_test-report.md` |
 | **0.4** | **2026-09-13** | developer | **P5 1차 결함 수정 — DEF-001~010 전건(미수정 0건).** ① **DEF-001(Major)**: title·description 원본을 `apps/core/seo.py`(IA §6.2·§6.3 표 그대로)로 단일화하고 브랜드 문자열을 DB 에서 분리, 메인 `WebSite` JSON-LD 추가, 표시 상호를 "강남 요가패스" 로 통일 ② **002** 인라인 SVG id 네임스페이스(`inline_svg uid=`) → vnu **error 0건** ③ **003** 메인 인라인 style 4곳 제거(유틸리티 클래스) ④ **004** 헤더 주 CTA 가 전 구간 노출되던 CSS 순서 문제 수정(G-8 위반 동반) + **헤더 높이 되먹임 제거** → 320px 가로 스크롤 0 ⑤ **005** 로고·푸터·GNB **클릭 영역만** 44px 확보 + 저작권 14px(토큰 값 불변, qa 권고 ⓐ) ⑥ **006** 고정 바 미렌더 화면의 하단 여백 해제(`html[data-fixed-bar]`) ⑦ **007** 롤백 대상 **태그 가드**·확인 입력·`--dry-run` + `deploy.sh --dry-run` 부수 효과 제거, **§4.1 #44 의 잘못된 기재 정정** ⑧ **008** `submit_token` 만료 판정에 clock 오프셋 적용 → §9.6 ⑦ `expired` 판정 가능 ⑨ **009** 처리방침 수집 항목 표에 `consent_at`·`phone_norm` 추가 + 자동 대조 ⑩ **010** 작업 사본을 `assets-work/` 로 옮기고 `.dockerignore` 정리 → 운영 이미지 자산 11개. **회귀 테스트 27건 + 브라우저 레이아웃 점검 도구 추가**(자동 테스트 53 → **80건**), §4.2 실행 확인 표·§4.3 확인 요청 6건 신설 | `shared/tickets/DEF-001…010`, `qa/05_test-report.md` |
 | **0.3** | **2026-09-13** | developer | **PM 결정 2건 + 구현 3단계(작업 11·12·13).** ① 폼 **토큰 만료 → 재작성 안내**(⑤/⑦ 분리 · 입력값 보존 · 새 토큰 · 테스트 5건) ② **OG 이미지 임시본**(여백 실측 · 임시 표시 4곳 · 교체 시 코드 변경 0) ③ **폰트 폴백 메트릭 실측 적용**(Windows 실측 / macOS 미실측 표시) ④ **배포·롤백·복구 스크립트 + nginx 운영·스테이징 샘플 2종** ⑤ **백업 일원화(`run_backup`)·회전·실패 주입·락 충돌 중단 + 복구 리허설 1회 성공** ⑥ **일일 운영 요약·`/healthz` 폴링·파기·카운터 정리 스케줄 가동** ⑦ **검증 지원 도구 ①~⑪ + 안전장치 5중 전건 실행 확인** ⑧ **결함 1건 수정** — 동시 이중 제출 500. 실행 확인 **20건 추가**(§4.1), 자동 테스트 48 → **53건** | PM 결정 2026-09-13, TKT-DSN-002 |
 | 0.2 | 2026-09-13 | developer | **구현 2단계** — 1차 6화면 완성(SCR-002·003·006 신규, 008·009 디자인 반영) · **문의 폼과 응답 형태 6종**(§3.1) · 빈도 제한·사용량 알림 · SEO/접근성/`<noscript>` 마감 · 파비콘 래스터 4종(TKT-DSN-002) · **템플릿 주석 누출 결함 수정** · 자동 테스트 9 → 48건 | TKT-DSN-002 |

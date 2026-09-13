@@ -4,7 +4,7 @@ from: qa
 to: developer
 phase: P5
 severity: major
-status: open
+status: resolved
 related_req: [REQ-F-003, REQ-N-002]
 related_tc: [TC-009, TC-091]
 related_scr: [SCR-001, SCR-002, SCR-003, SCR-006, SCR-008]
@@ -72,11 +72,42 @@ created: 2026-09-13
 ---
 
 ## 조치 (developer 작성)
-- 원인:
-- 조치 내용:
-- 수정 파일:
-- 영향 범위 (회귀 테스트 필요 영역):
-- 일자:
+- **원인**
+  - **직접 원인**: `developer/site/templates/base.html` 8행의 viewport `content` 에 `interactive-widget=resizes-content` 가 없었다. 전 화면이 이 파일을 상속하므로 **5화면 전건 누락**이다. 티켓 판정대로 **회귀가 아니라 1차 구현(`c6fa91f`)부터의 잔존 결함**이다.
+  - **근본 원인 — 설계 공백**: 기술 설계서가 G-9 3단 중 **①만 어느 절에도 적지 않았다.** ②는 §10.5(WebKit 검증 수단), ③은 §9.1 토큰 계산식 근처에 있었지만 ①(메타 문자열)은 승인 **디자인 문서(`design/03_page-design.md` §2.5)에만** 있었다. 구현이 설계서를 보고 작성되므로 ①만 빠졌고, 1차 TC-009 도 폴백 스크립트와 `--fixed-bar-h` 만 봐서 함께 놓쳤다.
+  - **왜 지금 사용자 영향이 없었나**: 티켓의 완화 정황과 같다 — 유일한 폼 화면 `/location` 이 S3(자기 참조 + 대표 전화 `[TBD]`)라 고정 바를 렌더하지 않는다. **대표 전화(T-E) 확정 즉시 S2 가 되어 실제 결함이 된다.**
+- **조치 내용**
+  1. viewport 메타를 정본 문자열 **`width=device-width, initial-scale=1, interactive-widget=resizes-content`** 로 교체했다(요청 사항 1). base 를 상속하지 않는 유일한 화면인 점검 안내 템플릿도 같은 문자열로 맞췄다.
+  2. **재발 방지 테스트 5건**을 `tests/test_seo_markup.py` 에 추가했다(요청 사항 2) — `ViewportMetaTests`: ⓐ 전 화면 토큰 존재(**누락 0건 · 빠진 화면을 모아서 보고**) ⓑ 문자열 정본 일치 ⓒ 화면당 메타 1개(뒤엣것이 이기는 사고 차단) ⓓ viewport 메타를 직접 선언하는 템플릿 전부 동일(독립 화면이 늘어나도 자동 대상) ⓔ ②`visualViewport`·`data-vk-fallback` 과 ③`scroll-padding-bottom` 의 번들 잔존.
+     **음성 확인**: 토큰만 뺀 상태에서 3건이 FAIL 하고 `['/', '/instructors', '/location', '/privacy', '/nope']` 를 보고한다 → 테스트가 이 결함을 실제로 잡는다.
+  3. **근본 원인(설계 공백) 해소** — 기술 설계서 **§9.1에 "가상 키보드 대응(G-9) 3단 구현" 표를 신설**했다(설계서 v0.6): 단별 구현 위치·정본 문자열·**담당 브라우저**·판정 수단. `static/js/viewport.js` 머리 주석에도 *이 파일은 ②만 담당하고 `isWebKit` 가드는 ①이 있는 전제에서만 옳다*를 남겼다.
+  4. **함께 처리한 qa 인계 건**: `tests/browser/layout-check.js` 가 `/nope` 의 **자기 404**(사양상 404 응답)를 콘솔 오류로 세어 위반 2건으로 판정하던 문제를 고쳤다. **문서 응답이 404 이고 메시지 출처 URL 이 문서 URL 과 같은 것만** 제외하고(제외 건수는 `(자기404 n건 제외)` 로 출력), **하위 리소스의 404 는 그대로 위반**이다(음성 확인: 없는 이미지를 주입하니 위반 1건으로 잡힘). 같은 도구에 **런타임 DOM 의 viewport 메타 점검 ⑥**도 추가했다.
+  - **하지 않은 것**: `viewport.js` 의 `if (!isWebKit) return;` 가드는 **그대로 두었다.** ①이 들어온 지금 Chromium 은 메타가 담당하며, 폴백을 Chromium 에도 켜면 메타에 의한 리사이즈와 `translateY` 보정이 **겹쳐 고정 바가 두 번 밀린다.** 이 판단을 설계서 §9.1 표에 적었다.
+- **수정 파일**
+  | 파일 | 내용 |
+  |---|---|
+  | `developer/site/templates/base.html` | viewport 메타 + 근거 주석 |
+  | `developer/site/templates/errors/maintenance.html` | 동일 문자열(base 미상속 화면) |
+  | `developer/site/static/js/viewport.js` | 머리 주석만(코드 변경 없음) |
+  | `developer/site/tests/test_seo_markup.py` | `ViewportMetaTests` 5건 신설 |
+  | `developer/site/tests/browser/layout-check.js` | 자기 404 제외 + 런타임 메타 점검 ⑥ |
+  | `developer/site/README.md` | §9 주의에 "viewport 메타 문자열을 바꾸지 않는다" 추가 |
+  | `developer/04_tech-design.md` **v0.6** | §9.1 G-9 3단 구현 표 신설 |
+  | `developer/04_dev-report.md` **v0.5** | §4.4 실행 확인 신설, 자동 테스트 80 → 85건 |
+- **실행 확인** (운영 미리보기 `yogapass-app:0.1.0-fix2` · `config.settings.production` · `:8001`)
+  | 확인 | 명령 | 결과 |
+  |---|---|---|
+  | 응답 HTML 5화면 | `curl -s :8001{/,/instructors,/location,/privacy,/nope} \| grep -oE '<meta name="viewport" content="[^"]*">'` | **5/5 토큰 존재 — 누락 0건** (상태 코드 200·200·200·200·**404**) |
+  | 런타임 DOM 5화면 × 4뷰포트 | `BASE=http://localhost:8001 NODE_PATH=../../qa/tools/node_modules node tests/browser/layout-check.js` | **20행 전부 `G-9메타: 있음` · ✓ 위반 0건**(종료 코드 0) |
+  | ②③ 번들 잔존 | 해시 자산 `viewport.<hash>.js` · `tokens.<hash>.css` 를 `curl` | `visualViewport` 2 · `data-vk-fallback` 2 · `scroll-padding-bottom: var(--scroll-pad-bottom);` |
+  | 자동 테스트 | `manage.py test`(`config.settings.test`) | **Ran 85 tests … OK**(80 → 85) |
+  | 린트·포맷 | `ruff check .` / `ruff format --check .` | `All checks passed!` / `88 files already formatted` |
+- **영향 범위 (회귀 테스트 필요 영역)**
+  - **전 화면 `<head>`**(5/5). 메타 1개 변경이고 DOM·CSS·JS 는 건드리지 않았다.
+  - 다만 viewport 메타는 **뷰포트 해석 자체를 바꾸므로** 레이아웃을 한 번 더 보기를 권한다 — 5화면 × 320/360/768/1280px 의 가로 스크롤·고정 바 위치·앵커 이동(`#contact`·`#map`). 제작 측 `layout-check.js` 실행 결과는 **위반 0건**이다.
+  - **판정 기준이 달라지는 지점 1가지**: `layout-check.js` 가 `/nope` 의 자기 404 를 더 이상 위반으로 세지 않는다(1차 qa 판정과 다름 — 출력에 제외 건수를 표시한다).
+  - **닫는 조건**: 티켓 요청 3 그대로 **정적 확인(⑤-1)** 으로 닫을 수 있다. **⑤-2(실기기 동작)는 기기 미확보로 이번에도 "미검증"** 이다(REQ-F-003 ⑤-4 · `developer/site/qa/webkit_checklist.md`).
+- **일자**: 2026-09-13
 
 ## 재검증 (qa 작성)
 | 사이클 | 결과 (closed / reopened) | 일자 | 비고 |

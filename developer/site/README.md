@@ -122,6 +122,7 @@ content/     시드 데이터(*.yml) — 사람이 고치는 단일 원본
 deploy/      entrypoint · gunicorn · crontab · nginx 설정·점검 화면
 tests/       스모크 · 화면 · 문의 폼 응답 형태 7종 · SEO/마크업 · 처리방침 대조 테스트
 tests/browser/ 실제 렌더 측정 도구(layout-check.js — Chrome + puppeteer-core 필요, 배포 대상 아님)
+             · /nope 는 사양상 404 라 **문서 자신의 404 콘솔 메시지만** 위반에서 뺀다(하위 리소스 404 는 위반)
 assets-work/ 자산 작업 사본(임시 OG 원본 등). **static/ 에 두지 않는다** — 이미지·배포 산출물에서 제외
 ```
 
@@ -163,6 +164,7 @@ curl -sS -o /tmp/pdyn.css "$B/pretendard-dynamic-subset.css"
 - **템플릿의 여러 줄 주석은 `{% comment %}` 를 쓴다.** Django 의 `{# … #}` 는 한 줄 전용이라 여러 줄로 쓰면 주석이 HTML 로 새어 나간다.
 - `static/img/*.svg` 는 브라우저가 **XML 로 파싱**한다. 주석 안에 `--`(연속 하이픈)를 넣으면 파싱 오류로 이미지가 뜨지 않는다.
 - OG 대표 이미지(`static/img/og-image.png`)는 **파일이 있을 때만** `og:image` 계열 태그가 붙는다.
+- **viewport 메타 문자열을 바꾸지 않는다** — `width=device-width, initial-scale=1, interactive-widget=resizes-content`. 마지막 토큰이 가상 키보드 대응(G-9)의 **Chromium 쪽 유일한 수단**이다(WebKit 은 `static/js/viewport.js` 폴백이 담당). 정본은 기술 설계 **§9.1 표**이고 `tests/test_seo_markup.py` `ViewportMetaTests` 가 전 화면을 대조한다.
   현재 파일은 **임시본**이다(PM 결정 2026-09-13). 출처·교체 절차는 `static/img/SOURCES.md`.
 - **`.env` 의 값 줄에 인라인 주석을 쓰지 않는다.** `docker run --env-file` 과 셸 파서가 주석을 값의 일부로 읽어
   숫자 해석 실패·가드 우회가 생긴다. 설명은 값 줄 **위**에 둔다.

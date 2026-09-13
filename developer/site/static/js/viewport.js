@@ -3,7 +3,10 @@
       (텍스트 200% 확대로 고정 바 라벨·GNB 가 2줄이 되면 G-4 간격과 G-10 앵커 오프셋이 함께 깨진다)
    ② 바를 렌더하지 않는 구간(≥1280px, 400% 확대 조건)에서는 removeProperty 로 인라인 값을 되돌린다.
       인라인 스타일은 미디어 쿼리를 이기기 때문이다.
-   ③ WebKit 가상 키보드 폴백(G-9): visualViewport 변화 시 고정 바 위치를 보정한다. */
+   ③ WebKit 가상 키보드 폴백(G-9 ②): visualViewport 변화 시 고정 바 위치를 보정한다.
+      G-9 는 3단 구현이고 이 파일은 그중 ②만 담당한다 — ① 은 templates/base.html 의
+      viewport 메타 `interactive-widget=resizes-content`(Chromium 경로), ③ 은 tokens.css 의
+      scroll-padding-bottom 이다. 아래 `isWebKit` 가드는 ①이 있는 전제에서만 옳다(DEF-011). */
 (function () {
   "use strict";
   var root = document.documentElement;

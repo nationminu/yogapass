@@ -1,5 +1,5 @@
 /**
- * 레이아웃 회귀 점검 (DEF-003 · DEF-004 · DEF-005)
+ * 레이아웃 회귀 점검 (DEF-003 · DEF-004 · DEF-005 · DEF-011)
  *
  * Django 테스트로는 잡을 수 없는 것 — **실제 렌더 결과**를 잰다.
  *   ① 가로 스크롤 0건 (320 / 360 / 768 / 1280px)   REQ-N-006 ⑤ · REQ-N-001
@@ -7,6 +7,11 @@
  *   ③ 문장 글꼴 14px 이상                           REQ-N-006 ⑤ · 디자인 시스템 §타이포
  *   ④ 콘솔 오류 0건 (CSP 차단 포함)                  REQ-N-015
  *   ⑤ 헤더 높이가 재측정으로 커지지 않는지            (viewport.js 되먹임 회귀)
+ *   ⑥ 런타임 DOM 의 viewport 메타에 G-9 ① 토큰 존재  REQ-F-003 ⑤-1 · DEF-011
+ *
+ * ④의 예외 1가지: 404 화면(/nope)은 사양상 404 로 응답하므로 브라우저가 그 응답을 콘솔 오류로
+ * 찍는다. **문서 URL 과 같은 주소의 404 1건만** 위반에서 빼고(출력에 "자기404 n건 제외" 표시),
+ * 하위 리소스의 404 는 그대로 센다.
  *
  * 실행 (developer/site 에서):
  *   BASE=http://localhost:8000 \
@@ -114,6 +119,9 @@ function measure() {
     headerHeight: header ? Math.round(header.getBoundingClientRect().height) : 0,
     bodyPaddingBottom: getComputedStyle(document.body).paddingBottom,
     hasFixedBar: !!document.querySelector(".barwrap"),
+    // G-9 ① — **런타임 DOM** 의 viewport 메타(DEF-011). 서버 응답 검사는 Django 테스트가 하고,
+    // 여기서는 스크립트가 메타를 덮어쓰지 않는지까지 본다.
+    viewport: (document.querySelector('meta[name="viewport"]') || {}).content || "",
   };
 }
 
@@ -124,12 +132,26 @@ function measure() {
     args: ["--no-sandbox", "--disable-gpu", "--hide-scrollbars"],
   });
   let violations = 0;
-  console.log("화면 | 뷰포트 | 가로스크롤 | 넘침 | 작은타깃 | 작은글꼴 | 인라인style | 콘솔 | 헤더h | body-pb(고정바)");
+  console.log(
+    "화면 | 뷰포트 | 가로스크롤 | 넘침 | 작은타깃 | 작은글꼴 | 인라인style | 콘솔 | 헤더h | body-pb(고정바) | G-9메타"
+  );
   for (const path of PAGES) {
     for (const width of VIEWPORTS) {
       const page = await browser.newPage();
+      /* 콘솔 오류 수집.
+       * 주의: 404 화면(SCR-008)은 **의도적으로 404 로 응답**하므로 브라우저가 그 응답 자체를
+       * "Failed to load resource: … status of 404" 로 콘솔에 찍는다. 이것은 구현 결함이 아니라
+       * 화면 사양이다. 문서 URL 과 같은 주소에서 난 404 1건만 제외하고, 하위 리소스(css·js·img)의
+       * 404 나 다른 화면의 404 는 그대로 위반으로 센다. (DEF-011 동반 정리)
+       */
+      const consoleErrors = [];
+      page.on("console", (m) => {
+        if (m.type() !== "error") return;
+        const where = (m.location() && m.location().url) || "";
+        // 판정은 **자르지 않은 원문**으로 한다(잘린 문자열에서 "404" 가 사라지면 판정이 바뀐다).
+        consoleErrors.push({ text: m.text(), url: where });
+      });
       const errors = [];
-      page.on("console", (m) => m.type() === "error" && errors.push(m.text().slice(0, 100)));
       page.on("pageerror", (e) => errors.push("pageerror: " + e.message.slice(0, 100)));
       await page.setViewport({
         width,
@@ -138,12 +160,27 @@ function measure() {
         isMobile: width < 768,
         hasTouch: width < 768,
       });
-      await page.goto(BASE + path, { waitUntil: "networkidle0", timeout: 30000 });
+      const response = await page.goto(BASE + path, { waitUntil: "networkidle0", timeout: 30000 });
+      const documentUrl = (response && response.url()) || BASE + path;
+      const documentStatus = response ? response.status() : 0;
       const first = await page.evaluate(measure);
       // ⑤ 재측정 — viewport.js 의 ResizeObserver 가 헤더를 계속 키우지 않는지 본다
       await page.setViewport({ width, height: 781, deviceScaleFactor: 1 });
       await new Promise((r) => setTimeout(r, 250));
       const again = await page.evaluate(measure);
+
+      /* **문서 자신의 404** 만 제외한다(위 주석). 제외 건수는 출력에 남긴다.
+       * 2건 이상 나올 수 있다 — 위 재측정에서 isMobile 이 바뀌면 puppeteer 가 페이지를 다시 읽고,
+       * 그때 같은 404 메시지가 한 번 더 찍힌다. 주소가 문서 URL 과 같은 것만 빼므로
+       * css·js·img 등 하위 리소스의 404 는 그대로 위반으로 남는다. */
+      let selfNotFound = 0;
+      for (const entry of consoleErrors) {
+        if (documentStatus === 404 && entry.url === documentUrl && /404/.test(entry.text)) {
+          selfNotFound += 1;
+          continue;
+        }
+        errors.push(entry.text.slice(0, 100));
+      }
 
       const problems = [];
       if (first.scrollWidth > first.clientWidth + 1) problems.push("가로스크롤");
@@ -153,6 +190,7 @@ function measure() {
       if (errors.length) problems.push("콘솔오류");
       if (again.headerHeight > first.headerHeight) problems.push("헤더높이증가");
       if (!first.hasFixedBar && first.bodyPaddingBottom !== "0px") problems.push("고정바없는데하단여백");
+      if (!first.viewport.includes("interactive-widget=resizes-content")) problems.push("viewport메타");
       if (problems.length) violations += 1;
 
       console.log(
@@ -166,9 +204,11 @@ function measure() {
           first.small.join(" ; ") || "0건",
           first.tinyText.join(" ; ") || "0건",
           first.inlineStyle + "건",
-          errors.length ? errors.length + "건: " + errors[0] : "0건",
+          (errors.length ? errors.length + "건: " + errors[0] : "0건") +
+            (selfNotFound ? " (자기404 " + selfNotFound + "건 제외)" : ""),
           first.headerHeight + "→" + again.headerHeight,
           first.bodyPaddingBottom + (first.hasFixedBar ? "(바 있음)" : "(바 없음)"),
+          first.viewport.includes("interactive-widget=resizes-content") ? "있음" : "★없음",
         ].join(" | ") + (problems.length ? "   ← " + problems.join(",") : "")
       );
       await page.close();

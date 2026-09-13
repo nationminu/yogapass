@@ -5,7 +5,11 @@
 <html lang="ko" data-fixed-bar="{% if cta.show_bar %}on{% else %}off{% endif %}">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% comment %} interactive-widget=resizes-content — G-9 ①(기본 수단 · DEF-011).
+     지정하지 않으면 Android·Chromium 에서 가상 키보드가 떠도 뷰포트가 줄지 않아 고정 바(CMP-007)가 가려진다.
+     ② WebKit 폴백(static/js/viewport.js)은 iOS 전용이라 Chromium 경로를 대신하지 못한다.
+     문자열을 바꾸면 tests/test_seo_markup.py ViewportMetaTests 가 막는다. {% endcomment %}
+  <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
   {% include "partials/meta.html" %}
 
   {# 폰트: Latin + 한글 기본 chunk 의 400 두 개만 preload (기술 설계 §9.4) #}

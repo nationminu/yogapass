@@ -1,0 +1,11 @@
+URL | 뷰 | 헤더(pos,h) | 대상 top | 헤더 아래 여유 | 스크롤Y | 고정바 | 판정
+/location#contact | 320px | sticky,65 | 162 | 97 | 881 | 없음/숨김 | OK(헤더에 가리지 않음)  scroll-margin-top=81px
+/location#contact | 360px | sticky,65 | 162 | 97 | 881 | 없음/숨김 | OK(헤더에 가리지 않음)  scroll-margin-top=81px
+/location#contact | 768px | sticky,69 | 170 | 101 | 720 | 없음/숨김 | OK(헤더에 가리지 않음)  scroll-margin-top=85px
+/location#contact | 1280px | sticky,73 | 178 | 105 | 884 | 없음/숨김 | OK(헤더에 가리지 않음)  scroll-margin-top=89px
+/location#map | 320px | sticky,65 | 162 | 97 | 97 | 없음/숨김 | OK(헤더에 가리지 않음)  scroll-margin-top=81px
+/location#map | 360px | sticky,65 | 162 | 97 | 97 | 없음/숨김 | OK(헤더에 가리지 않음)  scroll-margin-top=81px
+/location#map | 768px | sticky,69 | 170 | 101 | 120 | 없음/숨김 | OK(헤더에 가리지 않음)  scroll-margin-top=85px
+/location#map | 1280px | sticky,73 | 178 | 105 | 148 | 없음/숨김 | OK(헤더에 가리지 않음)  scroll-margin-top=89px
+
+✓ 앵커 이동 위반 0건

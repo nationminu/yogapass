@@ -1,0 +1,30 @@
+=== cycle3 / 04 운영 미리보기 DB migrate + seed_content (사이클 2와 동일 절차) ===
+--- migrate ---
+2026-09-13T18:56:29+0900 INFO core QA_TOOLS: off
+System check identified some issues:
+
+WARNINGS:
+?: (content.W001) 개인정보 처리방침 본문이 확정되지 않았습니다(미확정 항목: p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11).
+	HINT: content/privacy.yml 의 각 항목 본문을 고객 확정값으로 채우고 status 를 confirmed 로 바꾼 뒤 다시 배포하십시오 (REQ-N-023 ① · REQ-F-050 · T-F).
+Operations to perform:
+  Apply all migrations: accounts, auth, content, contenttypes, core, inquiry, mailer, sessions
+Running migrations:
+  No migrations to apply.
+--- seed_content ---
+2026-09-13T18:56:31+0900 INFO core QA_TOOLS: off
+System check identified some issues:
+
+WARNINGS:
+?: (content.W001) 개인정보 처리방침 본문이 확정되지 않았습니다(미확정 항목: p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11).
+	HINT: content/privacy.yml 의 각 항목 본문을 고객 확정값으로 채우고 status 를 confirmed 로 바꾼 뒤 다시 배포하십시오 (REQ-N-023 ① · REQ-F-050 · T-F).
+seed_content 완료 created=0 updated=20 dry_run=False
+--- 적재 후 5화면 상태 ---
+/              200  fixedbar=data-fixed-bar="on"
+/instructors   200  fixedbar=data-fixed-bar="on"
+/location      200  fixedbar=data-fixed-bar="off"
+/privacy       200  fixedbar=data-fixed-bar="on"
+/nope          404  fixedbar=data-fixed-bar="on"
+--- 강사 카드 수 / 문의 행 수 ---
+0
+     0
+

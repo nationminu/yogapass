@@ -4,7 +4,7 @@ from: qa
 to: developer
 phase: P5
 severity: major
-status: resolved
+status: closed
 related_req: [REQ-F-003, REQ-N-002]
 related_tc: [TC-009, TC-091]
 related_scr: [SCR-001, SCR-002, SCR-003, SCR-006, SCR-008]
@@ -113,3 +113,21 @@ created: 2026-09-13
 | 사이클 | 결과 (closed / reopened) | 일자 | 비고 |
 |---|---|---|---|
 | 2 | 신규 발행(open) | 2026-09-13 | 1차 사이클 미검출 잔존 결함. 회귀 아님 |
+| **3** | **closed** | **2026-09-13** | **qa 직접 재검증. 아래 확인 결과 참조.** |
+
+### 사이클 3 재검증 상세 (qa 실행 · 증거 `qa/evidence/cycle3/`)
+
+| # | 확인 | 실행 | 결과 |
+|---|---|---|---|
+| ① | 응답 HTML 5화면 토큰 | `curl` × 5 (운영 미리보기 `:8001` · `config.settings.production` · `DEBUG=False`) | **5/5 존재 · 누락 0건** · 화면당 메타 **1개** · 상태 200·200·200·200·**404** (`01_interactive_widget.txt`) |
+| ② | 런타임 DOM 5화면 × 4뷰포트 | qa 자체 계측 `cycle3-probe.js` + developer `layout-check.js` | **20조합 전건 토큰 있음** · `layout-check.js` **✓ 위반 0건 · 종료 코드 0** (`05`, `06`) |
+| ③ | 정본 문자열 | 템플릿 전수 `grep` | 선언 2곳(`base.html`·`errors/maintenance.html`) **정본 일치** · 다른 선언 **0건** (`02`) |
+| ④⑤ | G-9 ②③ 번들 잔존 | 해시 자산 직접 `curl` | `visualViewport`·`data-vk-fallback` 각 2회 · `scroll-padding-bottom: var(--scroll-pad-bottom);` 존재. 런타임 계산 77/81/85/89px (`01`, `06`) |
+| ⑥ | 재발 방지 테스트 | `manage.py test … ViewportMetaTests -v 2` | **Ran 5 tests … OK** (전체 **85건 OK**) (`16`) |
+| ⑦ | **테스트 음성 확인** | 저장소 **사본**을 임시 경로에 만들어 토큰만 제거 → 일회용 컨테이너 실행 | **FAILED (failures=7)** — 테스트가 이 결함을 실제로 잡는다. 저장소 원본 무변경(`git status --porcelain developer/` = 0행) (`17`) |
+| ⑧ | 회귀 | 5화면 × 320/360/768/1280 · 앵커 2종 × 4뷰포트 · S2(전화 주입) 상태 | **위반 0건** — 가로 스크롤 0 · 고정 바 하단 밀착(`bottom == innerHeight`) · 여백 77px · 앵커 여유 97~105px · 헤더 되먹임 0 · 콘솔 기타 오류 0 · HTML 오류 0 · Lighthouse 변동 없음 (`05`~`08`, `14`, `18`) |
+| ⑨ | ⑤-2 실기기 동작 | — | **"미검증"** (기기 미확보). REQ-F-003 **⑤-4**에 따라 **Block 아님** · `developer/site/qa/webkit_checklist.md` 존재 확인 |
+
+**부수 확인 — `layout-check.js` 판정 기준 변경(자기 404 제외)**: qa가 404 + 하위 리소스 404를 심은 최소 서버로 **음성 확인**한 결과 **위반 4건 · 종료 코드 1**로 잡혔다. 제외되는 것은 문서 자신의 404뿐이고 하위 리소스 404는 그대로 계수된다 → **기준 변경 수용**(`09`).
+
+**종결 판정: `closed`** — 티켓 요청 1·2·3 전건 충족. reopen 사유 없음.

@@ -1,0 +1,12 @@
+=== cycle3 / 15 SCR-008(/nope) 메타·색인 상태 — LH SEO 감점 사유 대조 ===
+  <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+  <title>페이지를 찾을 수 없습니다 | 강남 요가패스</title><meta name="robots" content="noindex, nofollow"><meta property="og:type" content="website"><meta property="og:site_name" content="강남 요가패스"><meta property="og:title" content="페이지를 찾을 수 없습니다 | 강남 요가패스"><meta property="og:image" content="http://localhost:8001/static/img/og-image.a3f7089eddd0.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:image:alt" content="강남 요가패스 로고와 '강남 요가 스튜디오' 문구가 있는 대표 이미지"><meta name="twitter:card" content="summary_large_image">
+  <script defer src="/static/js/viewport.d8276ea96fc3.js"></script>
+--- IA §6.2·§6.3 의 SCR-008 행 ---
+53:[보조] 404 (SCR-008) — 존재하지 않는 모든 경로              [공통]
+234:| SCR-008 | 404 (보조) | (미존재 경로) | 공통 | 정적 | 전체 | `noindex` | Must |
+601:| SCR-008 | `페이지를 찾을 수 없습니다 \| 강남 요가패스` | `noindex` |
+668:> v0.4에 있던 SCR-004·007 초안은 화면 폐기와 함께 삭제됐고, SCR-005는 대상 전환(예약조회 → 상담 신청 조회)에 따라 **문자열을 새로 썼다**. SCR-008 초안은 `noindex` 화면이라 적용 범위에서 빠졌다(작성해도 색인되지 않아 판정 대상이 아니다).
+--- REQ-N-013(noindex) 관련 요구 ---
+530:| REQ-N-013 | SEO | sitemap.xml, robots.txt, canonical | **공통** | 색인 정책은 영역 기준 | Must | Given `/sitemap.xml`·`/robots.txt` When 접근한다 Then 정상 응답하고 **sitemap에 색인 대상 공개 화면만** 들어 있다(완료 화면·404·회원·관리자 제외). 각 화면에 canonical이 있다. **`noindex` 화면을 robots.txt에서 Disallow하지 않는다** — Disallow하면 크롤러가 읽지 못해 `noindex`를 인식할 수 없고 URL만 색인될 수 있다. robots Disallow는 `noindex`를 넣을 수 없는 경로에만 쓴다 |
+594:| REQ-N-013 sitemap·robots·canonical | 공통 | P5 로컬 · P7 운영 | `/sitemap.xml`·`/robots.txt` 응답 확인(색인 대상만 포함, Disallow 규칙 없음) + 각 화면 canonical·`noindex` 확인 | 응답 본문 + `<head>` 인용 |

@@ -1,0 +1,27 @@
+=== cycle3 / 02 viewport 메타 선언 템플릿 전수 + 소스 대조 ===
+[1] developer/site 내 viewport 메타를 선언하는 템플릿 전수
+developer/site/templates/base.html:12:  <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+developer/site/templates/errors/maintenance.html:5:<meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+
+[2] 정본 문자열과 다른 선언이 있는가 (있으면 아래에 출력)
+  → 없음 (전건 정본 일치)
+
+[3] git diff — 이번 수정으로 바뀐 파일 (bcda9e0..98b1241)
+ developer/site/README.md                         |  2 +
+ developer/site/static/js/viewport.js             |  5 +-
+ developer/site/templates/base.html               |  6 ++-
+ developer/site/templates/errors/maintenance.html |  2 +-
+ developer/site/tests/browser/layout-check.js     | 50 ++++++++++++++++--
+ developer/site/tests/test_seo_markup.py          | 67 ++++++++++++++++++++++++
+ 6 files changed, 124 insertions(+), 8 deletions(-)
+
+[4] base.html viewport 라인
+10-     ② WebKit 폴백(static/js/viewport.js)은 iOS 전용이라 Chromium 경로를 대신하지 못한다.
+11-     문자열을 바꾸면 tests/test_seo_markup.py ViewportMetaTests 가 막는다. {% endcomment %}
+12:  <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+13-  {% include "partials/meta.html" %}
+
+[5] viewport.js isWebKit 가드 (그대로 두었다는 developer 보고 확인)
+9:      scroll-padding-bottom 이다. 아래 `isWebKit` 가드는 ①이 있는 전제에서만 옳다(DEF-011). */
+53:  var isWebKit = /AppleWebKit/.test(navigator.userAgent) && !/Chrome|Chromium|Edg/.test(navigator.userAgent);
+54:  if (!isWebKit) return;

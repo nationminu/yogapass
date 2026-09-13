@@ -1,0 +1,28 @@
+=== cycle3 / 00 환경 확인 · 2026-09-13 18:54:58 ===
+--- docker ps ---
+NAMES                            IMAGE                     STATUS                    PORTS
+yogapass-prodcheck-app-1         yogapass-app:0.1.0-fix2   Up 12 minutes (healthy)   127.0.0.1:8001->8000/tcp
+yogapass-prodcheck-scheduler-1   yogapass-app:0.1.0-fix2   Up 12 minutes (healthy)   
+yogapass-prodcheck-db-1          postgres:17-alpine        Up 12 minutes (healthy)   5432/tcp
+yogapass-scheduler-1             yogapass-scheduler        Up 3 hours (healthy)      
+yogapass-app-1                   yogapass-app              Up 2 hours (healthy)      127.0.0.1:8000->8000/tcp
+yogapass-proxy-1                 nginx:alpine              Up 3 hours (healthy)      127.0.0.1:8080->80/tcp
+yogapass-db-1                    postgres:17-alpine        Up 3 hours (healthy)      127.0.0.1:5432->5432/tcp
+yogapass-mail-1                  axllent/mailpit:latest    Up 3 hours (healthy)      1025/tcp, 1110/tcp, 127.0.0.1:8025->8025/tcp
+--- prodcheck app env (DJANGO_SETTINGS_MODULE / DEBUG) ---
+DJANGO_SETTINGS_MODULE=config.settings.production
+2026-09-13T18:55:00+0900 INFO core QA_TOOLS: off
+settings module: config.settings.production
+DEBUG: False
+--- HTTP 상태 5화면 (:8001) ---
+/              200
+/instructors   200
+/location      200
+/privacy       200
+/nope          404
+--- 이미지 태그 ---
+yogapass-app:0.1.0-fix2
+--- git 상태 (developer/ 변경 0행이어야 함) ---
+0
+--- 대상 커밋 ---
+98b1241 fix(P5): DEF-011 viewport interactive-widget 5화면 누락 — developer

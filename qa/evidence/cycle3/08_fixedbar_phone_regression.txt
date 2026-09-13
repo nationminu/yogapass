@@ -1,0 +1,31 @@
+=== cycle3 / 08 대표 전화 확정 상태(S2) 회귀 — 운영 미리보기 DB 에만 주입 후 원복 ===
+--- 주입 전: /location barwrap 개수 ---
+0
+--- 전화 확정 주입 (prodcheck DB 한정) ---
+
+phone = 02-1234-5678 published = True
+
+--- 주입 후 측정 (4뷰포트) ---
+ 320px  meta토큰=있음  data-fixed-bar=on  barwrap=있음/표시  pos=fixed  rect={"top":719,"bottom":780,"h":61} vs innerH=780  body-pb=77px  가로스크롤=없음
+        고정 바 버튼: 전화 문의[tel:0212345678] 296x44
+        #contact top=162 (헤더 bottom=65, 여유=97)
+        G-4 문서 끝 스크롤: 제출버튼 bottom=26 고정바 top=719 간격=693px (기준 16px 이상)
+ 360px  meta토큰=있음  data-fixed-bar=on  barwrap=있음/표시  pos=fixed  rect={"top":719,"bottom":780,"h":61} vs innerH=780  body-pb=77px  가로스크롤=없음
+        고정 바 버튼: 전화 문의[tel:0212345678] 336x44
+        #contact top=162 (헤더 bottom=65, 여유=97)
+        G-4 문서 끝 스크롤: 제출버튼 bottom=26 고정바 top=719 간격=693px (기준 16px 이상)
+ 768px  meta토큰=있음  data-fixed-bar=on  barwrap=있음/표시  pos=fixed  rect={"top":719,"bottom":780,"h":61} vs innerH=780  body-pb=77px  가로스크롤=없음
+        고정 바 버튼: 전화 문의[tel:0212345678] 744x44
+        #contact top=170 (헤더 bottom=69, 여유=101)
+        G-4 문서 끝 스크롤: 제출버튼 bottom=118 고정바 top=719 간격=601px (기준 16px 이상)
+1280px  meta토큰=있음  data-fixed-bar=on  barwrap=있음/미표시  pos=fixed  rect={"top":0,"bottom":0,"h":0} vs innerH=780  body-pb=0px  가로스크롤=없음
+        고정 바 버튼: 전화 문의[tel:0212345678] 0x0
+        #contact top=178 (헤더 bottom=73, 여유=105)
+        G-4 문서 끝 스크롤: 제출버튼 bottom=251 고정바 top=null 간격=529px (기준 16px 이상)
+
+--- 원복 ---
+
+phone = None published = False
+--- 원복 확인: /location barwrap 개수 · data-fixed-bar ---
+0
+data-fixed-bar="off"

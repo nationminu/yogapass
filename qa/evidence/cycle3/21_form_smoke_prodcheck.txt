@@ -1,0 +1,6 @@
+meta: width=device-width, initial-scale=1, interactive-widget=resizes-content
+폼 필드: csrfmiddlewaretoken(hidden), submit_token(hidden), name(text), phone(tel), message(textarea), consent(checkbox), company_ref(text)
+결과 URL: http://localhost:8001/location#contact
+role=status: 위치 정보는 확정되면 안내드립니다. 방문 전 연락 방법은 아래 문의하기를 이용해 주세요.
+role=alert : null
+제출 후 meta: width=device-width, initial-scale=1, interactive-widget=resizes-content

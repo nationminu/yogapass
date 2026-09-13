@@ -1,0 +1,26 @@
+=== cycle3 / 16 자동 테스트·린트 재실행 (qa 직접) · 19:06:47 ===
+--- manage.py test (config.settings.test) ---
+.......2026-09-13T19:06:54+0900 WARNING django.request Not Found: /no-such-page
+.2026-09-13T19:06:54+0900 WARNING django.request Not Found: /no-such-page
+...
+----------------------------------------------------------------------
+Ran 85 tests in 4.034s
+
+OK
+Destroying test database for alias 'default'...
+--- ViewportMetaTests 단독 실행 ---
+test_standalone_error_templates_also_carry_the_token (tests.test_seo_markup.ViewportMetaTests.test_standalone_error_templates_also_carry_the_token)
+viewport 메타를 직접 선언하는 템플릿(base.html · 점검 안내)을 전부 훑는다. ... ok
+test_viewport_content_matches_canonical_string (tests.test_seo_markup.ViewportMetaTests.test_viewport_content_matches_canonical_string) ... 2026-09-13T19:06:58+0900 WARNING django.request Not Found: /nope
+ok
+test_webkit_fallback_and_scroll_padding_are_in_the_bundle (tests.test_seo_markup.ViewportMetaTests.test_webkit_fallback_and_scroll_padding_are_in_the_bundle)
+G-9 ②③ — 번들에 남아 있는지 같이 본다(DEF-011 티켓 기대 결과 ②③). ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.531s
+
+OK
+Destroying test database for alias 'default' ('test_yogapass')...
+--- ruff check / format --check ---
+All checks passed!
+88 files already formatted

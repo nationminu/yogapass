@@ -1,0 +1,10 @@
+=== cycle3 / 18 HTML 검증 회귀 (vnu.jar) — viewport 메타 변경이 <head> 를 깨지 않는지 ===
+vnu.jar: qa/tools/node_modules/vnu-jar/build/dist/vnu.jar
+Warning: Section lacks heading. Consider using “h2”-“h6” elements to add identifying headings to all sections, or else use a “div” element instead for any cases where no heading is needed.
+From line 115, column 3; to line 115, column 23 in resource file:/C:/Workspace/workspaces/site-creator/projects/yogapass/qa/evidence/cycle3/pages/instructors.html
+Document checking completed. No errors found.
+--- error 건수 ---
+0
+0
+--- 전체 지적 줄 수 ---
+2

@@ -3,10 +3,10 @@ doc_id: QA-TC
 title: 테스트 케이스 · 요구사항 추적 매트릭스 — 1차
 phase: P5
 owner: qa
-version: 0.2
+version: 0.3
 status: in-review
 reviewers: [developer, planner]
-inputs: [planning/02_requirements.md, planning/02_storyboard.md, planning/02_information-architecture.md, design/03_page-design.md, design/03_design-system.md, developer/04_tech-design.md, developer/04_dev-report.md, qa/05_test-plan.md, shared/tickets/DEF-001~011]
+inputs: [planning/02_requirements.md (v1.2), planning/02_storyboard.md (v1.2), planning/02_information-architecture.md, design/03_page-design.md, design/03_design-system.md, developer/04_tech-design.md, developer/04_dev-report.md, qa/05_test-plan.md, shared/tickets/DEF-001~011]
 updated: 2026-09-13
 ---
 
@@ -15,6 +15,10 @@ updated: 2026-09-13
 판정 표기: `Pass` · `Fail` · `Block`(실행 불가·입력 미확보) · `N/A`(판정 대상 아님) · `부분`(일부 조건만 판정, 나머지는 사유 명시)
 1차 사이클 실행일: **2026-09-13** / 증거: `qa/evidence/cycle1/`
 **2차 사이클(재검증) 실행일: 2026-09-13** / 증거: `qa/evidence/cycle2/` — 대상은 개발 보고서 **v0.4**(커밋 `bcda9e0`, DEF-001~010 수정 반영본), 운영 미리보기 이미지 `yogapass-app:0.1.0-qa2`
+**3차 사이클(부분 재검증) 실행일: 2026-09-13** / 증거: `qa/evidence/cycle3/` — 대상은 커밋 **`98b1241`**(DEF-011 수정), 운영 미리보기 이미지 **`yogapass-app:0.1.0-fix2`**(`config.settings.production` · `:8001`), 판정 기준은 **요구사항 v1.2 · 화면정의서 v1.2**
+
+> **3차 사이클은 범위를 한정한 부분 재검증이다.** 범위 = ⓐ DEF-011 재검증(TC-009·TC-091) ⓑ viewport 메타 변경 회귀(5화면×320/360/768/1280 · 자동 테스트 85건 · 린트 · HTML 검증) ⓒ 판정 보류 3건의 v1.2 기준 재판정(TC-096 인접 간격 · TC-103 h1 · Lighthouse 404) ⓓ `layout-check.js` 판정 기준 변경 영향 확인.
+> **범위 밖 TC는 재실행하지 않고 2차 판정을 승계**한다(아래 §1.5에 승계 건수를 명시).
 
 > **2차 열 표기 규칙**
 > · `**Pass**`·`**Fail**`·`**Block**`·`**N/A**`·`**부분**` = **이번 사이클에 직접 실행해 판정**한 것
@@ -36,7 +40,7 @@ updated: 2026-09-13
 |---|---|---|---|---|---|---|---|---|
 | REQ-F-001 | 공통 헤더 | Must | 공통 | 전 화면 | `templates/partials/header.html` | TC-001 | Pass | 1차 유지 |
 | REQ-F-002 | 공통 푸터 | Must | 공통 | 전 화면 | `templates/partials/footer.html` | TC-002 | Pass | 1차 유지 |
-| REQ-F-003 | 전역 주 CTA | Must | 공통 | 전 화면 | `partials/fixed_bar.html` · `apps/core/cta.py` | TC-003~007 | **Fail** (DEF-006) | **Fail** — ②(DEF-006) 해소 · ③④ Pass. **⑤-1 미충족 → DEF-011** · ⑤-2 미검증 |
+| REQ-F-003 | 전역 주 CTA | Must | 공통 | 전 화면 | `partials/fixed_bar.html` · `apps/core/cta.py` | TC-003~007 | **Fail** (DEF-006) | **Fail** — ②(DEF-006) 해소 · ③④ Pass. **⑤-1 미충족 → DEF-011** · ⑤-2 미검증 → **3차: Pass** ← DEF-011 해소 (⑤-1 5/5 화면 토큰 존재·누락 0건 · ②③ 번들 잔존). **⑤-2(실기기)는 REQ-F-003 ⑤-4에 따라 "미검증"**(Block 아님 · 한계 L-1) |
 | REQ-F-004 | 전화 걸기 링크 | Must | 1차 | 전 화면 | `apps/core/templatetags/icons.tel_href` | TC-010 | 부분 (값 주입 시 Pass · 실값 `[TBD]`) | 부분 (값 주입 시 Pass · 실값 `[TBD]`) |
 | REQ-F-005 | 처리방침 전역 링크 | Must | 공통 | 전 화면 | 푸터·모바일 패널·폼 동의 | TC-011 | Pass | 1차 유지 |
 | REQ-F-006 | 화면 간 이동 일관성 | Must | 공통 | 전 화면 | `apps/content/services.nav_items` | TC-012 | Pass | 1차 유지 |
@@ -79,20 +83,20 @@ updated: 2026-09-13
 | REQ ID | 요구사항 | 우선순위 | 차수 | 적용 범위 | 검증 위치 | TC | 1차 결과 | 2차 결과 |
 |---|---|---|---|---|---|---|---|---|
 | REQ-N-001 | 반응형 360/768/1280 | Must | 공통 | 전 화면 | CSS 4구간 | TC-090 | Pass | 1차 유지 |
-| REQ-N-002 | 모바일 우선 · 고정 바 | Must | 공통 | 공개 영역 | `fixed_bar.html` | TC-091 | Pass | **부분** — 고정 바 정상. G-9 ① 미구현(**DEF-011**) |
+| REQ-N-002 | 모바일 우선 · 고정 바 | Must | 공통 | 공개 영역 | `fixed_bar.html` | TC-091 | Pass | **부분** — 고정 바 정상. G-9 ① 미구현(**DEF-011**) → **3차: Pass** ← G-9 ①②③ 3단 전건 충족. 고정 바 4뷰포트 하단 밀착(bottom=innerHeight) 실측 |
 | REQ-N-003 | 브라우저 호환 | Must | 공통 | 전 화면 | — | TC-092 | 부분 (Chrome만 · Edge·FF·Safari **미검증**) | 1차 유지 |
-| REQ-N-004 | Lighthouse 성능 90+ | Must | 공통 | M-2 대상 | 운영 미리보기 | TC-093 | Pass (중앙값 99·100·99·99) | 1차 유지 |
+| REQ-N-004 | Lighthouse 성능 90+ | Must | 공통 | M-2 대상 | 운영 미리보기 | TC-093 | Pass (중앙값 99·100·99·99) | **Pass** (100·100·99·99) → **3차: Pass** — 4화면 재측정 동일 + **SCR-008(404) 추가 측정 100점**(M-2 ③-1 `--ignore-status-code` 성공) |
 | REQ-N-005 | 지도 초기 로딩 저하 방지 | Must | 1차 | SCR-003 | `map.js` | TC-094 | Pass | 1차 유지 |
-| REQ-N-006 | WCAG 2.1 AA | Must | 공통 | 전 화면 | 토큰·마크업·CSS | TC-095~098 | **Fail** (② 터치 타깃 · ⑤ reflow·글꼴 — DEF-004·005) | **Pass** ← DEF-004·005 해소 (①②③④⑤ 전건 충족) |
-| REQ-N-007 | Lighthouse 접근성 90+ | Must | 공통 | M-2 대상 | — | TC-099 | Pass (전 화면 100) | 1차 유지 |
+| REQ-N-006 | WCAG 2.1 AA | Must | 공통 | 전 화면 | 토큰·마크업·CSS | TC-095~098 | **Fail** (② 터치 타깃 · ⑤ reflow·글꼴 — DEF-004·005) | **Pass** ← DEF-004·005 해소 (①②③④⑤ 전건 충족) → **3차: Pass 유지** — v1.2 ②-3 예외 ⓐ~ⓓ 4조건 실측 충족(푸터 링크 목록). 결함 등록 대상 아님 |
+| REQ-N-007 | Lighthouse 접근성 90+ | Must | 공통 | M-2 대상 | — | TC-099 | Pass (전 화면 100) | 1차 유지 → **3차: Pass** — 4화면 100 유지 + **SCR-008 100**(M-2 ③-1) |
 | REQ-N-008 | 폼 접근성 | Must | 공통 | SCR-003 | `form_field.html` | TC-100 | Pass | 1차 유지 |
 | REQ-N-009 | skip link · 문서 구조 | Should | 공통 | 전 화면 | `base.html` | TC-101 | Pass | 1차 유지 |
 | REQ-N-010 | title · description | Must | 공통 | 전 화면 | `partials/meta.html` | TC-102 | **Fail** (DEF-001) | **Pass** ← DEF-001 해소 |
-| REQ-N-011 | 지역 검색 대응 문구 | Must | 1차 | SCR-001·003 | `meta.html` · `home.html` | TC-103 | **Fail** (DEF-001) | **Pass(조건부)** ← DEF-001 해소 (`/location` h1 해석 — planner 확인 권고) |
+| REQ-N-011 | 지역 검색 대응 문구 | Must | 1차 | SCR-001·003 | `meta.html` · `home.html` | TC-103 | **Fail** (DEF-001) | **Pass(조건부)** ← DEF-001 해소 (`/location` h1 해석 — planner 확인 권고) → **3차: Pass(무조건)** — 요구사항 v1.2가 판정 단위를 "h1 + 리드 문장"으로 확정하고 SCR-003을 Pass로 명기 |
 | REQ-N-012 | 지역 업체 구조화 데이터 | Must | 1차 | 공개 영역 | `jsonld_localbusiness.html` | §5.3 · TC-104 | 부분 (JSON 유효 · 값 `[TBD]` · `WebSite` 누락 — DEF-001) | 부분 (JSON 유효 · **`WebSite` 추가** · 값 T-E Block) |
 | REQ-N-013 | sitemap · robots · canonical | Must | 공통 | 전 화면 | `apps/core/sitemaps.py` · `views.robots_txt` | §5.3 · TC-105 | Pass | 1차 유지 |
 | REQ-N-014 | OG · 소셜 공유 태그 | Should | 1차 | 색인 화면 | `meta.html` · `context_processors._og_image` | TC-106 | Pass | 1차 유지 |
-| REQ-N-015 | Lighthouse SEO·권장사항 90+ | Must | 공통 | M-2 대상 | — | TC-107 | Pass (SEO 100 / 권장 92~100 — 메인 감점 DEF-003) | **Pass** ← DEF-003 해소 (SEO·권장사항 전건 100) |
+| REQ-N-015 | Lighthouse SEO·권장사항 90+ | Must | 공통 | M-2 대상 | — | TC-107 | Pass (SEO 100 / 권장 92~100 — 메인 감점 DEF-003) | **Pass** ← DEF-003 해소 (SEO·권장사항 전건 100) → **3차: Pass** — 4화면 100 유지 + **SCR-008 권장사항 96**(감점 1건 = 자기 404의 `errors-in-console`). SCR-008 **SEO는 M-2 대상 제외(N/A)** — `noindex` 화면이라 SEO 측정 대상이 아니다 |
 | REQ-N-016 | 시맨틱 마크업 · 검증 오류 0건 | Must | 공통 | 전 화면 | 템플릿 | TC-108 | **Fail** (오류 5건 — DEF-002) | **Pass** ← DEF-002 해소 (vnu error 0건) |
 | REQ-N-017 | 전 구간 HTTPS | Must | 1차 | 운영 | 리버스 프록시 | §5.3 · TC-109 | **P7 이월** (P5 부분: 혼합 콘텐츠 0건) | 1차 유지 |
 | REQ-N-018 | 비밀 정보 분리 | Must | 공통 | 저장소·이미지 | `.env` · `.gitignore` | §5.3 · TC-110 | Pass | 1차 유지 |
@@ -155,6 +159,34 @@ updated: 2026-09-13
 | 2차 REQ 145건 | **N/A** (요구사항 §5.0 M-7 — 미충족으로 세지 않는다) |
 | **2차 사이클 추적률** | **100%** (96/96 — 신규 REQ·TC 없음. DEF-011 은 기존 TC-009 가 담당) |
 | **2차 사이클에 직접 실행한 TC** | **68건** / 99건 (나머지 31건은 `git diff c6fa91f..bcda9e0` 로 확인한 **수정 영향 범위 밖**이라 1차 판정 유지) |
+| **3차 사이클 추적률** | **100%** (96/96 — 신규 REQ·TC 0건. 요구사항 v1.2는 REQ 신설·폐기가 없다) |
+| **3차 사이클에 직접 실행한 TC** | **12건** / 99건 (TC-003·006·007·008·009·090·091·095·096·103·107·108 + 체크리스트 항목). 나머지 **87건은 2차 판정 승계** — 변경 파일이 `git diff bcda9e0..98b1241` 기준 6개(`base.html`·`maintenance.html`·`viewport.js` 주석·`test_seo_markup.py`·`layout-check.js`·`README.md`)뿐이고 DOM·CSS·뷰·모델은 변경 0건이다 |
+
+### 1.5 사이클 3(부분 재검증) 판정 변경 · 승계
+
+**판정이 바뀐 항목 (4건)**
+
+| 대상 | 2차 | **3차** | 근거 · 증거 |
+|---|---|---|---|
+| **TC-009** (REQ-F-003 ⑤-1) | **Fail** (DEF-011) | **Pass** | 응답 HTML·런타임 DOM 5/5 화면에 `interactive-widget=resizes-content` · 화면당 메타 1개 · 정본 문자열 일치. ②`visualViewport`·③`scroll-padding-bottom` 해시 자산에서 실측 확인 · `cycle3/01,02,05,06` |
+| **REQ-F-003** | **Fail** | **Pass** | ⑤-1 충족. ⑤-2는 REQ-F-003 ⑤-4에 따라 **"미검증"**(Block 아님 · 한계 L-1) |
+| **REQ-N-002** | **부분** | **Pass** | G-9 ①②③ 3단 전건 충족. 고정 바 4뷰포트 하단 밀착·본문 여백 77px 실측 · `cycle3/06,08` |
+| **Lighthouse 404 화면**(체크리스트 · M-2 ③) | **Block** | **Pass**(성능·접근성·권장사항) / **N/A**(SEO) | v1.2 M-2 ③-1의 `--ignore-status-code` 로 측정 성공 — 100 / 100 / 96 / 45. SEO는 `noindex` 화면이라 M-2 SEO 대상에서 제외 · `cycle3/14,15` |
+
+**해석 확정으로 판정 근거가 보강된 항목 (판정값 실질 불변 · 2건)**
+
+| 대상 | 3차 | 근거 |
+|---|---|---|
+| **TC-096 / REQ-N-006 ②** | **Pass 유지**(보류 해소) | 요구사항 v1.2 REQ-N-006 **②-3** ⓐ~ⓓ 4조건을 실측으로 확인 → 간극 0px 허용. **결함 등록 대상 아님** · `cycle3/11,12` |
+| **TC-103 / REQ-N-011** | **Pass(조건부) → Pass(무조건)** | v1.2가 판정 단위를 "h1 + 리드 문장"으로 확정하고 SCR-003을 Pass로 명기 · `cycle3/13` |
+
+**승계(재실행하지 않고 2차 판정을 그대로 사용) — 87건**
+
+| 승계 근거 | 내용 |
+|---|---|
+| 변경 범위 | `git diff bcda9e0..98b1241 -- developer/site/` = **6파일** (`templates/base.html` viewport 메타 1줄 + 주석 · `templates/errors/maintenance.html` 동일 문자열 · `static/js/viewport.js` **주석만** · `tests/test_seo_markup.py` 신규 테스트 5건 · `tests/browser/layout-check.js` 검증 도구 · `README.md`). **뷰·모델·폼·CSS·DOM 구조 변경 0건** |
+| 그럼에도 재실행한 것 | viewport 메타는 뷰포트 해석 자체를 바꾸므로 레이아웃·앵커·고정 바·콘솔·HTML 검증·Lighthouse를 회귀 범위로 재실행했다(§3 체크리스트 `3차` 열) |
+| 승계 대상 예 | 폼 응답 7종(②~⑦) · 알림 메일 · 배포/롤백 가드 · 백업/복구 · PII 대조 · 깨진 링크 · JSON-LD · 운영 안전장치 5중 · 명도 대비 |
 
 ---
 
@@ -172,7 +204,7 @@ updated: 2026-09-13
 | TC-006 | REQ-F-003 ③-1·③-3·③-4·③-5 | 기능 | 전화 `[TBD]` | 1280px에서 문서 끝까지 스크롤 | 헤더 sticky 유지, 비자기참조 화면 주 CTA "문의하기", `/location`은 **버튼 미렌더**(빈·비활성·`[TBD]` 0건), 768~1279px 헤더 CTA 없음 | **Pass** | **Pass** (재실행 — G-8 회귀 포함: <1280 헤더 CTA 0개) | 44 · **c2/09,10,36** |
 | TC-007 | §3.0 G-3 | 기능 | 고정 바 노출 화면 | `body` padding-bottom 측정 | `고정 바(60) + 16 + safe-area` = 76~77px | **Pass** (77px) | **Pass** (77px) | 44 · **c2/10** |
 | TC-008 | §3.0 G-4 (REQ-F-003 ④) | 기능 | 폼 화면 + 고정 바 | 문서 끝까지 스크롤 후 제출 버튼 ↔ 고정 바 간격 | 16px 이상 | **N/A** — 1차 유일 폼 화면(`/location`)이 자기 참조라 고정 바 미노출(G-6 ②). 측정 대상 없음 | **N/A** (조건 불변) | 45 |
-| TC-009 | REQ-F-003 ⑤-1 | 정적 | 빌드 결과물 | `<head>` `interactive-widget` · WebKit 폴백 · `scroll-padding-bottom` 존재 확인 | 공개 영역 전 화면 누락 0건 | **부분** — `viewport.js` 폴백·`--fixed-bar-h` 반영 확인. ⑤-2(실기기)는 **미검증** | **Fail** — `interactive-widget=resizes-content` 5/5 화면 누락 → **DEF-011**. 폴백·`scroll-padding-bottom`은 존재. ⑤-2 여전히 미검증 | 44, L-1 · **c2/38,39** |
+| TC-009 | REQ-F-003 ⑤-1 | 정적 | 빌드 결과물 | `<head>` `interactive-widget` · WebKit 폴백 · `scroll-padding-bottom` 존재 확인 | 공개 영역 전 화면 누락 0건 | **부분** — `viewport.js` 폴백·`--fixed-bar-h` 반영 확인. ⑤-2(실기기)는 **미검증** | **Fail** — `interactive-widget=resizes-content` 5/5 화면 누락 → **DEF-011**. 폴백·`scroll-padding-bottom`은 존재. ⑤-2 여전히 미검증 → **3차: Pass** ← DEF-011 해소. 응답 HTML·런타임 DOM 5/5 토큰 존재(**누락 0건**) · 화면당 메타 1개 · 정본 문자열 일치, ②③ 번들 잔존. ⑤-2는 ⑤-4에 따라 **미검증**(Block 아님) | 44, L-1 · **c2/38,39** · **c3/01,02,05,06** |
 | TC-010 | REQ-F-004 · REQ-C-009 | 기능 | 전화 확정 시드 | 헤더·푸터·오시는 길 `tel:` 링크 | 3곳 모두 `tel:` 렌더, 값 정규화 | **부분 Pass** — 주입 시 헤더 4·푸터 1·본문 5건. 실값 `[TBD]` | **부분 Pass** (재실행 — `tel:0212345678` 렌더. 실값 `[TBD]`) | 46 · **c2/36,40** |
 | TC-011 | REQ-F-005 | 기능 | — | 폼 동의 영역의 처리방침 링크 | `/privacy` 새 창 + 접근 이름에 "(새 창 열림)" | **Pass** | **Pass** | 41 · **c2/14** |
 | TC-012 | REQ-F-006 | 링크 | — | 5화면의 href/src 전수 상태 코드 + 앵커 id | 깨진 링크 0건 | **Pass** (25/25 = 200, 앵커 누락 0) | **Pass** (25/25 = 200, 앵커 18/18) | 19, 20 · **c2/14** |
@@ -240,19 +272,19 @@ updated: 2026-09-13
 | TC ID | 관련 REQ | 절차 | 기대 결과 | 1차 | 2차 | 증거 |
 |---|---|---|---|---|---|---|
 | TC-090 | REQ-N-001 | Chrome 실제 뷰포트 360·768·1280px × 5화면 | 가로 스크롤 0 · 넘치는 요소 0 | **Pass** (scrollWidth = clientWidth 전건) | **Pass** (5화면 × 360/768/1280 전건 `scrollWidth == clientWidth`) | 42, screenshots/ · **c2/07** |
-| TC-091 | REQ-N-002 | 360px 로드 직후 | 고정 바가 스크롤 0에서 보인다 | **Pass** | **Pass** | 48 · **c2/10** |
+| TC-091 | REQ-N-002 | 360px 로드 직후 | 고정 바가 스크롤 0에서 보인다 | **Pass** | **Pass** → **3차: Pass** — 5화면×4뷰포트 재실행. 바 있는 화면 position:fixed · bottom = innerHeight(780=780) · 높이 61px · body padding-bottom 77px. 전화 확정 주입(S2)이면 /location 도 동일 | 48 · **c2/10** · **c3/06,08** |
 | TC-092 | REQ-N-003 | Chrome / Edge / Firefox / Safari | 기능 실패 0 · Major 레이아웃 결함 0 | **부분** — Chrome(headless) Pass. **Edge·Firefox·Safari 미검증**(L-2·L-3) | **부분** 유지 — Chrome(headless)만. Edge·FF·Safari **미검증**(L-2·L-3) | 42 · **c2/07** |
 | TC-093 | REQ-N-004 | Lighthouse 모바일 3회 중앙값, 운영 미리보기 | 성능 90+ | **Pass** — 99 / 100 / 99 / 99 | **Pass** — 100 / 100 / 99 / 99 (3회 중앙값, 1차 대비 상승) | 39, lighthouse-mobile/ · **c2/12** |
 | TC-094 | REQ-N-005 | 초기 렌더 차단 경로 | 지도 리소스 없음 | **Pass** | **Pass** | 42 · **c2/14** |
 | TC-095 | REQ-N-006 ① | 디자인 토큰 18개 색 조합 WCAG 대비 계산 | 본문 4.5:1 · UI 경계 3:1 | **Pass** (미달 0건, 최소 3.31:1/경계·4.83:1/본문) | **Pass** — 색 토큰 diff 0건 확인 + 1차 측정(미달 0건) 유효 | 38 · **c2/git diff** |
-| TC-096 | REQ-N-006 ② | 360px 조작 요소 실측 | 44×44px 이상 · 인접 8px | **Fail** — 헤더 로고 140×32, 푸터 링크 328×32 (5종) | **Pass** ← DEF-005 해소 (로고 링크 140×44 · 푸터 328×44 · GNB 44×44 이상) | 42, 43, 45 → **DEF-005** · **c2/08,09** |
+| TC-096 | REQ-N-006 ② | 360px 조작 요소 실측 | 44×44px 이상 · 인접 8px | **Fail** — 헤더 로고 140×32, 푸터 링크 328×32 (5종) | **Pass** ← DEF-005 해소 (로고 링크 140×44 · 푸터 328×44 · GNB 44×44 이상) → **3차: Pass**(보류 해소) — v1.2 ②-3 ⓐ~ⓓ 실측: ⓐ 가로로 나란한 쌍 0건(1280px 열 간 32px) ⓑ 타깃 폭 = 컨테이너 폭 전체(328/346/232.7px) ⓒ 각 타깃 44px · 타깃 사이 간극 0px(어느 타깃에도 속하지 않는 죽은 영역 없음) ⓓ 포커스 3px solid outline. 목록 블록↔바깥 조작 요소 56.2px·32px ≥ 8px | 42, 43, 45 → **DEF-005** · **c2/08,09** · **c3/11,12** |
 | TC-097 | REQ-N-006 ③④ | 키보드 Tab 순회 + 이미지 대체 텍스트 | 전 요소 도달·포커스 표시 · 대체 텍스트 100% | **Pass** (Tab 16스텝 전건 3px outline, SVG 전건 `aria-hidden` 또는 `role="img"`+`aria-labelledby`, `<img>` 0건) | **Pass** (Tab 16스텝 재실행, 전건 3px outline, body 이탈 없음) | 18, 45 · **c2/11** |
 | TC-098 | REQ-N-006 ⑤ | 320px(400% 확대 상당) · 최소 글꼴 | 가로 스크롤 없음 · 본문 14px 이상 | **Fail** — 320px에서 `scrollWidth 326 > 320`(4화면), 푸터 저작권 13px | **Pass** ← DEF-004·005 해소 (320px 가로 스크롤 0 · 저작권 14px) | 42, 43 → **DEF-004·005** · **c2/07,08** |
 | TC-099 | REQ-N-007 | Lighthouse 접근성 | 90+ | **Pass** (전 화면 100) | **Pass** (4화면 전건 100) | 39 · **c2/12** |
 | TC-100 | REQ-N-008 | 폼 오류 상태 마크업 | `label[for]` · `aria-describedby` · `aria-invalid` · 오류 요약 `role="alert"` · 색 외 전달 | **Pass** | **Pass** (②재실행에서 `role=alert` + `aria-invalid` 3 확인) | 18, 06, 56 · **c2/21** |
 | TC-101 | REQ-N-009 | 문서 구조 | h1 1개 · 제목 단계 건너뜀 0 · 랜드마크 · skip link | **Pass** (5화면 전건) | **Pass** (vnu 오류 0건 + 랜드마크·h1 1개) | 18 · **c2/06** |
 | TC-102 | REQ-N-010 · REQ-C-016 | title·description ↔ IA §6.2·§6.3 문자열 대조 + 길이 | 문자열 일치 · 50~90자 | **Fail** — 색인 4화면 전건 불일치, 길이 41/33/35/48자 (전건 50자 미만) | **Pass** ← DEF-001 해소 (IA §6.2·§6.3 문자열 일치 · 62/69/57/56자 · title 5건 유일) | 49 → **DEF-001** · **c2/04** |
-| TC-103 | REQ-N-011 | 메인·오시는 길의 title·description·h1 | '강남'·'요가' 포함 | **Fail** — title·h1에 '강남' 없음 | **Pass(조건부)** ← DEF-001 해소. 메인·오시는 길 title·description·메인 h1 전건 '강남'·'요가' 포함. **`/location` h1 = "오시는 길"** 은 승인 스토리보드 §SCR-003 명세 그대로이며 리드 문장이 '강남 요가패스'를 담는다 — planner 해석 확인 권고 | 49 → **DEF-001** · **c2/04,05** |
+| TC-103 | REQ-N-011 | 메인·오시는 길의 title·description·h1 | '강남'·'요가' 포함 | **Fail** — title·h1에 '강남' 없음 | **Pass(조건부)** ← DEF-001 해소. 메인·오시는 길 title·description·메인 h1 전건 '강남'·'요가' 포함. **`/location` h1 = "오시는 길"** 은 승인 스토리보드 §SCR-003 명세 그대로이며 리드 문장이 '강남 요가패스'를 담는다 — planner 해석 확인 권고 → **3차: Pass(무조건)** — v1.2 판정 단위 확정. SCR-001 h1 `강남 요가패스` / SCR-003 h1 `오시는 길` + 리드 `강남 요가패스를 찾아오시는 방법을 안내합니다.` → 블록 단위로 '강남'·'요가' 포함, 키워드 나열 0건 | 49 → **DEF-001** · **c2/04,05** · **c3/13** |
 | TC-104 | REQ-N-012 | JSON-LD 파싱 + 필수 속성 | 오류 0 · 상호·주소·전화·영업시간·URL | **부분** — JSON 유효·`HealthAndBeautyBusiness`. 주소·전화·영업시간 `[TBD]`로 미포함. IA §6.4의 메인 `WebSite` 미적용. **원 도구(Schema Validator) 검사는 P7** | **부분** — JSON 유효 · `HealthAndBeautyBusiness` + **`WebSite` 추가 확인**(DEF-001 ④ 해소). 주소·전화·영업시간은 T-E **Block**. 원 도구 검사는 P7 | 20 → DEF-001 · **c2/37** |
 | TC-105 | REQ-N-013 · REQ-C-018 | `/sitemap.xml`·`/robots.txt`·canonical | 색인 4화면만 포함 · Disallow 0건 · canonical 존재 | **Pass** | **Pass** (sitemap 색인 4화면만 · robots Disallow 0 · canonical 4/4) | 03, pages/ · **c2/30** |
 | TC-106 | REQ-N-014 | OG 태그 + 이미지 응답 | og:title·description·image·url + twitter:card | **Pass** (5줄 + `og:image:alt`, 이미지 200·30,916B) | **Pass** (og 5줄 + `og:image:alt` + `twitter:card`, 이미지 200) | 03, 20 · **c2/15** |
@@ -300,29 +332,31 @@ updated: 2026-09-13
 
 | 항목 | 대상 | 1차 | 2차 | 3차 | 증거 |
 |---|---|---|---|---|---|
-| 반응형 360px | 5화면 | **Pass** (가로 스크롤 0) | **Pass** | | `42_viewport.txt` |
-| 반응형 768px | 5화면 | **Pass** | **Pass** | | 동 |
-| 반응형 1280px | 5화면 | **Pass** | **Pass** | | 동 |
-| 반응형 320px(400% 확대 상당) | 5화면 | **Fail** (4화면 326/320) | **Pass** ← DEF-004 해소 (5화면 320/320) | | 동 · DEF-004 |
-| Lighthouse 성능(모바일 중앙값) | 4화면 | **Pass** 99·100·99·99 | **Pass** 100·100·99·99 | | `39_…` |
-| Lighthouse 접근성 | 4화면 | **Pass** 100 전건 | **Pass** 100 전건 | | 동 |
-| Lighthouse 권장사항 | 4화면 | **Pass** 92·100·100·100 | **Pass** **100 전건** ← DEF-003 해소 | | 동 · DEF-003 |
-| Lighthouse SEO | 4화면 | **Pass** 100 전건 | **Pass** 100 전건 | | 동 |
-| Lighthouse 404 화면 | SCR-008 | **Block** — LH CLI가 비200 응답을 `ERRORED_DOCUMENT_REQUEST`로 거부 | **Block** — 동일 한계 재확인(`ERRORED_DOCUMENT_REQUEST`) | | 동 |
-| 깨진 링크 | 전체 | **Pass** 25/25 = 200 | **Pass** 25/25 = 200 · 앵커 18/18 | | `19_…` |
-| 콘솔 에러 | 5화면 | **Fail** — 메인 2건(CSP 인라인 스타일 차단) | **Pass** ← DEF-003 해소 (4화면 0건 / `/nope`는 자기 404 응답) | | `40_…` · DEF-003 |
-| `[TBD` 잔존 (M-5) | 렌더 HTML | **Pass** — `/privacy` 외 0건(`/privacy`는 REQ-F-050 1차 기준상 정상, 배포는 `check_release`가 차단) | **Pass** — `/privacy` 19개소 외 0건(1차와 동일) | | `04_…` |
-| HTML 검증 오류 | 5화면 | **Fail** 5건 | **Pass** **0건** ← DEF-002 해소 | | `50_…` · DEF-002 |
-| 명도 대비 | 18조합 | **Pass** 미달 0건 | **Pass** — 색 토큰 diff 0건, 1차 측정 유효 | | `38_…` |
-| 키보드 탐색·포커스 | `/location` | **Pass** 16스텝 | **Pass** 16스텝 (푸터 링크 44px 반영) | | `45_…` |
-| 터치 타깃 44px | 360px | **Fail** 5종 | **Pass** ← DEF-005 해소 | | `43_…` · DEF-005 |
-| **가상 키보드 정적 확인(⑤-1)** | 5화면 `<head>` | (미측정) | **Fail** — `interactive-widget=resizes-content` **5/5 누락** → DEF-011. 폴백·`scroll-padding-bottom`은 존재 | | `cycle2/39_…`·`38_…` |
-| 본문 최소 14px | 360px | **Fail** 1종(13px) | **Pass** ← DEF-005 해소 (저작권 14px) | | 동 · DEF-005 |
-| JS 비활성 | 5화면 | **Pass** | 1차 유지 | | `44_…` |
-| 비밀 정보 노출 | 저장소·이미지 | **Pass** 0건 | **Pass** 0건 | | `21_…`·`34_…` |
-| 운영 안전장치 5중 | 운영 이미지 | **Pass** | **Pass** (`0.1.0-qa2` 기준 재실행) | | `33_…`·`34_…` |
-| 복구 리허설 | 로컬 | **Pass** 1회 성공 | 1차 유지 — `run_backup` 1회 성공만 재실행 | | `24_…`·`25_…` |
-| 테스트 데이터 삭제 | 로컬 DB | **Pass** — 최종 `inquiry` **0건** (삭제 30건) | **Pass** — 최종 `inquiry` **0건** (삭제 3건) | | `54_…` |
+| 반응형 360px | 5화면 | **Pass** (가로 스크롤 0) | **Pass** |  **Pass** (5화면 320/320·360/360 — `c3/05,06`) | `42_viewport.txt` |
+| 반응형 768px | 5화면 | **Pass** | **Pass** |  **Pass** (768/768 전건) | 동 |
+| 반응형 1280px | 5화면 | **Pass** | **Pass** |  **Pass** (1280/1280 전건) | 동 |
+| 반응형 320px(400% 확대 상당) | 5화면 | **Fail** (4화면 326/320) | **Pass** ← DEF-004 해소 (5화면 320/320) |  **Pass** (viewport 메타 변경 후에도 5화면 320/320) | 동 · DEF-004 |
+| Lighthouse 성능(모바일 중앙값) | 4화면 | **Pass** 99·100·99·99 | **Pass** 100·100·99·99 |  **Pass** 100·100·99·99 (변동 없음) + **SCR-008 100** | `39_…` |
+| Lighthouse 접근성 | 4화면 | **Pass** 100 전건 | **Pass** 100 전건 |  **Pass** 100 전건 + **SCR-008 100** | 동 |
+| Lighthouse 권장사항 | 4화면 | **Pass** 92·100·100·100 | **Pass** **100 전건** ← DEF-003 해소 |  **Pass** 100 전건 + **SCR-008 96**(감점 = 자기 404 `errors-in-console` 1건) | 동 · DEF-003 |
+| Lighthouse SEO | 4화면 | **Pass** 100 전건 | **Pass** 100 전건 |  **Pass** 100 전건. SCR-008은 `noindex`라 **SEO 대상 제외(N/A)** | 동 |
+| Lighthouse 404 화면 | SCR-008 | **Block** — LH CLI가 비200 응답을 `ERRORED_DOCUMENT_REQUEST`로 거부 | **Block** — 동일 한계 재확인(`ERRORED_DOCUMENT_REQUEST`) |  **해소** — v1.2 M-2 ③-1 `--ignore-status-code` 로 **측정 성공**(runtimeError 없음). 100/100/96/45 — L-11 종료 | 동 |
+| 깨진 링크 | 전체 | **Pass** 25/25 = 200 | **Pass** 25/25 = 200 · 앵커 18/18 | 승계(2차 판정 유지 — 변경 영향 범위 밖) | `19_…` |
+| 콘솔 에러 | 5화면 | **Fail** — 메인 2건(CSP 인라인 스타일 차단) | **Pass** ← DEF-003 해소 (4화면 0건 / `/nope`는 자기 404 응답) |  **Pass** — qa 자체 계측(출처 URL·문서 상태 분류)으로 4화면 0건 / `/nope` 자기 404 1건 외 **기타 오류 0건** | `40_…` · DEF-003 |
+| `[TBD` 잔존 (M-5) | 렌더 HTML | **Pass** — `/privacy` 외 0건(`/privacy`는 REQ-F-050 1차 기준상 정상, 배포는 `check_release`가 차단) | **Pass** — `/privacy` 19개소 외 0건(1차와 동일) | 승계(2차 판정 유지 — 변경 영향 범위 밖) | `04_…` |
+| HTML 검증 오류 | 5화면 | **Fail** 5건 | **Pass** **0건** ← DEF-002 해소 |  **Pass** **0건** (vnu 재실행 — info warning 1줄만 잔존) | `50_…` · DEF-002 |
+| 명도 대비 | 18조합 | **Pass** 미달 0건 | **Pass** — 색 토큰 diff 0건, 1차 측정 유효 | 승계(2차 판정 유지 — 변경 영향 범위 밖) | `38_…` |
+| 키보드 탐색·포커스 | `/location` | **Pass** 16스텝 | **Pass** 16스텝 (푸터 링크 44px 반영) | 승계(2차 판정 유지 — 변경 영향 범위 밖) | `45_…` |
+| 터치 타깃 44px | 360px | **Fail** 5종 | **Pass** ← DEF-005 해소 |  **Pass** — v1.2 ②-3 예외 4조건 실측 충족(푸터 목록 간극 0px 허용) | `43_…` · DEF-005 |
+| **가상 키보드 정적 확인(⑤-1)** | 5화면 `<head>` | (미측정) | **Fail** — `interactive-widget=resizes-content` **5/5 누락** → DEF-011. 폴백·`scroll-padding-bottom`은 존재 |  **Pass** — 5/5 화면 토큰 존재(누락 0건) · 메타 1개 · 정본 문자열 일치 → **DEF-011 closed** | `cycle2/39_…`·`38_…` · **`c3/01,02,05`** |
+| 본문 최소 14px | 360px | **Fail** 1종(13px) | **Pass** ← DEF-005 해소 (저작권 14px) | 승계(2차 판정 유지 — 변경 영향 범위 밖) | 동 · DEF-005 |
+| JS 비활성 | 5화면 | **Pass** | 1차 유지 | 승계(2차 판정 유지 — 변경 영향 범위 밖) | `44_…` |
+| 비밀 정보 노출 | 저장소·이미지 | **Pass** 0건 | **Pass** 0건 | 승계(2차 판정 유지 — 변경 영향 범위 밖) | `21_…`·`34_…` |
+| 운영 안전장치 5중 | 운영 이미지 | **Pass** | **Pass** (`0.1.0-qa2` 기준 재실행) | 승계(2차 판정 유지 — 변경 영향 범위 밖) | `33_…`·`34_…` |
+| 복구 리허설 | 로컬 | **Pass** 1회 성공 | 1차 유지 — `run_backup` 1회 성공만 재실행 | 승계(2차 판정 유지 — 변경 영향 범위 밖) | `24_…`·`25_…` |
+| 자동 테스트(개발팀) · 린트 | 소스 | **Pass** 53건 | **Pass** 80건 | **Pass** **85건** `Ran 85 tests … OK` · `ruff check` `All checks passed!` · `ruff format --check` `88 files already formatted` | `c3/16` |
+| 앵커 이동(`#contact`·`#map`) | `/location` | **Pass** | **Pass** | **Pass** — 2앵커×4뷰포트 전건 sticky 헤더 아래 97~105px 여유 | `c3/07` |
+| 테스트 데이터 삭제 | 로컬 DB | **Pass** — 최종 `inquiry` **0건** (삭제 30건) | **Pass** — 최종 `inquiry` **0건** (삭제 3건) |  **Pass** — 최종 `inquiry` **0건** (삭제 1건) | `54_…` |
 
 ---
 
@@ -330,5 +364,6 @@ updated: 2026-09-13
 
 | 버전 | 일자 | 작성자 | 내용 | 관련 리뷰/CR |
 |---|---|---|---|---|
+| **0.3** | **2026-09-13** | qa | **3차 사이클(부분 재검증) 결과 기입** — §1.5 신설(판정 변경·승계 근거). **DEF-011 closed** → TC-009 Fail→**Pass**, REQ-F-003 Fail→**Pass**, REQ-N-002 부분→**Pass**. 판정 보류 3건을 요구사항 v1.2 기준으로 재판정 — TC-096(②-3 세로 목록형 예외 4조건 실측 충족 · 결함 아님), TC-103(h1 판정 단위 확정 → 무조건 Pass), Lighthouse 404(M-2 ③-1 `--ignore-status-code` 측정 성공 → **L-11 해소**). 회귀 재실행(5화면×4뷰포트 · 앵커 · HTML 검증 · Lighthouse 15세트 · 자동 테스트 85건 · 린트) **위반 0건**. **신규 결함 0건** | `shared/tickets/DEF-011`, 개발 보고서 v0.5, 요구사항 v1.2 |
 | **0.2** | **2026-09-13** | qa | **2차 사이클(재검증) 결과 기입** — RTM·TC·비기능 체크리스트에 `2차` 열 신설. DEF-001~010 **전건 closed**(TC-004·059·096·098·102·103·104·107·108·112·116·125 판정 전환), 회귀 항목 재실행(헤더·푸터·GNB·앵커·`/privacy` 표·메일 상호·폼 ①~⑦·링크·안전장치). **신규 결함 1건 발행 — DEF-011**(viewport `interactive-widget=resizes-content` 5화면 누락 → TC-009 부분 → **Fail**, REQ-F-003·REQ-N-002 판정 변경) | `shared/tickets/DEF-001~011`, 개발 보고서 v0.4 |
 | 0.1 | 2026-09-13 | qa | 최초 작성 — RTM 96건(추적률 100%) + TC 99건 정의 및 1차 사이클 실행 결과 기입 | — |

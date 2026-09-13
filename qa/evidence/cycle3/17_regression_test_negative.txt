@@ -1,0 +1,51 @@
+=== cycle3 / 17 재발 방지 테스트 음성 확인 (qa 직접) — 2차 시도 ===
+1차 시도: 운영 이미지에는 tests/ 가 **없어서**(안전장치 ②) 실행 불가 — ModuleNotFoundError. 이는 예상된 결과다.
+2차 시도(채택): 저장소를 건드리지 않기 위해 **소스를 임시 경로에 복사**해 그 사본에서만 토큰을 지우고,
+                개발 이미지로 일회용 컨테이너를 띄워(--rm) 사본을 /app 에 마운트해 테스트를 돌린다.
+명령: docker run --rm -v <임시사본>:/app --network yogapass_internal yogapass-app python manage.py test tests.test_seo_markup.ViewportMetaTests
+사본 base.html 12행: 12:  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+FAIL: test_viewport_content_matches_canonical_string (tests.test_seo_markup.ViewportMetaTests.test_viewport_content_matches_canonical_string) (path='/location')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_seo_markup.py", line 229, in test_viewport_content_matches_canonical_string
+    self.assertEqual(self.viewport_of(path), self.VIEWPORT)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'width=device-width, initial-scale=1' != 'width=device-width, initial-scale=1, interactive-widget=resizes-content'
+- width=device-width, initial-scale=1
++ width=device-width, initial-scale=1, interactive-widget=resizes-content
+
+
+======================================================================
+FAIL: test_viewport_content_matches_canonical_string (tests.test_seo_markup.ViewportMetaTests.test_viewport_content_matches_canonical_string) (path='/privacy')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_seo_markup.py", line 229, in test_viewport_content_matches_canonical_string
+    self.assertEqual(self.viewport_of(path), self.VIEWPORT)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'width=device-width, initial-scale=1' != 'width=device-width, initial-scale=1, interactive-widget=resizes-content'
+- width=device-width, initial-scale=1
++ width=device-width, initial-scale=1, interactive-widget=resizes-content
+
+
+======================================================================
+FAIL: test_viewport_content_matches_canonical_string (tests.test_seo_markup.ViewportMetaTests.test_viewport_content_matches_canonical_string) (path='/nope')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/tests/test_seo_markup.py", line 229, in test_viewport_content_matches_canonical_string
+    self.assertEqual(self.viewport_of(path), self.VIEWPORT)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'width=device-width, initial-scale=1' != 'width=device-width, initial-scale=1, interactive-widget=resizes-content'
+- width=device-width, initial-scale=1
++ width=device-width, initial-scale=1, interactive-widget=resizes-content
+
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.538s
+
+FAILED (failures=7)
+Destroying test database for alias 'default'...
+
+--- 저장소 원본 무결성 ---
+git status --porcelain developer/ 행 수: 0
+12:  <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">

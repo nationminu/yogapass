@@ -1,0 +1,23 @@
+화면 | 뷰 | 메타토큰(개수) | scrollW/clientW | 고정바(pos,높이,bottom vs innerH) | body-pb | scroll-pad-b | 콘솔오류(자기404/기타)
+/ | 320px | 있음(1) | 320/320 | fixed,61px,bottom=780 vs 780 | 77px | 77px | 0/0
+/ | 360px | 있음(1) | 360/360 | fixed,61px,bottom=780 vs 780 | 77px | 77px | 0/0
+/ | 768px | 있음(1) | 768/768 | fixed,61px,bottom=780 vs 780 | 77px | 77px | 0/0
+/ | 1280px | 있음(1) | 1280/1280 | fixed,0px,bottom=0 vs 780 | 0px | 89px | 0/0
+/instructors | 320px | 있음(1) | 320/320 | fixed,61px,bottom=780 vs 780 | 77px | 77px | 0/0
+/instructors | 360px | 있음(1) | 360/360 | fixed,61px,bottom=780 vs 780 | 77px | 77px | 0/0
+/instructors | 768px | 있음(1) | 768/768 | fixed,61px,bottom=780 vs 780 | 77px | 77px | 0/0
+/instructors | 1280px | 있음(1) | 1280/1280 | fixed,0px,bottom=0 vs 780 | 0px | 89px | 0/0
+/location | 320px | 있음(1) | 320/320 | 바없음 | 0px | 81px | 0/0
+/location | 360px | 있음(1) | 360/360 | 바없음 | 0px | 81px | 0/0
+/location | 768px | 있음(1) | 768/768 | 바없음 | 0px | 85px | 0/0
+/location | 1280px | 있음(1) | 1280/1280 | 바없음 | 0px | 89px | 0/0
+/privacy | 320px | 있음(1) | 320/320 | fixed,61px,bottom=780 vs 780 | 77px | 77px | 0/0
+/privacy | 360px | 있음(1) | 360/360 | fixed,61px,bottom=780 vs 780 | 77px | 77px | 0/0
+/privacy | 768px | 있음(1) | 768/768 | fixed,61px,bottom=780 vs 780 | 77px | 77px | 0/0
+/privacy | 1280px | 있음(1) | 1280/1280 | fixed,0px,bottom=0 vs 780 | 0px | 89px | 0/0
+/nope | 320px | 있음(1) | 320/320 | fixed,61px,bottom=780 vs 780 | 77px | 77px | 1/0
+/nope | 360px | 있음(1) | 360/360 | fixed,61px,bottom=780 vs 780 | 77px | 77px | 1/0
+/nope | 768px | 있음(1) | 768/768 | fixed,61px,bottom=780 vs 780 | 77px | 77px | 1/0
+/nope | 1280px | 있음(1) | 1280/1280 | fixed,0px,bottom=0 vs 780 | 0px | 89px | 1/0
+
+✓ qa 자체 계측 위반 0건

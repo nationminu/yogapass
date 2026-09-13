@@ -1,0 +1,60 @@
+
+================ 뷰포트 360px ================
+[목록 블록] div  폭=328px  범위 top=1615.2~1819.4
+   · "홈" 328x44  top=1643.4 bottom=1687.4  display=flex  border-bottom=0px none  text-decoration=none
+   · "강사 소개" 328x44  top=1687.4 bottom=1731.4  display=flex  border-bottom=0px none  text-decoration=none
+   · "오시는 길" 328x44  top=1731.4 bottom=1775.4  display=flex  border-bottom=0px none  text-decoration=none
+   · "문의하기" 328x44  top=1775.4 bottom=1819.4  display=flex  border-bottom=0px none  text-decoration=none
+   세로 인접 간극: [0, 0, 0]   가로로 나란한 쌍: 0건   블록 폭 대비 타깃 폭: 전체, 전체, 전체, 전체
+   최소 타깃 높이 = 44px  → 44px 기준 충족 / 간극 0px(맞닿음) 예
+[목록 블록] div  폭=328px  범위 top=1847.4~1919.6
+   · "개인정보 처리방침" 328x44  top=1875.6 bottom=1919.6  display=flex  border-bottom=0px none  text-decoration=none
+   세로 인접 간극: []   가로로 나란한 쌍: 0건   블록 폭 대비 타깃 폭: 전체
+   최소 타깃 높이 = 44px  → 44px 기준 충족 / 간극 0px(맞닿음) 예
+[푸터 주변 조작 요소 목록] (블록↔바깥 간격 8px 확인용)
+   푸터밖 <a> "문의하기" top=1401 bottom=1453 h=52
+   푸터내 <a> "홈" top=1643 bottom=1687 h=44
+   푸터내 <a> "강사 소개" top=1687 bottom=1731 h=44
+   푸터내 <a> "오시는 길" top=1731 bottom=1775 h=44
+   푸터내 <a> "문의하기" top=1775 bottom=1819 h=44
+   푸터내 <a> "개인정보 처리방침" top=1876 bottom=1920 h=44
+
+================ 뷰포트 768px ================
+[목록 블록] div  폭=346px  범위 top=2162.7~2366.8
+   · "홈" 346x44  top=2190.8 bottom=2234.8  display=flex  border-bottom=0px none  text-decoration=none
+   · "강사 소개" 346x44  top=2234.8 bottom=2278.8  display=flex  border-bottom=0px none  text-decoration=none
+   · "오시는 길" 346x44  top=2278.8 bottom=2322.8  display=flex  border-bottom=0px none  text-decoration=none
+   · "문의하기" 346x44  top=2322.8 bottom=2366.8  display=flex  border-bottom=0px none  text-decoration=none
+   세로 인접 간극: [0, 0, 0]   가로로 나란한 쌍: 0건   블록 폭 대비 타깃 폭: 전체, 전체, 전체, 전체
+   최소 타깃 높이 = 44px  → 44px 기준 충족 / 간극 0px(맞닿음) 예
+[목록 블록] div  폭=346px  범위 top=2394.8~2467
+   · "개인정보 처리방침" 346x44  top=2423 bottom=2467  display=flex  border-bottom=0px none  text-decoration=none
+   세로 인접 간극: []   가로로 나란한 쌍: 0건   블록 폭 대비 타깃 폭: 전체
+   최소 타깃 높이 = 44px  → 44px 기준 충족 / 간극 0px(맞닿음) 예
+[푸터 주변 조작 요소 목록] (블록↔바깥 간격 8px 확인용)
+   푸터밖 <a> "문의하기" top=1990 bottom=2042 h=52
+   푸터내 <a> "홈" top=2191 bottom=2235 h=44
+   푸터내 <a> "강사 소개" top=2235 bottom=2279 h=44
+   푸터내 <a> "오시는 길" top=2279 bottom=2323 h=44
+   푸터내 <a> "문의하기" top=2323 bottom=2367 h=44
+   푸터내 <a> "개인정보 처리방침" top=2423 bottom=2467 h=44
+
+================ 뷰포트 1280px ================
+[목록 블록] div  폭=232.7px  범위 top=1829.7~2033.8
+   · "홈" 232.7x44  top=1857.8 bottom=1901.8  display=flex  border-bottom=0px none  text-decoration=none
+   · "강사 소개" 232.7x44  top=1901.8 bottom=1945.8  display=flex  border-bottom=0px none  text-decoration=none
+   · "오시는 길" 232.7x44  top=1945.8 bottom=1989.8  display=flex  border-bottom=0px none  text-decoration=none
+   · "문의하기" 232.7x44  top=1989.8 bottom=2033.8  display=flex  border-bottom=0px none  text-decoration=none
+   세로 인접 간극: [0, 0, 0]   가로로 나란한 쌍: 0건   블록 폭 대비 타깃 폭: 전체, 전체, 전체, 전체
+   최소 타깃 높이 = 44px  → 44px 기준 충족 / 간극 0px(맞닿음) 예
+[목록 블록] div  폭=232.7px  범위 top=1829.7~2033.8
+   · "개인정보 처리방침" 232.7x44  top=1857.8 bottom=1901.8  display=flex  border-bottom=0px none  text-decoration=none
+   세로 인접 간극: []   가로로 나란한 쌍: 0건   블록 폭 대비 타깃 폭: 전체
+   최소 타깃 높이 = 44px  → 44px 기준 충족 / 간극 0px(맞닿음) 예
+[푸터 주변 조작 요소 목록] (블록↔바깥 간격 8px 확인용)
+   푸터밖 <a> "문의하기" top=1625 bottom=1677 h=52
+   푸터내 <a> "홈" top=1858 bottom=1902 h=44
+   푸터내 <a> "강사 소개" top=1902 bottom=1946 h=44
+   푸터내 <a> "오시는 길" top=1946 bottom=1990 h=44
+   푸터내 <a> "문의하기" top=1990 bottom=2034 h=44
+   푸터내 <a> "개인정보 처리방침" top=1858 bottom=1902 h=44

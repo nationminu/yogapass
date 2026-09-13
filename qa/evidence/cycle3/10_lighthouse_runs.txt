@@ -1,0 +1,16 @@
+home run1 exit=1
+home run2 exit=1
+home run3 exit=1
+instructors run1 exit=1
+instructors run2 exit=1
+instructors run3 exit=1
+location run1 exit=1
+location run2 exit=1
+location run3 exit=1
+privacy run1 exit=1
+privacy run2 exit=1
+privacy run3 exit=0
+e404 run1 exit=1
+e404 run2 exit=1
+e404 run3 exit=1
+DONE

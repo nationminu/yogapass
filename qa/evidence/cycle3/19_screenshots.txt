@@ -1,0 +1,10 @@
+saved home_360.png
+saved home_1280.png
+saved instructors_360.png
+saved instructors_1280.png
+saved location_360.png
+saved location_1280.png
+saved privacy_360.png
+saved privacy_1280.png
+saved nope_360.png
+saved nope_1280.png

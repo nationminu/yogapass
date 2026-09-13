@@ -1,0 +1,16 @@
+=== cycle3 / 03 대상 스택 콘텐츠 상태 확인 ===
+[1] /location 앵커 대상 존재 여부
+      1 id="contact"
+      1 id="map"
+[2] /instructors 강사 카드 수
+0
+[3] /location 고정 바 상태(data-fixed-bar)
+/              data-fixed-bar="on"
+/instructors   data-fixed-bar="on"
+/location      data-fixed-bar="off"
+/privacy       data-fixed-bar="on"
+/nope          data-fixed-bar="on"
+[4] DB 적재 상태 (content 테이블 행 수)
+ERROR:  relation "instructors_instructor" does not exist
+LINE 1: select 'instructor', count(*) from instructors_instructor un...
+                                           ^

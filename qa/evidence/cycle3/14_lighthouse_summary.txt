@@ -1,0 +1,32 @@
+=== M-1 모바일 기본 프리셋 · 3회 중앙값 (운영 미리보기 :8001 · LH 13.4.1) ===
+화면 | 성능 | 접근성 | 권장사항 | SEO | 원값
+home | 100 | 100 | 100 | 100 | 100/100/100/100  100/100/100/100  99/100/100/100
+instructors | 100 | 100 | 100 | 100 | 100/100/100/100  100/100/100/100  100/100/100/100
+location | 99 | 100 | 100 | 100 | 100/100/100/100  99/100/100/100  99/100/100/100
+privacy | 99 | 100 | 100 | 100 | 99/100/100/100  99/100/100/100  99/100/100/100
+e404 | 100 | 100 | 96 | 45 | 100/100/96/45  100/100/96/45  100/100/96/45
+
+=== 감점 감사 항목 (가중치>0 · score<1) ===
+home | performance | first-contentful-paint (First Contentful Paint) score=0.99 weight=10
+home | performance | total-blocking-time (Total Blocking Time) score=0.99 weight=30
+home | performance | speed-index (Speed Index) score=0.99 weight=10
+instructors | performance | first-contentful-paint (First Contentful Paint) score=0.99 weight=10
+instructors | performance | total-blocking-time (Total Blocking Time) score=0.99 weight=30
+instructors | performance | speed-index (Speed Index) score=0.99 weight=10
+location | performance | first-contentful-paint (First Contentful Paint) score=0.99 weight=10
+location | performance | largest-contentful-paint (Largest Contentful Paint) score=0.99 weight=25
+privacy | performance | first-contentful-paint (First Contentful Paint) score=0.98 weight=10
+privacy | performance | largest-contentful-paint (Largest Contentful Paint) score=0.99 weight=25
+privacy | performance | total-blocking-time (Total Blocking Time) score=0.98 weight=30
+privacy | performance | speed-index (Speed Index) score=0.99 weight=10
+e404 | performance | first-contentful-paint (First Contentful Paint) score=0.99 weight=10
+e404 | performance | speed-index (Speed Index) score=0.99 weight=10
+e404 | best-practices | errors-in-console (Browser errors were logged to the console) score=0 weight=1
+e404 | seo | is-crawlable (Page is blocked from indexing) score=0 weight=4.043478260869565
+e404 | seo | meta-description (Document does not have a meta description) score=0 weight=1
+e404 | seo | http-status-code (Page has unsuccessful HTTP status code) score=0 weight=1
+
+=== /nope configSettings 대조 + 404 상태 확인 ===
+{"formFactor":"mobile","throttlingMethod":"simulate","screenEmulation":{"mobile":true,"width":412,"height":823,"deviceScaleFactor":1.75,"disabled":false},"lh":"13.4.1"}
+finalDisplayedUrl: http://localhost:8001/nope  runtimeError: 없음
+is-crawlable 감사: {"score":0,"title":"Page is blocked from indexing"}

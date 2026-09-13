@@ -1,0 +1,18 @@
+=== cycle3 / 01 DEF-011 정적 확인 (REQ-F-003 ⑤-1) · 2026-09-13 18:55:17 ===
+[1] 응답 HTML 5화면 viewport 메타 (curl)
+/              status=200  meta개수=1  토큰=있음  <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+/instructors   status=200  meta개수=1  토큰=있음  <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+/location      status=200  meta개수=1  토큰=있음  <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+/privacy       status=200  meta개수=1  토큰=있음  <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+/nope          status=404  meta개수=1  토큰=있음  <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+
+[2] 누락 집계
+누락 화면 수 = 0 / 5
+
+[3] ②WebKit 폴백 · ③scroll-padding-bottom 번들 존재 확인 (해시 자산 실제 fetch)
+viewport js 자산: /static/js/viewport.d8276ea96fc3.js
+tokens css 자산: /static/css/tokens.b61a39a5f9a8.css
+      2 data-vk-fallback
+      3 isWebKit
+      2 visualViewport
+scroll-padding-bottom: var(--scroll-pad-bottom);

@@ -1,0 +1,30 @@
+=== cycle3 / 09 layout-check.js 판정 기준 변경(자기404 제외) 음성 확인 — qa 직접 수행 ===
+목적: '자기 404 제외'가 하위 리소스 404 까지 숨기지 않는지 확인한다.
+수단: qa 가 띄운 최소 서버(127.0.0.1:8099). /nope 는 404 + 하위 리소스 404(/missing-asset.png) 1건 포함.
+명령: BASE=http://127.0.0.1:8099 NODE_PATH=../../qa/tools/node_modules node tests/browser/layout-check.js
+기대: /nope 행이 '콘솔오류 1건(자기404 n건 제외)' 로 나오고 종료 코드 1
+
+화면 | 뷰포트 | 가로스크롤 | 넘침 | 작은타깃 | 작은글꼴 | 인라인style | 콘솔 | 헤더h | body-pb(고정바) | G-9메타
+/ | 320px | 없음 | 0건 | 0건 | 0건 | 0건 | 0건 | 0→0 | 0px(바 없음) | 있음
+/ | 360px | 없음 | 0건 | 0건 | 0건 | 0건 | 0건 | 0→0 | 0px(바 없음) | 있음
+/ | 768px | 없음 | 0건 | 0건 | 0건 | 0건 | 0건 | 0→0 | 0px(바 없음) | 있음
+/ | 1280px | 없음 | 0건 | 0건 | 0건 | 0건 | 0건 | 0→0 | 0px(바 없음) | 있음
+/instructors | 320px | 없음 | 0건 | 0건 | 0건 | 0건 | 0건 | 0→0 | 0px(바 없음) | 있음
+/instructors | 360px | 없음 | 0건 | 0건 | 0건 | 0건 | 0건 | 0→0 | 0px(바 없음) | 있음
+/instructors | 768px | 없음 | 0건 | 0건 | 0건 | 0건 | 0건 | 0→0 | 0px(바 없음) | 있음
+/instructors | 1280px | 없음 | 0건 | 0건 | 0건 | 0건 | 0건 | 0→0 | 0px(바 없음) | 있음
+/location | 320px | 없음 | 0건 | 0건 | 0건 | 0건 | 0건 | 0→0 | 0px(바 없음) | 있음
+/location | 360px | 없음 | 0건 | 0건 | 0건 | 0건 | 0건 | 0→0 | 0px(바 없음) | 있음
+/location | 768px | 없음 | 0건 | 0건 | 0건 | 0건 | 0건 | 0→0 | 0px(바 없음) | 있음
+/location | 1280px | 없음 | 0건 | 0건 | 0건 | 0건 | 0건 | 0→0 | 0px(바 없음) | 있음
+/privacy | 320px | 없음 | 0건 | 0건 | 0건 | 0건 | 0건 | 0→0 | 0px(바 없음) | 있음
+/privacy | 360px | 없음 | 0건 | 0건 | 0건 | 0건 | 0건 | 0→0 | 0px(바 없음) | 있음
+/privacy | 768px | 없음 | 0건 | 0건 | 0건 | 0건 | 0건 | 0→0 | 0px(바 없음) | 있음
+/privacy | 1280px | 없음 | 0건 | 0건 | 0건 | 0건 | 0건 | 0→0 | 0px(바 없음) | 있음
+/nope | 320px | 없음 | 0건 | 0건 | 0건 | 0건 | 2건: Failed to load resource: the server responded with a status of 404 (Not Found) (자기404 2건 제외) | 0→0 | 0px(바 없음) | 있음   ← 콘솔오류
+/nope | 360px | 없음 | 0건 | 0건 | 0건 | 0건 | 2건: Failed to load resource: the server responded with a status of 404 (Not Found) (자기404 2건 제외) | 0→0 | 0px(바 없음) | 있음   ← 콘솔오류
+/nope | 768px | 없음 | 0건 | 0건 | 0건 | 0건 | 1건: Failed to load resource: the server responded with a status of 404 (Not Found) (자기404 1건 제외) | 0→0 | 0px(바 없음) | 있음   ← 콘솔오류
+/nope | 1280px | 없음 | 0건 | 0건 | 0건 | 0건 | 1건: Failed to load resource: the server responded with a status of 404 (Not Found) (자기404 1건 제외) | 0→0 | 0px(바 없음) | 있음   ← 콘솔오류
+
+✗ 위반 4건
+종료 코드: 1

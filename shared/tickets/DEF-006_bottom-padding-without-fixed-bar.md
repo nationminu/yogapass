@@ -4,7 +4,7 @@ from: qa
 to: developer
 phase: P5
 severity: minor
-status: resolved
+status: closed
 related_req: [REQ-F-003, REQ-N-002]
 related_tc: [TC-004]
 related_scr: [SCR-003]
@@ -64,4 +64,4 @@ created: 2026-09-13
 ## 재검증 (qa 작성)
 | 사이클 | 결과 (closed / reopened) | 일자 | 비고 |
 |---|---|---|---|
-| 2차 | | | TC-004 재수행 + TC-003·005·007(전화 확정/미확정 양쪽) 회귀 |
+| **2** | **closed** | 2026-09-13 | `/location`(자기 참조 + 전화 `[TBD]`): `data-fixed-bar="off"` · `.barwrap` **DOM 없음** · `body padding-bottom` **0px**(320·360·768·1280 전건). 다른 4화면은 바 표시 + 77px, 1280px 는 미표시 + 0px. 전화 확정 주입 시 `/location` 도 바 표시 + 77px 로 전환(검증 후 원복). 증거 `cycle2/10_fixedbar_gnb.txt`, `36_fixedbar_phone.txt` |

@@ -4,7 +4,7 @@ from: qa
 to: developer
 phase: P5
 severity: major
-status: resolved
+status: closed
 related_req: [REQ-N-010, REQ-N-011, REQ-N-012, REQ-C-016]
 related_tc: [TC-102, TC-103, TC-104]
 related_scr: [SCR-001, SCR-002, SCR-003, SCR-006, SCR-008]
@@ -106,4 +106,4 @@ created: 2026-09-13
 ## 재검증 (qa 작성)
 | 사이클 | 결과 (closed / reopened) | 일자 | 비고 |
 |---|---|---|---|
-| 2차 | | | TC-102·103·104 재수행 + `50_html_validate` 회귀 |
+| **2** | **closed** | 2026-09-13 | 색인 4화면 title·description 이 IA §6.2·§6.3 표와 **문자열 단위 일치**, 길이 62·69·57·56자(50~90 충족), title 5건 전건 유일. 메인 JSON-LD 에 `WebSite` 추가 확인. **DB 미적재 상태에서도 같은 title** 출력(브랜드 원본 분리 확인). 알림 메일 제목 `[문의 접수] 강남 요가패스`. 증거 `cycle2/04_meta_vs_ia.txt`, `02_meta_db_empty.txt`, `37_jsonld.txt`, `25_mail.txt` |

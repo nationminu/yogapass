@@ -1,0 +1,43 @@
+### DEF-010 / TC-116 — 운영 이미지(yogapass-app:0.1.0-qa2) 내부 점검
+--- /app/static/img 목록
+SOURCES.md
+apple-touch-icon.png
+apple-touch-icon.svg
+favicon.ico
+favicon.svg
+icon-192.png
+icon-512.png
+logo-horizontal.svg
+logo-mark.svg
+og-image.png
+og-image.svg
+
+--- TEMP/작업 파일 검색 (find /app -iname "*TEMP*")
+/app/templates
+/app/apps/core/templatetags
+건수: 2
+
+--- assets-work / qa / tests / .env / Dockerfile / compose 잔존
+assets-work            0건
+qa                     0건
+tests                  0건
+.env                   0건
+Dockerfile             0건
+compose.yaml           0건
+compose.local.yaml     0건
+compose.prod.yaml      0건
+
+--- qa_* 관리 명령 노출
+0
+
+--- 정적 자산 ↔ design/assets/SOURCES.md 대조
+  OK  apple-touch-icon.png
+  OK  apple-touch-icon.svg
+  OK  favicon.ico
+  OK  favicon.svg
+  OK  icon-192.png
+  OK  icon-512.png
+  OK  logo-horizontal.svg
+  OK  logo-mark.svg
+  OK  og-image.png
+  OK  og-image.svg

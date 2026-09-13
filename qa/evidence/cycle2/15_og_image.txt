@@ -1,0 +1,28 @@
+=== og:* / twitter:* 태그 (홈) ===
+<meta property="og:type" content="website"
+<meta property="og:site_name" content="강남 요가패스"
+<meta property="og:title" content="강남 요가패스 | 강남 요가 스튜디오·수업 안내"
+<meta property="og:description" content="강남에 있는 요가 스튜디오 요가패스입니다. 수업과 강사를 확인하고 궁금한 점은 온라인 문의나 전화로 남겨주세요."
+<meta property="og:url" content="http://localhost:8001/"
+<meta property="og:image" content="http://localhost:8001/static/img/og-image.a3f7089eddd0.png"
+<meta property="og:image:width" content="1200"
+<meta property="og:image:height" content="630"
+<meta property="og:image:alt" content="강남 요가패스 로고와 '강남 요가 스튜디오' 문구가 있는 대표 이미지"
+<meta name="twitter:card" content="summary_large_image"
+
+=== og-image 파일 응답 ===
+og-image.png: 200
+total 104
+drwxr-xr-x 2 app app  4096 Sep 13 08:23 .
+drwxr-xr-x 7 app app  4096 Sep 12 15:08 ..
+-rwxr-xr-x 1 app app  4382 Sep 13 08:16 SOURCES.md
+-rwxr-xr-x 1 app app  3027 Sep 12 20:41 apple-touch-icon.png
+-rwxr-xr-x 1 app app  1072 Sep 12 15:21 apple-touch-icon.svg
+-rwxr-xr-x 1 app app 13942 Sep 12 20:40 favicon.ico
+-rwxr-xr-x 1 app app  1178 Sep 12 20:40 favicon.svg
+-rwxr-xr-x 1 app app  3130 Sep 12 20:41 icon-192.png
+-rwxr-xr-x 1 app app  8811 Sep 12 20:41 icon-512.png
+-rwxr-xr-x 1 app app  1175 Sep 12 15:21 logo-horizontal.svg
+-rwxr-xr-x 1 app app   765 Sep 12 15:21 logo-mark.svg
+-rwxr-xr-x 1 app app 30916 Sep 13 01:27 og-image.png
+-rwxr-xr-x 1 app app  2846 Sep 12 15:21 og-image.svg

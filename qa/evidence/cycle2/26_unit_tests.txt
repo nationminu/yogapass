@@ -1,0 +1,17 @@
+### 자동 테스트 재실행 (qa 가 직접 실행)
+.2026-09-13T18:06:48+0900 WARNING django.request Not Found: /nope
+...........2026-09-13T18:06:48+0900 WARNING django.request Not Found: /nope
+.2026-09-13T18:06:48+0900 WARNING django.request Not Found: /nope
+..2026-09-13T18:06:48+0900 WARNING django.request Not Found: /nope
+......2026-09-13T18:06:49+0900 WARNING django.request Not Found: /no-such-page
+.2026-09-13T18:06:49+0900 WARNING django.request Not Found: /no-such-page
+...
+----------------------------------------------------------------------
+Ran 80 tests in 3.650s
+
+OK
+Destroying test database for alias 'default'...
+
+### ruff
+All checks passed!
+88 files already formatted

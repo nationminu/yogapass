@@ -4,7 +4,7 @@ from: qa
 to: developer
 phase: P5
 severity: minor
-status: resolved
+status: closed
 related_req: [REQ-N-015, REQ-N-004]
 related_tc: [TC-107]
 related_scr: [SCR-001]
@@ -69,4 +69,4 @@ security: Applying inline style violates the following Content Security Policy d
 ## 재검증 (qa 작성)
 | 사이클 | 결과 (closed / reopened) | 일자 | 비고 |
 |---|---|---|---|
-| 2차 | | | 메인 콘솔 오류 0건 + Lighthouse 권장사항 재측정(3회 중앙값) |
+| **2** | **closed** | 2026-09-13 | 5화면 인라인 `style="` **0건**. Chrome 헤드리스 4화면×4뷰포트 **콘솔 오류 0건**(`/nope` 1건은 자기 404 응답 — REQ-F-060 동작). Lighthouse 권장사항 메인 **92 → 100**(3회 중앙값), 감점 항목 `errors-in-console`·`inspector-issues` 소멸. 증거 `cycle2/07_viewport.txt`, `12_lighthouse_mobile_summary.txt` |

@@ -1,0 +1,27 @@
+=== 키보드 Tab 순회 · 포커스 표시 (360px /location, 앞 20개) ===
+1) a.skip "본문 바로가기" 121x48 | outline=solid 3px rgb(11, 79, 158) shadow=none | 포커스표시=있음
+2) a.logo "요가패스 YOGAPASS 강남 요가 스튜" 140x44 | outline=solid 3px rgb(11, 79, 158) shadow=none | 포커스표시=있음
+3) summary.mnav-btn "" 44x44 | outline=solid 3px rgb(11, 79, 158) shadow=none | 포커스표시=있음
+4) a.chip "지도·오시는 길" 119x44 | outline=solid 3px rgb(11, 79, 158) shadow=none | 포커스표시=있음
+5) a.chip "문의하기" 86x44 | outline=solid 3px rgb(11, 79, 158) shadow=none | 포커스표시=있음
+6) input.inp "text" 328x52 | outline=solid 3px rgb(11, 79, 158) shadow=none | 포커스표시=있음
+7) input.inp "tel" 328x52 | outline=solid 3px rgb(11, 79, 158) shadow=none | 포커스표시=있음
+8) textarea.inp "textarea" 328x191 | outline=solid 3px rgb(11, 79, 158) shadow=none | 포커스표시=있음
+9) input. "checkbox" 24x24 | outline=solid 3px rgb(11, 79, 158) shadow=none | 포커스표시=있음
+10) a.link "개인정보 처리방침 보기 (새 창 열림)" 216x16 | outline=solid 3px rgb(11, 79, 158) shadow=none | 포커스표시=있음
+11) button.btn btn-lg btn-p "문의 남기기" 328x52 | outline=solid 3px rgb(11, 79, 158) shadow=none | 포커스표시=있음
+12) a. "홈" 328x44 | outline=solid 3px rgb(255, 255, 255) shadow=none | 포커스표시=있음
+13) a. "강사 소개" 328x44 | outline=solid 3px rgb(255, 255, 255) shadow=none | 포커스표시=있음
+14) a. "오시는 길" 328x44 | outline=solid 3px rgb(255, 255, 255) shadow=none | 포커스표시=있음
+15) a. "문의하기" 328x44 | outline=solid 3px rgb(255, 255, 255) shadow=none | 포커스표시=있음
+16) a.strong "개인정보 처리방침" 328x44 | outline=solid 3px rgb(255, 255, 255) shadow=none | 포커스표시=있음
+17) (body)
+18) a.skip "본문 바로가기" 121x48 | outline=solid 3px rgb(11, 79, 158) shadow=none | 포커스표시=있음
+19) a.logo "요가패스 YOGAPASS 강남 요가 스튜" 140x44 | outline=solid 3px rgb(11, 79, 158) shadow=none | 포커스표시=있음
+20) summary.mnav-btn "" 44x44 | outline=solid 3px rgb(11, 79, 158) shadow=none | 포커스표시=있음
+
+=== 동의 체크박스 영역 ===
+{"input":{"tag":"input","cls":"err","w":24,"h":24},"label":{"tag":"label","cls":"","w":292,"h":77},"row":{"tag":"div","cls":"agree","w":328,"h":97}}
+
+=== 제출 버튼 ↔ 고정 바 간격 (G-4) — 고정 바가 있는 화면 home 으로 확인 ===
+{"barTop":719,"lastBottom":133,"gap":586}

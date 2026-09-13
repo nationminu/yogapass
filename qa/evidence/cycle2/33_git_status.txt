@@ -1,0 +1,10 @@
+### 소스 변경 0건 확인 — git status (developer/site 기준)
+   developer/ 변경: 0건
+
+### qa/ 변경(예정 산출물·증거)
+?? qa/evidence/cycle2/
+?? qa/tools/form-check2.js
+?? qa/tools/meta-check2.js
+?? qa/tools/probe6.js
+?? qa/tools/probe7.js
+?? qa/tools/probe8.js

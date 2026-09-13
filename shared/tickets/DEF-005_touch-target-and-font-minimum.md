@@ -4,7 +4,7 @@ from: qa
 to: developer
 phase: P5
 severity: minor
-status: resolved
+status: closed
 related_req: [REQ-N-006]
 related_tc: [TC-096, TC-098]
 related_scr: [SCR-001, SCR-002, SCR-003, SCR-006, SCR-008]
@@ -88,4 +88,4 @@ created: 2026-09-13
 ## 재검증 (qa 작성)
 | 사이클 | 결과 (closed / reopened) | 일자 | 비고 |
 |---|---|---|---|
-| 2차 | | | 360px 실측 재수행 + 인접 간격 8px 재확인 + 320px 레이아웃 회귀(DEF-004와 같은 영역) |
+| **2** | **closed** | 2026-09-13 | 헤더 로고 **링크 140×44 / 그래픽 140×32 유지**, 푸터 링크 6종 **328×44**(360px)·346×44(768)·233×44(1280), GNB 전건 **44×44 이상**("홈" 37→44), 푸터 저작권 **14px**. 44px 미만 잔존은 체크박스 input 24×24(감싸는 label 이 타깃)과 문단 내 인라인 링크뿐 — 1차 제외 목록 그대로. 증거 `cycle2/08_a11y_detail.txt`, `09_layout_probe.txt`, `11_focus_tab.txt` |

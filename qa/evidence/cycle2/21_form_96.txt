@@ -1,0 +1,46 @@
+시작 inquiry 건수: 2
+대상: http://localhost:8030 (QA_RATE_LIMIT_MODE=off) / 만료용 http://localhost:8040 (+25h)
+
+### ① 정상 접수
+  HTTP=200  Retry-After=-
+  화면: 폼재렌더=false role=status:2 role=alert:0 aria-invalid=0 새토큰=-…
+  입력값 보존: name="null" phone="null" message="" consent=false
+  문구: ["문의가 접수되었습니다"]
+
+### ⑤ 토큰 재사용 (같은 토큰 재제출)
+  HTTP=200  Retry-After=-
+  화면: 폼재렌더=false role=status:2 role=alert:0 aria-invalid=0 새토큰=-…
+  입력값 보존: name="null" phone="null" message="" consent=false
+  문구: ["문의가 접수되었습니다"]
+
+### ② 서버 검증 실패 (이름 공백·전화 형식 오류·동의 없음)
+  HTTP=200  Retry-After=-
+  화면: 폼재렌더=true role=status:1 role=alert:1 aria-invalid=3 새토큰=IjAxMDg5Y2M4Y2Qy…
+  입력값 보존: name="null" phone="null" message="QA2 검증 실패 본문" consent=false
+  문구: ["입력 내용을 확인해 주세요"]
+
+### ③ honeypot
+  HTTP=200  Retry-After=-
+  화면: 폼재렌더=false role=status:2 role=alert:0 aria-invalid=0 새토큰=-…
+  입력값 보존: name="null" phone="null" message="" consent=false
+  문구: ["문의가 접수되었습니다"]
+
+### ⑦-a 토큰 부재(missing)
+  HTTP=200  Retry-After=-
+  화면: 폼재렌더=true role=status:1 role=alert:1 aria-invalid=0 새토큰=IjkyZjgzNzM4ZDNi…
+  입력값 보존: name="null" phone="null" message="QA2 토큰 부재 본문" consent=false
+  문구: ["시간이 지나 문의가 접수되지 않았습니다"]
+
+### ⑦-b 토큰 변조(invalid)
+  HTTP=200  Retry-After=-
+  화면: 폼재렌더=true role=status:1 role=alert:1 aria-invalid=0 새토큰=IjE0YjdlZGZjZDc1…
+  입력값 보존: name="null" phone="null" message="QA2 토큰 변조 본문" consent=false
+  문구: ["시간이 지나 문의가 접수되지 않았습니다"]
+
+  (정상 시계 발급 토큰 ImJiNjE4MjFmMjc3NDRl… 을 +25h 컨테이너에 제출)
+### ⑦-c 토큰 만료(expired)
+  HTTP=200  Retry-After=-
+  화면: 폼재렌더=true role=status:1 role=alert:1 aria-invalid=0 새토큰=ImQ0ZmFjMzEzNTEx…
+  입력값 보존: name="null" phone="null" message="QA2 토큰 만료 본문" consent=false
+  문구: ["시간이 지나 문의가 접수되지 않았습니다"]
+종료 inquiry 건수: 3

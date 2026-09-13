@@ -4,7 +4,7 @@ from: qa
 to: developer
 phase: P5
 severity: minor
-status: resolved
+status: closed
 related_req: [REQ-N-006, REQ-N-001]
 related_tc: [TC-098]
 related_scr: [SCR-001, SCR-002, SCR-006, SCR-008]
@@ -73,4 +73,4 @@ created: 2026-09-13
 ## 재검증 (qa 작성)
 | 사이클 | 결과 (closed / reopened) | 일자 | 비고 |
 |---|---|---|---|
-| 2차 | | | 320px 재측정 + 360/768/1280 회귀 + 전화 확정 시드 상태에서도 재측정 |
+| **2** | **closed** | 2026-09-13 | 5화면 × 320/360/768/1280px **전건 `scrollWidth == clientWidth`**(320px 326→320). 근본 원인이던 헤더 주 CTA 전 구간 노출도 해소 — `<1280px` 헤더 CTA **0개**, `≥1280px` 만 1개(G-8). 전화 확정 시드 상태에서도 320px 가로 스크롤 없음. 증거 `cycle2/07_viewport.txt`, `09_layout_probe.txt`, `36_fixedbar_phone.txt`, `32_layout_check_dev_tool.txt` |

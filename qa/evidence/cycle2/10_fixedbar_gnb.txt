@@ -1,0 +1,56 @@
+=== A. 고정 바 실측 (CMP-007 .barwrap/.bar) + 하단 여백 + 겹침 ===
+화면	뷰포트	data-fixed-bar	.barwrap DOM	.bar 표시	바 높이	바 버튼	body pb	문서끝 제출버튼과 바 간격
+home	320px	on	있음	표시	61px	문의하기[/location#contact] 296x44	77px	-
+home	360px	on	있음	표시	61px	문의하기[/location#contact] 336x44	77px	-
+home	768px	on	있음	표시	61px	문의하기[/location#contact] 744x44	77px	-
+home	1280px	on	있음	미표시	0px	-	0px	-
+instructors	320px	on	있음	표시	61px	문의하기[/location#contact] 296x44	77px	-
+instructors	360px	on	있음	표시	61px	문의하기[/location#contact] 336x44	77px	-
+instructors	768px	on	있음	표시	61px	문의하기[/location#contact] 744x44	77px	-
+instructors	1280px	on	있음	미표시	0px	-	0px	-
+location	320px	off	없음	미표시	0px	-	0px	-
+location	360px	off	없음	미표시	0px	-	0px	-
+location	768px	off	없음	미표시	0px	-	0px	-
+location	1280px	off	없음	미표시	0px	-	0px	-
+privacy	320px	on	있음	표시	61px	문의하기[/location#contact] 296x44	77px	-
+privacy	360px	on	있음	표시	61px	문의하기[/location#contact] 336x44	77px	-
+privacy	768px	on	있음	표시	61px	문의하기[/location#contact] 744x44	77px	-
+privacy	1280px	on	있음	미표시	0px	-	0px	-
+e404	320px	on	있음	표시	61px	문의하기[/location#contact] 296x44	77px	-
+e404	360px	on	있음	표시	61px	문의하기[/location#contact] 336x44	77px	-
+e404	768px	on	있음	표시	61px	문의하기[/location#contact] 744x44	77px	-
+e404	1280px	on	있음	미표시	0px	-	0px	-
+
+=== B. GNB(nav.gnb) vs 모바일 패널(.mpanel) 구분 — display·크기·간격 ===
+--- 320px  details.open=false  햄버거 버튼={"disp":"flex","w":44,"h":44}
+  gnb: display=none 크기=0x0
+    링크: "홈" 0x0(disp=flex) , "강사 소개" 0x0(disp=flex) , "오시는 길" 0x0(disp=flex) , "문의하기" 0x0(disp=flex)
+    가로 간격: [null,null,null]  세로 간격: [0,0,0]
+  mpanel: display=block 크기=44x601
+    링크: "홈" 44x52(disp=flex) , "강사 소개" 44x110(disp=flex) , "오시는 길" 44x110(disp=flex) , "문의하기" 44x110(disp=flex) , "개인정보 처리방침" 44x219(disp=flex)
+    가로 간격: [-44,-44,-44,-44]  세로 간격: [0,0,0,0]
+  [패널 열림] 링크: "홈" 320x52 , "강사 소개" 320x52 , "오시는 길" 320x52 , "문의하기" 320x52 , "개인정보 처리방침" 320x52
+    세로 간격: [0,0,0,0]  | 열린 상태 scrollW/clientW: 320/320
+--- 360px  details.open=false  햄버거 버튼={"disp":"flex","w":44,"h":44}
+  gnb: display=none 크기=0x0
+    링크: "홈" 0x0(disp=flex) , "강사 소개" 0x0(disp=flex) , "오시는 길" 0x0(disp=flex) , "문의하기" 0x0(disp=flex)
+    가로 간격: [null,null,null]  세로 간격: [0,0,0]
+  mpanel: display=block 크기=44x601
+    링크: "홈" 44x52(disp=flex) , "강사 소개" 44x110(disp=flex) , "오시는 길" 44x110(disp=flex) , "문의하기" 44x110(disp=flex) , "개인정보 처리방침" 44x219(disp=flex)
+    가로 간격: [-44,-44,-44,-44]  세로 간격: [0,0,0,0]
+  [패널 열림] 링크: "홈" 360x52 , "강사 소개" 360x52 , "오시는 길" 360x52 , "문의하기" 360x52 , "개인정보 처리방침" 360x52
+    세로 간격: [0,0,0,0]  | 열린 상태 scrollW/clientW: 360/360
+--- 768px  details.open=false  햄버거 버튼={"disp":"flex","w":0,"h":0}
+  gnb: display=flex 크기=291x44
+    링크: "홈" 44x44(disp=flex) , "강사 소개" 80x44(disp=flex) , "오시는 길" 80x44(disp=flex) , "문의하기" 76x44(disp=flex)
+    가로 간격: [4,4,4]  세로 간격: [-44,-44,-44]
+  mpanel: display=block 크기=0x0
+    링크: "홈" 0x0(disp=flex) , "강사 소개" 0x0(disp=flex) , "오시는 길" 0x0(disp=flex) , "문의하기" 0x0(disp=flex) , "개인정보 처리방침" 0x0(disp=flex)
+    가로 간격: [0,0,0,0]  세로 간격: [0,0,0,0]
+--- 1280px  details.open=false  햄버거 버튼={"disp":"flex","w":0,"h":0}
+  gnb: display=flex 크기=291x44
+    링크: "홈" 44x44(disp=flex) , "강사 소개" 80x44(disp=flex) , "오시는 길" 80x44(disp=flex) , "문의하기" 76x44(disp=flex)
+    가로 간격: [4,4,4]  세로 간격: [-44,-44,-44]
+  mpanel: display=block 크기=0x0
+    링크: "홈" 0x0(disp=flex) , "강사 소개" 0x0(disp=flex) , "오시는 길" 0x0(disp=flex) , "문의하기" 0x0(disp=flex) , "개인정보 처리방침" 0x0(disp=flex)
+    가로 간격: [0,0,0,0]  세로 간격: [0,0,0,0]

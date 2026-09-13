@@ -4,7 +4,7 @@ from: qa
 to: developer
 phase: P5
 severity: trivial
-status: resolved
+status: closed
 related_req: [REQ-N-024]
 related_tc: [TC-116]
 related_scr: []
@@ -68,4 +68,4 @@ og-image.TEMP-source.svg   2,998 B   2026-09-13 01:25
 ## 재검증 (qa 작성)
 | 사이클 | 결과 (closed / reopened) | 일자 | 비고 |
 |---|---|---|---|
-| 2차 | | | 운영 이미지 재빌드 후 자산 목록 재대조 + `og:image` 200 응답 회귀 |
+| **2** | **closed** | 2026-09-13 | 운영 이미지 `yogapass-app:0.1.0-qa2` 의 `/app/static/img/` **11개**(작업 중간 파일 없음), `find /app -iname "*TEMP*"` 실파일 **0건**(매치 2건은 `templates`·`templatetags` 디렉토리). `assets-work`·`qa`·`tests`·`.env`·`Dockerfile`·`compose*` **전건 0건**. 자산 10종 전건 `SOURCES.md` 기재. 증거 `cycle2/16_prod_image_assets.txt` |

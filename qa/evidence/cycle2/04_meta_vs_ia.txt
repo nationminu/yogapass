@@ -1,0 +1,60 @@
+--- /  (SCR-001)  HTTP 200
+  title      OK  "강남 요가패스 | 강남 요가 스튜디오·수업 안내"
+  desc       OK  len=62 "강남에 있는 요가 스튜디오 요가패스입니다. 수업과 강사를 확인하고 궁금한 점은 온라인 문의나 전화로 남겨주세요."
+  desc 50~90 OK
+  og:title   "강남 요가패스 | 강남 요가 스튜디오·수업 안내"  | og:desc len=62
+  robots     "null" | canonical "http://localhost:8001/"
+  h1         "강남 요가패스"
+  '강남' in title/h1: true / true
+  JSON-LD @type: ["HealthAndBeautyBusiness","WebSite"]
+  inline style 개수: 0
+  중복 id: 0건
+--- /instructors  (SCR-002)  HTTP 200
+  title      OK  "요가 강사 소개 | 강남 요가패스"
+  desc       OK  len=69 "강남 요가패스에서 수업을 진행하는 강사들을 소개합니다. 강사별 담당 수업과 자격·경력을 확인하고 체험 수업을 신청해 보세요."
+  desc 50~90 OK
+  og:title   "요가 강사 소개 | 강남 요가패스"  | og:desc len=69
+  robots     "null" | canonical "http://localhost:8001/instructors"
+  h1         "요가 강사 소개"
+  '강남' in title/h1: true / false
+  JSON-LD @type: []
+  inline style 개수: 0
+  중복 id: 0건
+--- /location  (SCR-003)  HTTP 200
+  title      OK  "오시는 길 | 강남 요가패스"
+  desc       OK  len=57 "강남 요가패스 오시는 길입니다. 주소와 가까운 지하철역, 운영시간을 확인하고 길찾기로 바로 이동하세요."
+  desc 50~90 OK
+  og:title   "오시는 길 | 강남 요가패스"  | og:desc len=57
+  robots     "null" | canonical "http://localhost:8001/location"
+  h1         "오시는 길"
+  '강남' in title/h1: true / false
+  JSON-LD @type: ["HealthAndBeautyBusiness"]
+  inline style 개수: 0
+  중복 id: 0건
+--- /privacy  (SCR-006)  HTTP 200
+  title      OK  "개인정보 처리방침 | 강남 요가패스"
+  desc       OK  len=56 "강남 요가패스 개인정보 처리방침입니다. 수집하는 개인정보 항목과 이용 목적, 보관 기간을 안내합니다."
+  desc 50~90 OK
+  og:title   "개인정보 처리방침 | 강남 요가패스"  | og:desc len=56
+  robots     "null" | canonical "http://localhost:8001/privacy"
+  h1         "개인정보 처리방침"
+  '강남' in title/h1: true / false
+  JSON-LD @type: []
+  inline style 개수: 0
+  중복 id: 0건
+--- /nope  (SCR-008)  HTTP 404
+  title      OK  "페이지를 찾을 수 없습니다 | 강남 요가패스"
+  desc       OK  len=0 "null"
+  desc 50~90 OK
+  og:title   "페이지를 찾을 수 없습니다 | 강남 요가패스"  | og:desc len=0
+  robots     "noindex, nofollow" | canonical "null"
+  h1         "요청하신 페이지를 찾을 수 없습니다"
+  '강남' in title/h1: true / false
+  JSON-LD @type: []
+  inline style 개수: 0
+  중복 id: 0건
+
+title 유일성: 5개 중 고유 5개 → OK
+
+총 불일치(화면 단위): 0
+Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c, line 76

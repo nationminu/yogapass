@@ -1,0 +1,6 @@
+### Nu Html Checker (vnu.jar) — 운영 미리보기 5화면 저장본
+"file:/C:/Workspace/workspaces/site-creator/projects/yogapass/qa/evidence/cycle2/pages/instructors.html":114.3-114.23: info warning: Section lacks heading. Consider using “h2”-“h6” elements to add identifying headings to all sections, or else use a “div” element instead for any cases where no heading is needed.
+EXIT=0
+
+### error 건수
+0

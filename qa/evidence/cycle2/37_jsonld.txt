@@ -1,0 +1,20 @@
+### / — JSON-LD 2건
+  [1] JSON 파싱 OK  @type=HealthAndBeautyBusiness
+      name          있음  "강남 요가패스"
+      address       없음 (값 미확정 → 미출력)
+      telephone     없음 (값 미확정 → 미출력)
+      openingHours  없음 (값 미확정 → 미출력)
+      url           있음  "http://localhost:8001/"
+  [2] JSON 파싱 OK  @type=WebSite
+      name          있음  "강남 요가패스"
+      url           있음  "http://localhost:8001/"
+      전문: {"@context":"https://schema.org","@type":"WebSite","name":"강남 요가패스","url":"http://localhost:8001/","inLanguage":"ko-KR"}
+
+### /location — JSON-LD 1건
+  [1] JSON 파싱 OK  @type=HealthAndBeautyBusiness
+      name          있음  "강남 요가패스"
+      address       없음 (값 미확정 → 미출력)
+      telephone     없음 (값 미확정 → 미출력)
+      openingHours  없음 (값 미확정 → 미출력)
+      url           있음  "http://localhost:8001/"
+

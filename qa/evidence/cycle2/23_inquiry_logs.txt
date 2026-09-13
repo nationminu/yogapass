@@ -1,0 +1,26 @@
+### 로그 판정 (검증 컨테이너 qa2-norl · qa2-norl25)
+--- qa2-norl (:8030)
+2026-09-13T18:04:02+0900 INFO core.inquiry inquiry.invalid fields=[phone]
+2026-09-13T18:04:03+0900 INFO core.inquiry inquiry.invalid fields=[phone]
+2026-09-13T18:04:04+0900 INFO core.inquiry inquiry.created ref=181a3e7f-3226-4941-802b-3cefa523b1f3
+2026-09-13T18:04:05+0900 INFO core.inquiry inquiry.duplicate token_state=used ref=181a3e7f-3226-4941-802b-3cefa523b1f3
+2026-09-13T18:04:05+0900 INFO core.inquiry inquiry.invalid fields=[name,phone,consent]
+2026-09-13T18:04:06+0900 WARNING core.inquiry inquiry.blocked reason=honeypot ip_hash=befafe6bbe3bde532764b2a6ffe47404
+2026-09-13T18:04:26+0900 INFO core.inquiry inquiry.expired token_state=missing ref=none
+2026-09-13T18:05:15+0900 INFO core.inquiry inquiry.created ref=7c01316a-061f-4ca0-9e9d-008675c34a48
+2026-09-13T18:05:15+0900 INFO core.inquiry inquiry.duplicate token_state=used ref=7c01316a-061f-4ca0-9e9d-008675c34a48
+2026-09-13T18:05:15+0900 INFO core.inquiry inquiry.invalid fields=[name,phone,consent]
+2026-09-13T18:05:15+0900 WARNING core.inquiry inquiry.blocked reason=honeypot ip_hash=befafe6bbe3bde532764b2a6ffe47404
+2026-09-13T18:05:15+0900 INFO core.inquiry inquiry.expired token_state=missing ref=none
+2026-09-13T18:05:15+0900 INFO core.inquiry inquiry.expired token_state=invalid ref=none
+2026-09-13T18:05:47+0900 INFO core.inquiry inquiry.expired token_state=missing ref=none
+
+--- qa2-norl25 (:8040, +25h)
+2026-09-13T18:04:03+0900 INFO core.inquiry inquiry.expired token_state=expired ref=none
+2026-09-13T18:05:15+0900 INFO core.inquiry inquiry.expired token_state=expired ref=none
+
+--- token_state 별 집계
+      1 token_state=invalid
+      3 token_state=missing
+      2 token_state=used
+      2 token_state=expired

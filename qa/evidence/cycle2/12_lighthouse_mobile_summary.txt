@@ -1,0 +1,20 @@
+=== M-1 모바일 기본 프리셋 · 3회 중앙값 (대상: 운영 미리보기 http://localhost:8001, LH 13.4.1) ===
+화면 | 성능 | 접근성 | 권장사항 | SEO | 원값(perf/a11y/bp/seo)
+home | 100 | 100 | 100 | 100 | 100/100/100/100  100/100/100/100  100/100/100/100
+instructors | 100 | 100 | 100 | 100 | 100/100/100/100  100/100/100/100  100/100/100/100
+location | 99 | 100 | 100 | 100 | 99/100/100/100  99/100/100/100  99/100/100/100
+privacy | 99 | 100 | 100 | 100 | 99/100/100/100  99/100/100/100  99/100/100/100
+
+=== 감점 감사 항목 (가중치>0, 3회 중 발생 횟수) ===
+3x home | performance | first-contentful-paint (First Contentful Paint)
+3x home | performance | speed-index (Speed Index)
+3x instructors | performance | first-contentful-paint (First Contentful Paint)
+3x instructors | performance | speed-index (Speed Index)
+3x location | performance | first-contentful-paint (First Contentful Paint)
+3x location | performance | largest-contentful-paint (Largest Contentful Paint)
+3x location | performance | speed-index (Speed Index)
+3x location | performance | total-blocking-time (Total Blocking Time)
+3x privacy | performance | first-contentful-paint (First Contentful Paint)
+3x privacy | performance | largest-contentful-paint (Largest Contentful Paint)
+3x privacy | performance | speed-index (Speed Index)
+3x privacy | performance | total-blocking-time (Total Blocking Time)

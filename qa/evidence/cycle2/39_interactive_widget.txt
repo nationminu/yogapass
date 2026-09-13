@@ -1,0 +1,6 @@
+### REQ-F-003 ⑤-1 정적 확인 — 런타임 DOM 기준 (JS 주입 여부 포함)
+  /              viewport="width=device-width, initial-scale=1"  interactive-widget=**없음**  data-vk-fallback=null  scroll-padding-bottom=77px  data-fixed-bar=on
+  /instructors   viewport="width=device-width, initial-scale=1"  interactive-widget=**없음**  data-vk-fallback=null  scroll-padding-bottom=77px  data-fixed-bar=on
+  /location      viewport="width=device-width, initial-scale=1"  interactive-widget=**없음**  data-vk-fallback=null  scroll-padding-bottom=81px  data-fixed-bar=off
+  /privacy       viewport="width=device-width, initial-scale=1"  interactive-widget=**없음**  data-vk-fallback=null  scroll-padding-bottom=77px  data-fixed-bar=on
+  /nope          viewport="width=device-width, initial-scale=1"  interactive-widget=**없음**  data-vk-fallback=null  scroll-padding-bottom=77px  data-fixed-bar=on

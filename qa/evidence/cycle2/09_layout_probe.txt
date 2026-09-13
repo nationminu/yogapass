@@ -1,0 +1,56 @@
+=== A. 화면×뷰포트: 헤더 주CTA(G-8) · 고정 바 · body 하단 여백 · aria-current · 헤더 높이 ===
+화면	뷰포트	헤더CTA	헤더CTA문구	고정바	고정바버튼	body padding-bottom	--fixed-bar-h	headerH	aria-current(GNB/CTA)
+home	320px	0	-	없음	-	77px	61px	65	2/0
+home	360px	0	-	없음	-	77px	61px	65	2/0
+home	768px	0	-	없음	-	77px	61px	69	2/0
+home	1280px	1	문의하기[/location#contact]	없음	-	0px	0px	73	2/0
+instructors	320px	0	-	없음	-	77px	61px	65	2/0
+instructors	360px	0	-	없음	-	77px	61px	65	2/0
+instructors	768px	0	-	없음	-	77px	61px	69	2/0
+instructors	1280px	1	문의하기[/location#contact]	없음	-	0px	0px	73	2/0
+location	320px	0	-	없음	-	0px	0px	65	2/0
+location	360px	0	-	없음	-	0px	0px	65	2/0
+location	768px	0	-	없음	-	0px	0px	69	2/0
+location	1280px	0	-	없음	-	0px	0px	73	2/0
+privacy	320px	0	-	없음	-	77px	61px	65	0/0
+privacy	360px	0	-	없음	-	77px	61px	65	0/0
+privacy	768px	0	-	없음	-	77px	61px	69	0/0
+privacy	1280px	1	문의하기[/location#contact]	없음	-	0px	0px	73	0/0
+e404	320px	0	-	없음	-	77px	61px	65	0/0
+e404	360px	0	-	없음	-	77px	61px	65	0/0
+e404	768px	0	-	없음	-	77px	61px	69	0/0
+e404	1280px	1	문의하기[/location#contact]	없음	-	0px	0px	73	0/0
+
+=== B. 헤더 높이 되먹임 회귀 — 같은 페이지 5회 연속 로드 ===
+360px  높이(5회): 65 → 65 → 65 → 65 → 65  | --header-h: 65px,65px,65px,65px,65px  | --header-min-h: 64px
+768px  높이(5회): 69 → 69 → 69 → 69 → 69  | --header-h: 69px,69px,69px,69px,69px  | --header-min-h: 68px
+1280px  높이(5회): 73 → 73 → 73 → 73 → 73  | --header-h: 73px,73px,73px,73px,73px  | --header-min-h: 72px
+
+=== C. 조작 요소 크기·인접 간격 (헤더 로고 · GNB · 푸터 링크) ===
+--- 360px
+  로고 링크: ["140x44"]  그래픽(svg): ["140x32"]
+  GNB: "홈" 44x52 , "강사 소개" 44x110 , "오시는 길" 44x110 , "문의하기" 44x110 , "개인정보 처리방침" 44x219
+  GNB 인접 간격(px): [-44,-44,-44,-44]  | GNB 전체 폭: 44
+  푸터 링크: "홈" 328x44 , "강사 소개" 328x44 , "오시는 길" 328x44 , "문의하기" 328x44 , "개인정보 처리방침" 328x44
+  푸터 링크 인접 간격(px): [0,0,0,57]
+  푸터 문단 글꼴: [{"txt":"© 2026 강남 요가패스","fs":"14px"}]
+--- 768px
+  로고 링크: ["140x44"]  그래픽(svg): ["140x32"]
+  GNB: "홈" 44x44 , "강사 소개" 80x44 , "오시는 길" 80x44 , "문의하기" 76x44
+  GNB 인접 간격(px): [4,4,4]  | GNB 전체 폭: 292
+  푸터 링크: "홈" 346x44 , "강사 소개" 346x44 , "오시는 길" 346x44 , "문의하기" 346x44 , "개인정보 처리방침" 346x44
+  푸터 링크 인접 간격(px): [0,0,0,56]
+  푸터 문단 글꼴: [{"txt":"© 2026 강남 요가패스","fs":"14px"}]
+--- 1280px
+  로고 링크: ["140x44"]  그래픽(svg): ["140x32"]
+  GNB: "홈" 44x44 , "강사 소개" 80x44 , "오시는 길" 80x44 , "문의하기" 76x44
+  GNB 인접 간격(px): [4,4,4]  | GNB 전체 폭: 291
+  푸터 링크: "홈" 233x44 , "강사 소개" 233x44 , "오시는 길" 233x44 , "문의하기" 233x44 , "개인정보 처리방침" 233x44
+  푸터 링크 인접 간격(px): [0,0,0,-176]
+  푸터 문단 글꼴: [{"txt":"© 2026 강남 요가패스","fs":"14px"}]
+
+=== D. 앵커 이동 위치 (#contact · #map, 헤더에 가리지 않는지) ===
+  360px #map → 대상 top=162px, 헤더 bottom=65px, scroll-margin-top=81px, 헤더에 가림=아니오(OK)
+  360px #contact → 대상 top=162px, 헤더 bottom=65px, scroll-margin-top=81px, 헤더에 가림=아니오(OK)
+  1280px #map → 대상 top=178px, 헤더 bottom=73px, scroll-margin-top=89px, 헤더에 가림=아니오(OK)
+  1280px #contact → 대상 top=178px, 헤더 bottom=73px, scroll-margin-top=89px, 헤더에 가림=아니오(OK)

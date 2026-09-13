@@ -1,0 +1,31 @@
+### 내부 링크·정적 자산 상태 코드 (운영 미리보기 :8001)
+  OK 200  /
+  OK 200  /instructors
+  OK 200  /location
+  OK 200  /privacy
+  OK 200  /static/css/base.4fd73317bcd8.css
+  OK 200  /static/css/components/base.40932799a467.css
+  OK 200  /static/css/components/form.5dcc8f05d70c.css
+  OK 200  /static/css/components/layout.118dfe84ce54.css
+  OK 200  /static/css/components/nav.13f066af8482.css
+  OK 200  /static/css/fonts.bb29d9770af1.css
+  OK 200  /static/css/pages/error.7410152b3110.css
+  OK 200  /static/css/pages/home.efcb35a57542.css
+  OK 200  /static/css/pages/instructors.27741bd38bb9.css
+  OK 200  /static/css/pages/location.4663c3fcedce.css
+  OK 200  /static/css/pages/privacy.ec0e208260a7.css
+  OK 200  /static/css/tokens.b61a39a5f9a8.css
+  OK 200  /static/fonts/pretendard/Pretendard-Regular.subset.90.b1c3f2937d88.woff2
+  OK 200  /static/fonts/pretendard/Pretendard-Regular.subset.91.97b7ae623488.woff2
+  OK 200  /static/img/apple-touch-icon.3581f52784a9.png
+  OK 200  /static/img/favicon.07ad962b07a0.svg
+  OK 200  /static/img/favicon.9d29fe40db40.ico
+  OK 200  /static/js/form.e622ea46a043.js
+  OK 200  /static/js/map.35e36340a934.js
+  OK 200  /static/js/menu.1691a8ea96dd.js
+  OK 200  /static/js/viewport.d8505dd92b22.js
+
+내부 링크·자산: 200 25건 / 비정상 0건
+
+### 앵커 대상 id 존재 확인
+  앵커 대상 존재 18건 / 누락 0건

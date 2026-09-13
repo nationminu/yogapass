@@ -1,0 +1,19 @@
+### TC-070 회귀 — /privacy 목차 11항목 · [TBD] 표시
+   h2 개수: 13
+   '[TBD' 출현: 19
+   목차 링크: 11개
+
+### TC-084 회귀 — 전화 확정 시 헤더·푸터·오시는 길 3곳 반영 (prodcheck DB 주입 → 원복)
+
+주입 완료
+   /              tel: 링크 7건 | 주소 문자열 3건
+   /instructors   tel: 링크 7건 | 주소 문자열 1건
+   /location      tel: 링크 11건 | 주소 문자열 4건
+   푸터 영역 tel: 1건
+
+원복 완료
+
+### TC-080 회귀 — 404 화면
+   /nope HTTP=404
+   noindex: 1건 | 헤더·푸터: 1/1
+   안내 링크: href="/" href="/instructors" href="/location" href="/location#contact" href="/privacy" 

@@ -4,7 +4,7 @@ from: qa
 to: developer
 phase: P5
 severity: minor
-status: resolved
+status: closed
 related_req: [REQ-N-016, REQ-N-006]
 related_tc: [TC-108]
 related_scr: [SCR-001, SCR-002, SCR-003, SCR-006, SCR-008]
@@ -67,4 +67,4 @@ html/privacy.html:342.3-342.19: error: Duplicate ID “ypht”.
 ## 재검증 (qa 작성)
 | 사이클 | 결과 (closed / reopened) | 일자 | 비고 |
 |---|---|---|---|
-| 2차 | | | vnu 재실행(오류 0건) + `18_a11y_markup` 회귀 |
+| **2** | **closed** | 2026-09-13 | Nu Html Checker(vnu.jar) 5화면 저장본 **error 0건**(종전 5건). 렌더 HTML 중복 id **0건**(5/5 화면). 남은 출력은 `instructors.html` 의 info warning 1줄(오류 아님 — §4.3 ④). 증거 `cycle2/06_html_validate.txt`, `04_meta_vs_ia.txt` |

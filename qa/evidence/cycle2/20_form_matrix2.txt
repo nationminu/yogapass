@@ -1,0 +1,60 @@
+시작 시점 inquiry 건수: 1
+
+############ ⑦-missing
+  HTTP=200
+  화면: form재렌더=1  role=status:1  role=alert:1  aria-invalid=1
+  새 토큰: …
+  입력값 보존: name='' phone='' message='' consent_checked=1
+  문구: 입력 내용을 확인 
+  Retry-After: 
+
+############ ⑦-invalid
+  HTTP=200
+  화면: form재렌더=1  role=status:1  role=alert:1  aria-invalid=1
+  새 토큰: IjgyZGMxMmM1ZWM0YzQ1…
+  입력값 보존: name='' phone='' message='' consent_checked=1
+  문구: 입력 내용을 확인 
+  Retry-After: 
+
+############ ⑦-expired
+  정상 시계 발급 토큰: IjIwODA2NDZiNjU0YjQ2… → +25h 컨테이너에 제출
+  HTTP=200
+  화면: form재렌더=1  role=status:1  role=alert:1  aria-invalid=0
+  새 토큰: IjdiODBlYWM2NTMwNjQ0…
+  입력값 보존: name='' phone='' message='' consent_checked=1
+  문구: 시간이 지나 문의가 접수되지 않았습니다 
+  Retry-After: 
+
+############ ① 정상 접수 (빈도제한 off)
+  HTTP=200
+  화면: form재렌더=0  role=status:2  role=alert:0  aria-invalid=0
+  새 토큰: …
+  입력값 보존: name='' phone='' message='' consent_checked=0
+  문구: 문의가 접수되었습니다 
+  Retry-After: 
+
+############ ⑤ 토큰 재사용 (방금 쓴 토큰 재제출)
+  HTTP=200
+  화면: form재렌더=0  role=status:2  role=alert:0  aria-invalid=0
+  새 토큰: …
+  입력값 보존: name='' phone='' message='' consent_checked=0
+  문구: 문의가 접수되었습니다 
+  Retry-After: 
+
+############ ② 서버 검증 실패
+  HTTP=200
+  화면: form재렌더=1  role=status:1  role=alert:1  aria-invalid=3
+  새 토큰: ImI5Y2Q5NGRjYTBlYTQ2…
+  입력값 보존: name='' phone='' message='' consent_checked=0
+  문구: 입력 내용을 확인 
+  Retry-After: 
+
+############ ③ honeypot
+  HTTP=200
+  화면: form재렌더=0  role=status:2  role=alert:0  aria-invalid=0
+  새 토큰: …
+  입력값 보존: name='' phone='' message='' consent_checked=0
+  문구: 문의가 접수되었습니다 
+  Retry-After: 
+
+종료 시점 inquiry 건수: 2 (시작 1)

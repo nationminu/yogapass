@@ -1,0 +1,15 @@
+### home (360px)
+ -- 14px 미만 텍스트 --
+   10.5px  text.[object SVGAnimatedString]  "강남 요가 스튜디오"
+   12.5px  span.eyebrow  "강남 요가 스튜디오"
+ -- 44x44 미만 조작 요소 --
+### location (360px)
+ -- 14px 미만 텍스트 --
+   10.5px  text.[object SVGAnimatedString]  "강남 요가 스튜디오"
+ -- 44x44 미만 조작 요소 --
+   24x24  input.  inline=false  "checkbox"
+   216x16  a.link  inline=true  "개인정보 처리방침 보기 (새 창 열림)"
+### privacy (360px)
+ -- 14px 미만 텍스트 --
+   10.5px  text.[object SVGAnimatedString]  "강남 요가 스튜디오"
+ -- 44x44 미만 조작 요소 --

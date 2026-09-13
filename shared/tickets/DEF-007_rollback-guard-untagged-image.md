@@ -4,7 +4,7 @@ from: qa
 to: developer
 phase: P5
 severity: minor
-status: resolved
+status: closed
 related_req: [REQ-N-033]
 related_tc: [TC-125]
 related_scr: []
@@ -105,4 +105,4 @@ ROLLBACK_VERSION=${ROLLBACK_VERSION:-$(echo "$TARGET_IMAGE" | sed 's/.*://')}
 ## 재검증 (qa 작성)
 | 사이클 | 결과 (closed / reopened) | 일자 | 비고 |
 |---|---|---|---|
-| 2차 | | | 태그 없는 `.deploy-rollback-image`·빈 파일·정상 태그 3경우 재수행 + `deploy.sh --dry-run` 부수 효과 확인 |
+| **2** | **closed** | 2026-09-13 | 7가지 상황 전건 의도대로 — 태그 없는 이름 / `:latest` / 빈 파일 / 파일 없음 / 없는 버전은 **종료 코드 1 로 거부**, 정상 태그 + `--dry-run` 은 판정만(0), 정상 태그 + 비대화형은 **확인 없이 롤백하지 않음**(1). 실행 전후 `docker ps` **동일**(스택 변경 0건). `deploy.sh --dry-run` 의 `.deploy-rollback-image` **부수 효과 소멸**(원본·사본 모두 0건). `sh -n` 4스크립트 통과. 증거 `cycle2/27_rollback_guard.txt`, `28_deploy_dryrun.txt` |

@@ -1,0 +1,7 @@
+### ⑦ 토큰 부재 재렌더 시 입력값 4항목 보존 (원문 발췌)
+name  : <input class="inp" id="f-name" name="name" type="text" maxlength="20" required value="QA2-보존확인" placeholder="이름을 입력해 주세요" autocomplete="name" >
+phone : <input class="inp" id="f-phone" name="phone" type="tel" maxlength="20" required value="010-6666-7777" placeholder="010-0000-0000" autocomplete="tel" inputmode="tel" aria-describedby="hint-phone">
+consent: <input type="checkbox" id="f-consent" name="consent" required checked>
+message: "QA2 입력값 보존 확인 본문"
+문구  : 시간이 지나 문의가 접수되지 않았습니다.
+새 토큰: IjNmMmE2ZTBlMzQ3MDRh…

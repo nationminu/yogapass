@@ -1,0 +1,49 @@
+############ ① 정상 접수 (정상 시계 :8010)
+  HTTP=200
+  form 재렌더=0  role=status:2 role=alert:0  aria-invalid=0
+  새 토큰: …
+  입력값 보존: name= / phone= / message길이=0 / consent=0
+  주요 문구: 문의가 접수되었습니다 
+
+############ ⑤ 토큰 재사용 (같은 토큰 재제출)
+  HTTP=200
+  form 재렌더=0  role=status:2 role=alert:0  aria-invalid=0
+  새 토큰: …
+  입력값 보존: name= / phone= / message길이=0 / consent=0
+  주요 문구: 문의가 접수되었습니다 
+
+############ ② 서버 검증 실패 (이름·전화·동의 누락)
+  HTTP=200
+  form 재렌더=1  role=status:1 role=alert:1  aria-invalid=3
+  새 토큰: IjIyYjdhZGUyYzc5NDQ5MDZi…
+  입력값 보존: name= / phone= / message길이=0 / consent=0
+  주요 문구: 
+
+############ ③ honeypot
+  HTTP=200
+  form 재렌더=0  role=status:2 role=alert:0  aria-invalid=0
+  새 토큰: …
+  입력값 보존: name= / phone= / message길이=0 / consent=0
+  주요 문구: 문의가 접수되었습니다 
+
+############ ⑦-a 토큰 부재(missing)
+  HTTP=429
+  form 재렌더=1  role=status:1 role=alert:1  aria-invalid=0
+  새 토큰: …
+  입력값 보존: name= / phone= / message길이=0 / consent=1
+  주요 문구: 잠시 후 다시 
+
+############ ⑦-b 토큰 변조(invalid)
+  HTTP=429
+  form 재렌더=1  role=status:1 role=alert:1  aria-invalid=0
+  새 토큰: ImNjMWMyNjk0NzVmODQwMDFh…
+  입력값 보존: name= / phone= / message길이=0 / consent=1
+  주요 문구: 잠시 후 다시 
+
+############ ⑦-c 토큰 만료(expired) — 정상 시계(:8010)에서 발급한 토큰을 +25h 시계(:8020)에 제출
+  발급 토큰(정상 시계): IjkwNmI2N2JmY2ZjYTQ1ZDk4…
+  HTTP=200
+  form 재렌더=1  role=status:1 role=alert:1  aria-invalid=0
+  새 토큰: IjNhMjQ3YzJkN2U2YTQ1N2E5…
+  입력값 보존: name= / phone= / message길이=0 / consent=1
+  주요 문구: 시간이 지나 문의가 접수되지 않았습니다 

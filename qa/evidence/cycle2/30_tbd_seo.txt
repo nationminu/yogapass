@@ -1,0 +1,26 @@
+### M-5 [TBD] 잔존 스캔 (운영 미리보기 렌더 결과)
+home         [TBD 출현 0회
+instructors  [TBD 출현 0회
+location     [TBD 출현 0회
+privacy      [TBD 출현 19회
+notfound     [TBD 출현 0회
+
+### sitemap.xml / robots.txt / canonical
+--- sitemap.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<url><loc>http://localhost:8001/</loc><changefreq>monthly</changefreq><priority>1.0</priority></url><url><loc>http://localhost:8001/instructors</loc><changefreq>monthly</changefreq><priority>0.7</priority></url><url><loc>http://localhost:8001/location</loc><changefreq>monthly</changefreq><priority>0.7</priority></url><url><loc>http://localhost:8001/privacy</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+</urlset>
+
+--- robots.txt
+User-agent: *
+Disallow:
+
+Sitemap: http://localhost:8001/sitemap.xml
+
+--- 각 화면 canonical·robots 메타
+/              <link rel="canonical" href="http://localhost:8001/" | 
+/instructors   <link rel="canonical" href="http://localhost:8001/instructors" | 
+/location      <link rel="canonical" href="http://localhost:8001/location" | 
+/privacy       <link rel="canonical" href="http://localhost:8001/privacy" | 
+/nope           | <meta name="robots" content="noindex, nofollow"

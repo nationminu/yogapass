@@ -1,0 +1,15 @@
+### 상태 A: DB 미적재(마이그레이션 전) — 운영 미리보기 :8001
+--- /
+<title>강남 요가패스 | 강남 요가 스튜디오·수업 안내</title>
+<meta name="description" content="강남에 있는 요가 스튜디오 요가패스입니다. 수업과 강사를 확인하고 궁금한 점은 온라인 문의나 전화로 남겨주세요."
+--- /instructors
+<title>요가 강사 소개 | 강남 요가패스</title>
+<meta name="description" content="강남 요가패스에서 수업을 진행하는 강사들을 소개합니다. 강사별 담당 수업과 자격·경력을 확인하고 체험 수업을 신청해 보세요."
+--- /location
+<title>오시는 길 | 강남 요가패스</title>
+<meta name="description" content="강남 요가패스 오시는 길입니다. 주소와 가까운 지하철역, 운영시간을 확인하고 길찾기로 바로 이동하세요."
+--- /privacy
+<title>개인정보 처리방침 | 강남 요가패스</title>
+<meta name="description" content="강남 요가패스 개인정보 처리방침입니다. 수집하는 개인정보 항목과 이용 목적, 보관 기간을 안내합니다."
+--- /nope
+<title>페이지를 찾을 수 없습니다 | 강남 요가패스</title>

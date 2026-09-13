@@ -1,0 +1,51 @@
+### 사이클 2 환경 정리
+qa2-clock-normal qa2-clock-plus25 qa2-norl qa2-norl25 
+ Container yogapass-prodcheck-db-1  Removing
+ Container yogapass-prodcheck-db-1  Removed
+ Volume yogapass-prodcheck_pgdata  Removing
+ Network yogapass-prodcheck_internal  Removing
+ Volume yogapass-prodcheck_pgdata  Removed
+ Network yogapass-prodcheck_internal  Removed
+
+--- 남은 컨테이너
+yogapass-app-1	yogapass-app	Up 2 hours (healthy)
+yogapass-db-1	postgres:17-alpine	Up 2 hours (healthy)
+yogapass-mail-1	axllent/mailpit:latest	Up 3 hours (healthy)
+yogapass-proxy-1	nginx:alpine	Up 3 hours (healthy)
+yogapass-scheduler-1	yogapass-scheduler	Up 2 hours (healthy)
+
+--- 로컬 스택 화면 상태
+   :8000/            200
+   :8000/location    200
+   :8000/healthz     200
+
+--- 소스 변경 재확인
+warning: could not open directory 'developer/site/developer/': No such file or directory
+   developer/ : 0행
+   inquiry 건수: 0
+   [정정] 프로젝트 루트 기준 재확인
+   developer/ 변경: 0행
+   planning/ design/ pm/ devops/ shared/decisions 변경: 0행
+   qa/ · shared/tickets 변경:
+      M qa/05_test-cases.md
+      M qa/05_test-report.md
+      M qa/WORKLOG.md
+      M shared/tickets/DEF-001_meta-title-description-mismatch.md
+      M shared/tickets/DEF-002_duplicate-id-html-validation.md
+      M shared/tickets/DEF-003_csp-blocks-inline-style-home.md
+      M shared/tickets/DEF-004_reflow-320px-horizontal-scroll.md
+      M shared/tickets/DEF-005_touch-target-and-font-minimum.md
+      M shared/tickets/DEF-006_bottom-padding-without-fixed-bar.md
+      M shared/tickets/DEF-007_rollback-guard-untagged-image.md
+      M shared/tickets/DEF-008_clock-offset-not-applied-to-token-expiry.md
+      M shared/tickets/DEF-009_privacy-collected-items-vs-schema.md
+      M shared/tickets/DEF-010_temp-source-file-in-prod-image.md
+     ?? qa/evidence/cycle2/
+     ?? qa/tools/form-check2.js
+     ?? qa/tools/meta-check2.js
+     ?? qa/tools/probe10.js
+     ?? qa/tools/probe6.js
+     ?? qa/tools/probe7.js
+     ?? qa/tools/probe8.js
+     ?? qa/tools/probe9.js
+     ?? shared/tickets/DEF-011_viewport-interactive-widget-missing.md

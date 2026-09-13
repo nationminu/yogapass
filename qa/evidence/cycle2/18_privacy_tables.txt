@@ -1,0 +1,20 @@
+--- 320px  문서 scrollW/clientW = 320/320  가로 스크롤 없음
+   표1 행5 display=block thead=block 표폭=288(right 304) 부모=div.tbl-wrap overflowX=visible 부모폭=288 부모scrollW=288
+   표2 행3 display=block thead=block 표폭=288(right 304) 부모=div.tbl-wrap overflowX=visible 부모폭=288 부모scrollW=288
+   표3 행4 display=block thead=block 표폭=288(right 304) 부모=div.tbl-wrap overflowX=visible 부모폭=288 부모scrollW=288
+   표4 행2 display=block thead=block 표폭=288(right 304) 부모=div.tbl-wrap overflowX=visible 부모폭=288 부모scrollW=288
+--- 360px  문서 scrollW/clientW = 360/360  가로 스크롤 없음
+   표1 행5 display=block thead=block 표폭=328(right 344) 부모=div.tbl-wrap overflowX=visible 부모폭=328 부모scrollW=328
+   표2 행3 display=block thead=block 표폭=328(right 344) 부모=div.tbl-wrap overflowX=visible 부모폭=328 부모scrollW=328
+   표3 행4 display=block thead=block 표폭=328(right 344) 부모=div.tbl-wrap overflowX=visible 부모폭=328 부모scrollW=328
+   표4 행2 display=block thead=block 표폭=328(right 344) 부모=div.tbl-wrap overflowX=visible 부모폭=328 부모scrollW=328
+--- 768px  문서 scrollW/clientW = 768/768  가로 스크롤 없음
+   표1 행5 display=table thead=table-header-group 표폭=720(right 744) 부모=div.tbl-wrap overflowX=visible 부모폭=720 부모scrollW=720
+   표2 행3 display=table thead=table-header-group 표폭=720(right 744) 부모=div.tbl-wrap overflowX=visible 부모폭=720 부모scrollW=720
+   표3 행4 display=table thead=table-header-group 표폭=720(right 744) 부모=div.tbl-wrap overflowX=visible 부모폭=720 부모scrollW=720
+   표4 행2 display=table thead=table-header-group 표폭=720(right 744) 부모=div.tbl-wrap overflowX=visible 부모폭=720 부모scrollW=720
+--- 1280px  문서 scrollW/clientW = 1280/1280  가로 스크롤 없음
+   표1 행5 display=table thead=table-header-group 표폭=720(right 1080) 부모=div.tbl-wrap overflowX=visible 부모폭=720 부모scrollW=720
+   표2 행3 display=table thead=table-header-group 표폭=720(right 1080) 부모=div.tbl-wrap overflowX=visible 부모폭=720 부모scrollW=720
+   표3 행4 display=table thead=table-header-group 표폭=720(right 1080) 부모=div.tbl-wrap overflowX=visible 부모폭=720 부모scrollW=720
+   표4 행2 display=table thead=table-header-group 표폭=720(right 1080) 부모=div.tbl-wrap overflowX=visible 부모폭=720 부모scrollW=720

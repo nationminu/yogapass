@@ -1,0 +1,14 @@
+### ④ 빈도 제한 초과 (:8010 — 제한 적용 컨테이너, 창 10분 최대 5건)
+  제출1: HTTP=429  Retry-After=21224  문구=["잠시 후 다시 시도해 주세요"]
+  제출2: HTTP=429  Retry-After=21224  문구=["잠시 후 다시 시도해 주세요"]
+  제출3: HTTP=429  Retry-After=21224  문구=["잠시 후 다시 시도해 주세요"]
+  제출4: HTTP=429  Retry-After=21224  문구=["잠시 후 다시 시도해 주세요"]
+  제출5: HTTP=429  Retry-After=21224  문구=["잠시 후 다시 시도해 주세요"]
+  제출6: HTTP=429  Retry-After=21223  문구=["잠시 후 다시 시도해 주세요"]
+  제출7: HTTP=429  Retry-After=21223  문구=["잠시 후 다시 시도해 주세요"]
+  제출8: HTTP=429  Retry-After=21223  문구=["잠시 후 다시 시도해 주세요"]
+2026-09-13T18:06:16+0900 WARNING core.inquiry inquiry.blocked reason=rate_limit ip_hash=befafe6bbe3bde532764b2a6ffe47404 scope=form
+2026-09-13T18:06:16+0900 WARNING core.inquiry inquiry.blocked reason=rate_limit ip_hash=befafe6bbe3bde532764b2a6ffe47404 scope=form
+2026-09-13T18:06:17+0900 WARNING core.inquiry inquiry.blocked reason=rate_limit ip_hash=befafe6bbe3bde532764b2a6ffe47404 scope=form
+2026-09-13T18:06:17+0900 WARNING core.inquiry inquiry.blocked reason=rate_limit ip_hash=befafe6bbe3bde532764b2a6ffe47404 scope=form
+2026-09-13T18:06:17+0900 WARNING core.inquiry inquiry.blocked reason=rate_limit ip_hash=befafe6bbe3bde532764b2a6ffe47404 scope=form

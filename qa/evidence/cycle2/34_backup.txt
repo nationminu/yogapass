@@ -1,0 +1,11 @@
+### 백업 스모크 (회귀 — 수정 영향 범위 밖이나 1회 실행 확인)
+run_backup file=yogapass-local-20260913-1815.dump bytes=88601 elapsed=0.2s rotated=0 label=- free_gb=218.4
+2026-09-13T18:15:14+0900 INFO core.jobs job.finished job=run_backup status=success detail=file=yogapass-local-20260913-1815.dump bytes=88601 elapsed=0.2s rotated=0 label=- free_gb=218.4
+   종료 코드=0
+
+--- 백업 파일 목록(최근 3개)
+drwxr-xr-x 1 natio 197610     0 Sep 13 17:42 ..
+-rw-r--r-- 1 natio 197610 68431 Sep 13 10:43 yogapass-local-20260913-1043.label-pre-deploy.dump
+-rw-r--r-- 1 natio 197610 73581 Sep 13 10:55 yogapass-local-20260913-1055.label-pre-restore.dump
+-rw-r--r-- 1 natio 197610 85533 Sep 13 16:18 yogapass-local-20260913-1618.dump
+-rw-r--r-- 1 natio 197610 85998 Sep 13 16:19 yogapass-local-20260913-1619.label-pre-restore.dump

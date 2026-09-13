@@ -4,7 +4,7 @@ from: qa
 to: developer
 phase: P5
 severity: minor
-status: resolved
+status: closed
 related_req: [REQ-F-046]
 related_tc: [TC-059]
 related_scr: [SCR-003]
@@ -95,4 +95,4 @@ Django `signing.loads(max_age=…)` 는 **서명에 박힌 타임스탬프와 `t
 ## 재검증 (qa 작성)
 | 사이클 | 결과 (closed / reopened) | 일자 | 비고 |
 |---|---|---|---|
-| 2차 | | | `expired` 유발 → §9.6 ⑦ 전 항목 재판정 + ①⑤(정상·재사용) 회귀 |
+| **2** | **closed** | 2026-09-13 | 정상 시계 컨테이너에서 발급한 토큰을 **+25h 컨테이너**에 제출 → HTTP **200** + "시간이 지나 문의가 접수되지 않았습니다." + 폼 재렌더 + **입력값 4항목 보존** + 새 토큰 · 저장 **0건** · 로그 **`inquiry.expired token_state=expired`**. §9.6 ⑦ 3상태(missing·invalid·expired) **전건 판정 가능**. ①②③④⑤ 회귀 정상. 증거 `cycle2/21_form_96.txt`, `22_form_preserve.txt`, `23_inquiry_logs.txt` |

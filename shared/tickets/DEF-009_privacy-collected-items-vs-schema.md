@@ -4,7 +4,7 @@ from: qa
 to: developer
 phase: P5
 severity: minor
-status: resolved
+status: closed
 related_req: [REQ-N-020, REQ-F-050]
 related_tc: [TC-112]
 related_scr: [SCR-006]
@@ -74,4 +74,4 @@ created: 2026-09-13
 ## 재검증 (qa 작성)
 | 사이클 | 결과 (closed / reopened) | 일자 | 비고 |
 |---|---|---|---|
-| 2차 | | | `qa_pii_columns` ↔ `privacy.yml` 재대조 + TC-070(목차 11항목) 회귀 |
+| **2** | **closed** | 2026-09-13 | `qa_pii_columns` 6컬럼(name·phone·phone_norm·message·consent_at·source_ip_hash) ↔ `/privacy` 수집 항목 표 **양방향 누락 0건**. 표에 "수집·이용 동의 시각"·"휴대폰 번호의 정규화 표기" **2행 추가** 확인(수집 항목 표 5행), 보관 기간 표에도 반영. 초과 고지 0건. 카드 전환(<768px)·가로 스크롤 없음 회귀 정상. 증거 `cycle2/17_pii_columns.txt`, `18_privacy_tables.txt` |

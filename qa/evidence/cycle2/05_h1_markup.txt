@@ -1,0 +1,18 @@
+=== / h1 원문 ===
+        <span class="eyebrow">강남 요가 스튜디오</span>
+        <h1>강남 요가패스</h1>
+        
+        <div class="cta-row">
+          <a class="btn btn-lg btn-p" href="/location#contact">문의하기</a>
+          
+
+=== /location h1 원문 ===
+    <div class="pagehead">
+      <h1>오시는 길</h1>
+      <p class="lead">강남 요가패스를 찾아오시는 방법을 안내합니다.</p>
+      <nav class="chips" aria-label="페이지 내 이동">
+        <a class="chip" href="#map">지도·오시는 길</a>
+        <a class="chip" href="#contact">문의하기</a>
+
+=== site.yml hero_headline / 디자인·스토리보드의 SCR-003 h1 명세 ===
+41:  hero_headline:

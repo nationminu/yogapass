@@ -1,0 +1,66 @@
+### DEF-007 / TC-125 — rollback.sh 대상 가드 재검증
+※ developer/site 를 고치지 않기 위해 deploy/·compose·.env 사본을 프로젝트 밖 임시 경로에 두고 실행한다.
+※ 실행 전 docker ps:
+qa2-clock-normal	yogapass-app:latest
+qa2-clock-plus25	yogapass-app:latest
+qa2-norl	yogapass-app:latest
+qa2-norl25	yogapass-app:latest
+yogapass-app-1	yogapass-app
+yogapass-db-1	postgres:17-alpine
+yogapass-mail-1	axllent/mailpit:latest
+yogapass-prodcheck-app-1	yogapass-app:0.1.0-qa2
+yogapass-prodcheck-db-1	postgres:17-alpine
+yogapass-proxy-1	nginx:alpine
+yogapass-scheduler-1	yogapass-scheduler
+
+--- 1) 태그 없는 이름 (.deploy-rollback-image = yogapass-app)
+종료 코드=1
+[rollback] ✗ 되돌릴 이미지 'yogapass-app' (.deploy-rollback-image) 에 태그가 없습니다. 릴리스 태그를 붙인 이미지(yogapass-app:<버전>)만 되돌릴 수 있습니다. ROLLBACK_VERSION 을 주십시오.
+
+--- 2) latest 태그 (.deploy-rollback-image = yogapass-app:latest)
+종료 코드=1
+[rollback] ✗ 'latest' 태그로는 되돌리지 않습니다(.deploy-rollback-image). 되돌릴 릴리스 버전을 ROLLBACK_VERSION 으로 지정하십시오.
+
+--- 3) 빈 파일
+종료 코드=1
+[rollback] ✗ 되돌릴 이미지를 정할 수 없습니다. ROLLBACK_VERSION 또는 ROLLBACK_IMAGE 를 주십시오.
+
+--- 4) 파일 없음 (인자·환경변수 없음)
+종료 코드=1
+[rollback] ✗ 되돌릴 이미지를 정할 수 없습니다. ROLLBACK_VERSION 또는 ROLLBACK_IMAGE 를 주십시오.
+
+--- 5) 없는 버전 ROLLBACK_VERSION=9.9.9
+종료 코드=1
+[rollback] ✗ 이미지 yogapass-app:9.9.9 가 서버에 없습니다. (docker image prune -a 로 지워졌을 수 있습니다)
+
+--- 6) 존재하는 정상 태그 ROLLBACK_VERSION=0.1.0-qa1 + --dry-run
+종료 코드=0
+[rollback] 되돌릴 이미지: yogapass-app:0.1.0-qa1 (출처: ROLLBACK_VERSION · APP_VERSION=0.1.0-qa1)
+[rollback] --dry-run: 대상 판정·가드까지만 수행했습니다. 변경한 것은 없습니다.
+
+--- 7) 존재하는 정상 태그 + 비대화형(확인 입력 없음)
+종료 코드=1
+[rollback] 되돌릴 이미지: yogapass-app:0.1.0-qa1 (출처: ROLLBACK_VERSION · APP_VERSION=0.1.0-qa1)
+[rollback] ✗ 대화형 터미널이 아닙니다. 확인 없이 롤백하지 않습니다. ROLLBACK_ASSUME_YES=1 을 주거나 --yes 를 붙이십시오.
+
+### 실행 후 docker ps (스택이 바뀌지 않았는지)
+qa2-clock-normal	yogapass-app:latest
+qa2-clock-plus25	yogapass-app:latest
+qa2-norl	yogapass-app:latest
+qa2-norl25	yogapass-app:latest
+yogapass-app-1	yogapass-app
+yogapass-db-1	postgres:17-alpine
+yogapass-mail-1	axllent/mailpit:latest
+yogapass-prodcheck-app-1	yogapass-app:0.1.0-qa2
+yogapass-prodcheck-db-1	postgres:17-alpine
+yogapass-proxy-1	nginx:alpine
+yogapass-scheduler-1	yogapass-scheduler
+
+### .deploy-rollback-image 잔존(사본 디렉토리): ls: cannot access '.deploy-rollback-image': No such file or directory
+### 원본 developer/site 의 .deploy-rollback-image: ls: cannot access 'C:/Workspace/workspaces/site-creator/projects/yogapass/developer/site/.deploy-rollback-image': No such file or directory
+
+### sh -n 문법 검사
+deploy/deploy.sh         OK
+deploy/entrypoint.sh     OK
+deploy/restore.sh        OK
+deploy/rollback.sh       OK

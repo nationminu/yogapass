@@ -1,0 +1,30 @@
+### 시험 데이터 삭제 (사이클 2)
+--- 삭제 전 건수
+inquiry: 3
+inquiry_inquiry          삭제 0건
+mailer_outbox            삭제 0건
+core_ratelimitcounter    삭제 4건
+core_jobrunlog           삭제 0건
+합계 삭제 4건
+2026-09-13T18:15:33+0900 INFO core.jobs job.finished job=qa_purge_test_data status=success detail=inquiry_inquiry=0 mailer_outbox=0 core_ratelimitcounter=4 core_jobrunlog=0 total=4
+--- 삭제 후 건수
+inquiry: 3
+
+--- [재실행] --since 를 UTC 기준으로 지정
+2026-09-13T18:15:55+0900 INFO core.jobs job.finished job=qa_purge_test_data status=success detail=inquiry_inquiry=0 mailer_outbox=0 core_ratelimitcounter=0 core_jobrunlog=1 total=1
+inquiry_inquiry          삭제 0건
+mailer_outbox            삭제 0건
+core_ratelimitcounter    삭제 0건
+core_jobrunlog           삭제 1건
+합계 삭제 1건
+--- 삭제 후 건수
+inquiry: 3
+
+--- 원인: qa_purge_test_data 는 §10.4 규칙대로 name/message 가 'TEST-' 로 시작하는 행만 지운다.
+    이번 사이클은 qa 가 'QA2-' 접두어를 써서 대상에 걸리지 않았다 (도구 결함 아님 · qa 절차 착오).
+--- 잔여 시험 데이터 직접 삭제
+
+삭제 대상 inquiry: 3 / outbox: 3
+outbox 삭제: (3, {'mailer.Outbox': 3})
+inquiry 삭제: (3, {'inquiry.Inquiry': 3})
+최종 inquiry 건수: 0

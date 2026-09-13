@@ -1,0 +1,47 @@
+### 알림 메일 제목·본문의 상호 표기 회귀 (DEF-001 ⑤ 표시 상호 통일)
+--- 아웃박스(DB) 최근 3건
+
+Traceback (most recent call last):
+  File "/app/manage.py", line 16, in <module>
+    main()
+    ~~~~^^
+  File "/app/manage.py", line 12, in main
+    execute_from_command_line(sys.argv)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+    ~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.13/site-packages/django/core/management/__init__.py", line 436, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 416, in run_from_argv
+    self.execute(*args, **cmd_options)
+    ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/site-packages/django/core/management/base.py", line 460, in execute
+    output = self.handle(*args, **options)
+  File "/usr/local/lib/python3.13/site-packages/django/core/management/commands/shell.py", line 247, in handle
+    exec(options["command"], {**globals(), **self.get_namespace(**options)})
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 2, in <module>
+ImportError: cannot import name 'OutboundMail' from 'apps.mailer.models' (/app/apps/mailer/models.py)
+
+--- Mailpit 수신함
+총 21 건
+  [2026-09-13T09:06:01.45Z] [문의 접수] 강남 요가패스  →  ops@yogapass.local
+  [2026-09-13T09:05:01.316Z] [문의 접수] 강남 요가패스  →  ops@yogapass.local
+  [2026-09-13T09:03:01.405Z] [문의 접수] 강남 요가패스  →  ops@yogapass.local
+
+--- 알림 메일 본문 (Mailpit 최신 1건)
+Subject: [문의 접수] 강남 요가패스
+From: no-reply@yogapass.local
+Text 앞 400자:
+문의가 접수되었습니다.
+
+접수 일시: 2026-09-13 18:05
+이름: QA2-정상
+연락처: 010-5555-0001
+접수 번호: 7c01316a-061f-4ca0-9e9d-008675c34a48
+
+문의 내용:
+QA2 정상 접수 본문
+

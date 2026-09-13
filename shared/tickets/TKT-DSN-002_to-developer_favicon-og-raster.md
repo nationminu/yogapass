@@ -55,7 +55,10 @@ due: P4 빌드 구성 시
 
 ## 처리 결과 (수신 팀 작성)
 
-- 처리 내용: **부분 처리** — 래스터 **4종 완료 / `og-image.png` 1종 보류**. 더불어 **`favicon.svg` 의 XML 파싱 오류 1건**을 발견해 회신한다.
+> **2026-09-13 갱신 (2차 회신)** — PM 결정에 따라 **`og-image.png` 보류를 해제하고 임시본을 넣었다.**
+> 아래 ①~④는 1차 회신 원문이고, **⑤가 2차 회신**이다. 표의 `og-image.png` 행도 갱신했다.
+
+- 처리 내용: **처리 완료(임시본 포함)** — 래스터 **5종 전부 산출**(`og-image.png` 은 **임시본**). 더불어 **`favicon.svg` 의 XML 파싱 오류 1건**을 발견해 회신한다.
 
 **① 래스터 내보내기 결과**
 
@@ -65,7 +68,7 @@ due: P4 빌드 구성 시
 | `icon-192.png` | ✅ | 3.1KB | PNG 192×192 |
 | `icon-512.png` | ✅ | 8.8KB | PNG 512×512 |
 | `apple-touch-icon.png` | ✅ | 3.0KB | PNG 180×180 |
-| `og-image.png` | ❌ **보류** | — | 아래 ③ |
+| `og-image.png` | ⚠ **임시본** (2026-09-13) | 30.9KB (상한 300KB) | PNG 1200×630 · 텍스트+로고 실측 경계 516×323 at (97,136) → 좌우 96px 여백 안. 아래 ⑤ |
 
 실행한 변환 명령(**일회용 컨테이너** — 틀·프로젝트에 변환 도구를 설치하지 않았다):
 
@@ -92,11 +95,27 @@ magick /tmp/f32.png /tmp/f48.png /out/favicon.ico'
 - 영향: 브라우저는 `image/svg+xml` 을 **XML 로 엄격 파싱**하므로 이 파일을 그대로 배포하면 **파비콘이 표시되지 않는다.** (`icon-master-512.svg` · `apple-touch-icon-master-180.svg` · `og-image.svg` 는 이상 없음)
 - 우리 조치: 사본 `developer/site/static/img/favicon.svg` 의 해당 문구를 `` `color-primary` 토큰 `` 으로 바꿔 해소하고, 그 사본으로 `.ico` 를 만들었다. **원본 수정은 designer 소관**이라 고치지 않았다.
 
+**⑤ `og-image.png` — 임시본 생성 (2026-09-13 · PM 결정 반영)**
+
+PM 결정: **"임시본을 넣고 나중에 교체한다. 임시본임을 파일명·주석·인계 메모에 분명히 남기고, 정식본 교체 시 코드 변경이 없게 하라."**
+
+- **무엇이 임시인가**: **폰트뿐이다.** 레이아웃·색·문구·좌표는 `design/assets/og-image.svg` 원본 그대로이며, **조판만 Noto Sans CJK KR 로 렌더**했다(저장소의 Pretendard 는 `unicode-range` 분할 woff2 서브셋뿐이라 래스터 변환기가 로드하지 못한다 — ③ 참조). 따라서 **자간·글자 폭이 Pretendard 조판과 다르다.**
+- **티켓이 경고한 "좌우 96px 여백 초과"는 눈이 아니라 실측으로 확인했다**: 배경·격자·브랜드 바를 제거한 **텍스트+로고만** 렌더해 `magick -trim` 으로 경계를 쟀다 → **516×323 at (97, 136)** → 좌 97 ≥ 96 · 우 613 ≤ 1104 → **여백 안에 들어간다.**
+- **임시본 표시 4곳**: ⓐ 작업 사본 파일명 `developer/site/static/img/og-image.TEMP-source.svg` ⓑ 그 파일의 머리 주석 ⓒ `og-image.png` 안의 PNG `tEXt Comment`(`TEMPORARY placeholder OG image. TKT-DSN-002 / PM decision 2026-09-13 …`) ⓓ **인계 메모 `developer/site/static/img/SOURCES.md`**(생성 명령·검증값·교체 절차 포함).
+- **검증 결과**: PNG 1200×630 · 8-bit sRGB · **30,916 B**(상한 300KB의 10%) · `GET /static/img/og-image.png` → 200 · `og:image`·`:width`·`:height`·**`og:image:alt`(티켓 문자열 그대로)**·`twitter:card` **5줄이 자동으로 붙는 것**을 실행 응답에서 확인했다.
+
+**정식본 교체 절차 (코드 변경 0)**
+
+1. Pretendard 가 설치된 환경, 또는 **텍스트를 아웃라인(path)으로 바꾼 SVG**(우리가 권했던 ⓒ안)로 `design/assets/og-image.svg` 를 1200×630 PNG(≤300KB)로 내보낸다.
+2. 그 파일을 **`developer/site/static/img/og-image.png` 에 덮어쓴다.** 경로·파일명이 같으므로 템플릿·뷰·설정은 고치지 않는다(`apps/core/context_processors._og_image` 가 파일 존재만 본다).
+3. `og-image.TEMP-source.svg` 를 삭제하고 `static/img/SOURCES.md` 의 임시 표기 행을 갱신한다. 운영 배포 시 `collectstatic` 이 해시 파일명으로 다시 굽는다.
+4. 고객 로고 원본(V-2) 수령 시에는 위 1~3을 designer 재제작본으로 한 번 더 수행하면 된다 — **CR 처리 범위가 파일 1개로 끝난다.**
+
 - 변경 파일·버전:
-  - `developer/site/static/img/` — `favicon.ico` · `icon-192.png` · `icon-512.png` · `apple-touch-icon.png` (신규) · `favicon.svg` (XML 오류 수정)
+  - `developer/site/static/img/` — `favicon.ico` · `icon-192.png` · `icon-512.png` · `apple-touch-icon.png` (신규) · `favicon.svg` (XML 오류 수정) · **`og-image.png`(임시본, 2026-09-13)** · **`og-image.TEMP-source.svg`(신규)** · **`SOURCES.md`(신규 — 인계 메모)**
   - `developer/site/templates/base.html` · `templates/partials/meta.html` · `apps/core/context_processors.py`
-  - `developer/04_dev-report.md` v0.2 §7
-- 처리 일자: 2026-09-13
+  - `developer/04_dev-report.md` v0.2 §7 → **v0.3 §7**
+- 처리 일자: 2026-09-13 (1차 회신) · **2026-09-13 2차 회신 — `og-image.png` 임시본 반영**
 
 ## 확인 (발행 팀 작성)
 - [ ] 처리 결과 확인 → `status: closed`

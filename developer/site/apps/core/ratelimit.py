@@ -21,6 +21,7 @@ from django.db import IntegrityError, transaction
 from django.db.models import F
 from django.utils import timezone
 
+from apps.core import qaflags
 from apps.core.clock import now
 from apps.core.models import RateLimitCounter
 
@@ -80,7 +81,12 @@ def check_form_submission(identifier_hash: str) -> RateLimitDecision:
     """폼 제출 1회를 계상하고 허용 여부를 돌려준다.
 
     시도 자체를 세므로 **차단된 요청도 계상**된다(연속 시도를 창 안에서 계속 막기 위함).
+
+    검증 전용 `QA_RATE_LIMIT_MODE=off` 는 **계상과 판정 자체를 건너뛴다**(요건 ④ 독립 토글).
+    다른 항목(보관 기간·시각 오프셋)과 서로 영향을 주지 않는다.
     """
+    if qaflags.rate_limit_disabled():
+        return RateLimitDecision(allowed=True)
     config = settings.RATE_LIMIT
     minutes = int(config["FORM_WINDOW_MINUTES"])
     window_max = int(config["FORM_WINDOW_MAX"])
@@ -110,21 +116,8 @@ def check_form_submission(identifier_hash: str) -> RateLimitDecision:
 # ------------------------------------------------------------------ 사용량 알림 (REQ-N-019)
 def _alert_thresholds() -> dict[str, int]:
     """기본 임계값. QA_TOOLS_ENABLED=1 일 때만 QA_* 로 낮출 수 있다(기술 설계 §5.3 · §10.6)."""
-    import os
-
     defaults = {"per_source_day": 3, "per_hour": 20, "total_day": 500}
-    if not getattr(settings, "QA_TOOLS_ENABLED", False):
-        return defaults
-    env_map = {
-        "per_source_day": "QA_RATE_LIMIT_ALERT_PER_SOURCE_DAY",
-        "per_hour": "QA_RATE_LIMIT_ALERT_PER_HOUR",
-        "total_day": "QA_RATE_LIMIT_ALERT_TOTAL_DAY",
-    }
-    for key, name in env_map.items():
-        raw = os.environ.get(name, "").strip()
-        if raw.isdigit():
-            defaults[key] = int(raw)
-    return defaults
+    return qaflags.alert_thresholds(defaults)
 
 
 def usage_alert_reasons(identifier_hash: str) -> list[str]:

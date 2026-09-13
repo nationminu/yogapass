@@ -6,6 +6,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
@@ -24,6 +25,15 @@ if QA_TOOLS_ENABLED and DJANGO_ENV == "production":
     raise ImproperlyConfigured(
         "QA_TOOLS_ENABLED=1 과 DJANGO_ENV=production 은 함께 쓸 수 없습니다 (기술 설계 §10.6)."
     )
+if QA_TOOLS_ENABLED:
+    # §10.6 ③ 구조적 차단 — 운영 이미지에는 qa/ 가 없으므로 여기서 기동이 거부된다.
+    try:
+        import qa.qa_settings  # noqa: F401
+    except ImportError as exc:  # pragma: no cover - 운영 이미지 전용 경로
+        raise ImproperlyConfigured(
+            "QA_TOOLS_ENABLED=1 이지만 검증 도구(qa/)가 이 이미지에 없습니다. "
+            "운영 이미지에서는 검증 도구를 켤 수 없습니다 (기술 설계 §10.6)."
+        ) from exc
 
 # ---------------------------------------------------------------- 보안
 SECRET_KEY = env("DJANGO_SECRET_KEY")
@@ -70,6 +80,14 @@ INSTALLED_APPS = [
     "apps.inquiry",
     "apps.mailer",
 ]
+
+# 검증 도구 앱 등록 (§10.6 ④)
+#   · 운영 이미지에는 qa/ 가 **없으므로** 아래 조건이 거짓이 되어
+#     `qa_*` 명령이 존재조차 하지 않는다.
+#   · 로컬·스테이징 이미지에는 있으므로 등록되고, `QA_TOOLS_ENABLED` 가 꺼져 있으면
+#     각 명령이 "이 환경에서는 사용할 수 없습니다" + **종료 코드 2** 로 끝난다(§10.2 공통 행).
+if importlib.util.find_spec("qa") is not None:
+    INSTALLED_APPS = [*INSTALLED_APPS, "qa"]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

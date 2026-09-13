@@ -1,21 +1,26 @@
 ---
 doc_id: DEV-REPORT
-title: 개발 보고서 — 1차 구현 (2단계 · 전 화면 + 문의 폼)
+title: 개발 보고서 — 1차 구현 (3단계 · 운영·배포·백업·검증 지원 도구)
 phase: P4
 owner: developer
-version: 0.2
+version: 0.3
 status: draft
 reviewers: [designer, planner]
 inputs: [developer/04_tech-design.md, planning/02_requirements.md, planning/02_storyboard.md, design/03_design-system.md, design/03_page-design.md, design/mockups/, shared/tickets/TKT-DSN-002_to-developer_favicon-og-raster.md, shared/reviews/P4a_tech-design_devops_r2.md, shared/reviews/P4a_tech-design_qa_r2.md]
 updated: 2026-09-13
 ---
 
-# 개발 보고서 (초안) — 1차 구현 2단계
+# 개발 보고서 (초안) — 1차 구현 3단계
 
-> **이 문서의 상태**: `draft`. 1차 구현 **14개 작업 중 작업 1~10 + 작업 14 일부**를 마친 시점의 중간 보고다.
+> **이 문서의 상태**: `draft`. 1차 구현 **14개 작업 중 작업 1~13 + 작업 14 일부**를 마친 시점의 보고다.
 > **규칙**: 이 문서에는 **직접 실행해 확인한 것만** 적는다. 실행하지 않은 항목은 "미확인"으로 적고 "완료"로 쓰지 않는다.
-> 설계 근거는 `developer/04_tech-design.md` v0.3, 실행 절차는 `developer/site/README.md`.
-> v0.1(1단계) 대비 달라진 곳은 **▲** 로 표시했다.
+> 설계 근거는 `developer/04_tech-design.md` **v0.4**, 실행 절차는 `developer/site/README.md`.
+> v0.1(1단계) 대비 달라진 곳은 **▲**, **v0.3(3단계)에서 새로 한 것은 ★** 로 표시했다.
+>
+> **★ 이번 판(v0.3)의 핵심 3줄**
+> 1. **PM 결정 2건을 반영했다** — ① 폼 토큰 **만료 = 다시 작성 안내**(설계 §9.6 ⑤를 ⑤/⑦로 분리, 테스트 5건 추가) ② **OG 이미지 임시본** 생성·교체 절차 확정.
+> 2. **운영·배포·백업·복구·검증 지원 도구를 구현하고, 로컬에서 재현 가능한 범위를 전부 실행해 확인했다** — 백업 회전·실패 주입·락 충돌 중단·**복구 리허설 1회 성공**·안전장치 5중.
+> 3. **구현 중 결함 1건을 발견해 고쳤다** — 같은 토큰 **동시 이중 제출이 500** 이 되던 경로(UNIQUE 충돌 미처리). 동시 5건 실행으로 재현·수정 확인.
 
 ---
 
@@ -23,15 +28,18 @@ updated: 2026-09-13
 
 | 항목 | 내용 |
 |---|---|
-| 이번 범위 | ▲ 기술 설계 §11.1 **작업 5(SCR-002) · 6(SCR-003 지도) · 7(문의 폼) · 8(문의 알림 본문) · 9(SCR-006·008·009) · 10(SEO·접근성·`<noscript>` 마감)** + TKT-DSN-002(파비콘·OG 래스터) 처리 |
-| 진척(작업 단위) | ▲ **10 / 14 작업** (남은 것: 11 성능 측정 · 12 배포/백업 · 13 검증 지원 도구 · 14 자체 점검 마감) |
+| 이번 범위 | ★ **PM 결정 2건**(토큰 만료 처리 · OG 임시본) + 기술 설계 §11.1 **작업 11(성능·폰트 폴백 메트릭 실측) · 12(운영 compose·배포/롤백/복구·백업·nginx 샘플·일일 요약) · 13(검증 지원 도구 ①~⑪)** |
+| 진척(작업 단위) | ★ **13 / 14 작업** (남은 것: 14 자체 점검 마감. 작업 11 중 **Lighthouse 측정만 미실행** — 브라우저 실행 환경 없음) |
 | 1차 화면 | ▲ **6화면 전부 구현** — SCR-001·002·003·006·008·009 |
 | Must REQ 구현률 | ▲ 1차 Must 60건 기준 **추정** — **완료 약 34 · 부분 약 14 · 미착수 약 12** (§2 표가 근거. **확정 집계는 qa 추적 매트릭스가 한다** — 이 숫자를 게이트 판정에 그대로 쓰지 않는다) |
 | 로컬 빌드 · 실행 | **성공** — `docker compose … up` 으로 app·db·mail·scheduler·proxy **5개 서비스 healthy**, 4개 공개 화면 200 / 없는 경로 404 (§4) |
 | 운영 빌드 | **성공** — prod 이미지 빌드 + gunicorn 기동 + 해시·brotli·`immutable` 확인, 새 화면 4종 200 (§4) |
-| 문의 폼 | ▲ **설계 §9.6 응답 형태 6종을 전부 구현하고 6종 모두 실행 확인**(자동 테스트 + curl) |
-| 자동 테스트 | ▲ **48건 전부 통과** (v0.1 9건 → 48건), `ruff check` 통과 |
-| 검증팀 전달 가능 여부 | ▲ **부분 가능.** 화면·폼·SEO·접근성 마크업은 지금 검증할 수 있다. 백업·배포·검증 지원 도구(작업 12·13)는 아직 없다 |
+| 문의 폼 | ★ **설계 §9.6 응답 형태 7종**(v0.4에서 ⑤/⑦ 분리)을 전부 구현하고 전건 실행 확인(자동 테스트 + curl) |
+| 백업·복구 | ★ `run_backup` **정상·`--dry-run`·라벨·락 충돌 중단·실패 주입·회전(일7/주4/월3)** 전건 실행. **`restore.sh` 로컬 복구 리허설 1회 성공**(문의 36건 → 백업 시점 11건으로 복원) |
+| 배포·롤백 | ★ `deploy.sh` **0단계 사전 점검 실행 확인**(디스크·롤백 이미지·IRREVERSIBLE·최근 백업·`check_release` 로 **배포 차단까지 확인**) · `rollback.sh` 가드 2종 확인. **실제 배포·롤백은 서버 필요 → 미확인** |
+| 검증 지원 도구 | ★ **①~⑪ 전부 구현**, 운영 안전장치 **5중 전건 실행 확인**(운영 이미지에 `qa/`·`qa_*` 명령 **0건**, `QA_TOOLS_ENABLED` 없이 실행 시 **종료 코드 2**, 운영+QA 조합 **기동 거부**) |
+| 자동 테스트 | ★ **53건 전부 통과** (v0.2 48건 → 53건 · 토큰 만료 5건 + 동시 이중 제출 1건 추가, 중복 1건 대체), `ruff check` · `ruff format --check` 통과 |
+| 검증팀 전달 가능 여부 | ★ **가능.** 화면·폼·SEO·접근성·**백업/복구·검증 지원 도구 전부** 지금 검증할 수 있다. 남은 제약은 **브라우저·실기기·서버가 필요한 항목**뿐이다(§4 말미·§8) |
 
 ---
 
@@ -97,7 +105,13 @@ updated: 2026-09-13
 | REQ-N-036 | 기본값 거부 권한 레이어 | 완료 | `apps/core/access.py` — ▲ 1차 공개 4경로 등록, 미등록 경로는 거부 |
 | REQ-N-037 | 알림 메일 체계 | ▲ 완료(1차 1종) | `apps/mailer/*` + `kind=inquiry_notify`·`rate_limit_alert`. 발송 로그·재시도·실패 기록 포함 |
 | REQ-N-024 | 지도 화면 캡처 금지 | ▲ 완료 | 대체 영역은 CSS `repeating-linear-gradient` 격자다. **이미지 파일 0건** |
-| REQ-N-032·033·038·039·040 | 백업·배포/롤백·파기·스테이징 | 미착수 | 작업 12 |
+| REQ-N-032 | ★ DB 백업·무결성·회전·실패 알림 | ★ **완료(로컬 확인)** | `apps/core/management/commands/run_backup.py` — `pg_dump -Fc` → **`pg_restore --list` 무결성 확인** → 회전(일7/주4/월3, 라벨 제외 최근 3) → `core_jobrunlog` → 실패 시 `mailer_outbox(kind=backup_failed)`. 여유 공간 하한 `BACKUP_MIN_FREE_GB`. **복구는 `deploy/restore.sh`(가드 3중)**. 실행 증거 §4 #29~#36 |
+| REQ-N-033 | ★ 배포·롤백 절차 | ★ **부분(스크립트 완료 · 서버 실행 미확인)** | `deploy/deploy.sh`(0 → 0.5 스케줄러 정지 → 1 라벨 백업 → 2 빌드 → 3 마이그레이션 → 4 기동 → 5 `/healthz` **앱 직접** 확인·다운타임 실측 → 6 실패 시 자동 롤백) · `deploy/rollback.sh`(이미지 보존 3중 전제 확인). **로컬에서는 0단계와 가드만 확인 가능** |
+| REQ-N-037 | ★ 발송 실패·재시도 기록 | ★ 완료 | `send_outbox` 백오프 5단계 + `attempts`·`last_error`. **`QA_FAIL_INJECT=smtp` 로 실패 주입 확인**(§4 #37) |
+| REQ-N-038 | ★ 보관 기간 경과 자동 파기 | ★ 완료(로컬 확인) | `purge_expired`(항목별 `RETENTION_DAYS` · 검증 시 `QA_RETENTION_MINUTES__<KEY>` 분 단위 단축 · `--dry-run` · `QA_FAIL_INJECT=purge`) · 스케줄 03:10 |
+| REQ-N-039 | 운영 DB 접근 최소화·백업 위치 문서화 | 부분 | 제작 측 몫: **qa 조회 수단을 마스킹 읽기 전용 명령으로 한정**(`qa_show`, 해제 옵션 없음) · 백업 파일 경로·권한 규칙은 설계 §12.5.2. **권한자 목록은 devops 배포 계획서 소관** |
+| REQ-N-040 | 스테이징 접근 제어 | 부분 | `deploy/nginx/yogapass-stg.conf.sample`(server 전체 `auth_basic` + IP 제한 · **예외 경로 0건**) + 앱 `FORCE_NOINDEX`. **로컬 더미 자격으로 선검증 가능**(설계 §13 #12). 실제 적용은 devops |
+| REQ-N-031 (보강) | ★ 살아 있지만 응답 실패 인지 | ★ 완료 | `ping_health`(5분, **앱 직접 호출**) + `report_failures` 일일 요약 6항목 ⓐ~ⓕ. **요약 메일 Mailpit 수신 확인**(§4 #35) |
 
 ---
 
@@ -105,7 +119,7 @@ updated: 2026-09-13
 
 | SCR ID | 화면 | URL | 상태 | 구현 파일 | 디자인 명세와 차이 (사유) |
 |---|---|---|---|---|---|
-| — (공통) | 헤더·푸터·고정 바·스킵 링크·메타 | — | 완료 | `templates/base.html` · `partials/*` | ▲ `<link rel="icon">`(ico)·`apple-touch-icon` 추가. `og:image` 는 **래스터 미보유라 태그를 빼고 빌드**(§7) |
+| — (공통) | 헤더·푸터·고정 바·스킵 링크·메타 | — | 완료 | `templates/base.html` · `partials/*` | ▲ `<link rel="icon">`(ico)·`apple-touch-icon`. ★ **`og:image` 계열 5줄이 붙는다** — 임시본 `og-image.png` 반영(§7) |
 | SCR-001 | 메인 | `/` | 부분(뼈대) | `pages/home.html` | 문구·데이터 미수령으로 현재 4섹션만 렌더(v0.1과 동일) |
 | SCR-002 | 요가 강사 소개 | `/instructors` | ▲ **완료(데이터 대기)** | `pages/instructors.html` · `css/pages/instructors.css` | 강사 0명이라 **현재는 CMP-026 빈 상태**만 보인다. 1·2·3·12명 레이아웃은 테스트로 검증했다. 경력 접기는 **항목 4개 이상**을 기준으로 접는다(디자인의 "3줄 초과"를 렌더 줄 수 대신 항목 수로 근사 — §6 #3) |
 | SCR-003 | 오시는 길 + 문의 폼 | `/location`(`#contact`) | ▲ **완료(값 대기)** | `pages/location.html` · `css/pages/location.css` · `css/components/form.css` · `js/map.js` · `js/form.js` | 지도 임베드 URL·주소·전화가 `[TBD]` 라 **지도 버튼·정보 행·길찾기·주소 복사·전화 링크가 전부 미노출**이다(설계대로). 고정 바는 **S3 미노출**, 헤더 주 CTA 는 **H3 미노출** — 목업의 기본 상태와 같다 |
@@ -121,10 +135,13 @@ updated: 2026-09-13
 | ② | 서버 검증 실패 | **200** | 오류 요약(`role="alert"`) + 항목별 `aria-invalid`, **입력값 보존·토큰 유지** | 0건 | 0건 | `INFO inquiry.invalid fields=[name,phone,consent]` | 자동 테스트 + curl(§4 #8) |
 | ③ | honeypot | **200** | **①과 동일 화면** | 0건 | 0건 | `WARNING inquiry.blocked reason=honeypot ip_hash=…` | 자동 테스트(동일성 비교) + curl(§4 #9) |
 | ④ | 빈도 제한 초과 | **429** | 실패(일반) + `Retry-After` | 0건 | 0건(임계 초과 시 `rate_limit_alert` 1건) | `WARNING inquiry.blocked reason=rate_limit ip_hash=… scope=form` | 자동 테스트 + curl(§4 #10, `Retry-After: 95` 관측) |
-| ⑤ | 토큰 재사용·만료 | **200** | **①과 동일 화면** | 0건(추가 없음) | 0건 | `INFO inquiry.duplicate token_state=used\|expired ref=…` | 자동 테스트 + curl(§4 #7) |
+| ⑤ | ★ 토큰 **재사용**(중복 제출) | **200** | **①과 동일 화면** | 0건(추가 없음) | 0건 | `INFO inquiry.duplicate token_state=used ref=…` | 자동 테스트 + curl(§4 #7) + **동시 5건 실행**(§4 #28) |
 | ⑥ | 서버 오류 | **500** | `errors/500.html`, 스택 트레이스 미노출 | 0건(롤백) | 0건(롤백) | `ERROR` + 트레이스(개인정보 없음) | 자동 테스트(예외 주입) |
+| ★ ⑦ | **토큰 만료·부재·변조** | **200** | **"시간이 지나 문의가 접수되지 않았습니다." + 폼 재렌더**(입력값 4항목 보존 · 새 토큰 발급) · `role="alert"` · 포커스 이동 | 0건 | 0건 | `INFO inquiry.expired token_state=expired\|missing\|invalid ref=none` | 자동 테스트 5건 + curl(§4 #27) |
 
-- **설계와 다른 점 0건.** 구현이 표를 벗어난 곳은 없다.
+- **설계와 다른 점 0건.** 구현이 표를 벗어난 곳은 없다(설계 §9.6 도 v0.4 에서 7행으로 함께 고쳤다).
+- ★ **⑦은 PM 결정(2026-09-13)으로 ⑤에서 분리됐다.** v0.2까지는 만료도 "저장 없이 성공 화면"이어서 **24시간 이상 폼을 열어 둔 이용자의 문의가 조용히 버려질 수 있었다**(v0.2 §6 #7로 올렸던 항목). 이제 저장하지 않되 **다시 작성하도록 안내하고 입력값을 보존**한다. 재제출하면 정상 접수(①)된다 — 자동 테스트로 고정했다.
+- ★ **동시 이중 제출**(같은 토큰 동시 5건)은 UNIQUE 충돌로 **500이 되고 있었다**. 충돌을 잡아 ⑤로 처리하도록 고쳤고, 재실행 결과 **200 × 5 · 저장 1건**이다(§4 #28).
 - ③·⑤가 ①과 구분되는 유일한 증거는 **저장·발송 건수와 `key=value` 로그**다(설계 §9.6 · qa R2 #4). 로그 조회는 `docker compose … logs app`.
 - ④의 차단 지속: 10분 창 초과 → 창 잔여 시간 / 1일 초과 → 익일 00:00(Asia/Seoul), 둘 다면 늦은 쪽. `core_ratelimitcounter` 에는 **한도를 넘긴 창의 행에만** `blocked_until` 이 기록된다.
 
@@ -175,11 +192,80 @@ updated: 2026-09-13
 | 26 | 이미지 내용 | `docker run --rm --entrypoint sh yogapass-app:0.1.0-dev -c "ls /app"` | `qa/`·`tests/`·`.env` 없음(구조적 제외 유지) |
 | 27 | 정리 | 미리보기 컨테이너 중지 · 임시 env 파일 삭제 · 검증용 DB 행 삭제 | 로컬 DB 에 검증 데이터 0건 |
 
+### ★ 4.1 3단계 실행 확인 (2026-09-13 · 20건)
+
+> 아래는 **이번 판에서 직접 실행한 것**만 적었다. 명령은 전부 `developer/site/` 에서 실행했다.
+> `C` = `docker compose -f compose.yaml -f compose.local.yaml`
+
+**PM 결정 ① — 토큰 만료 처리**
+
+| # | 항목 | 명령 | 결과 |
+|---|---|---|---|
+| 27 | **⑦ 만료·부재 응답** | `curl -X POST /location` (CSRF 동봉 · `submit_token=` 빈 값) | **HTTP 200** + "시간이 지나 문의가 접수되지 않았습니다." + `id="contact-form"` 재렌더 + **입력값 4항목 보존**(`value="홍길동"`·전화·본문·`checked`) + 새 토큰. 로그 `inquiry.expired token_state=missing ref=none`. **저장 0건** |
+| 28 | **⑤ 동시 이중 제출** | `$C exec app python qa/concurrency.py --url …/location --count 5 --same-token` | **수정 전: 200×2 + `500`×3** → 원인 = `submit_token` UNIQUE 충돌 미처리 → 수정 후 **200×5 · 저장 정확히 1건**(`qa_show inquiry --count-only` 로 전후 비교) |
+
+**PM 결정 ② — OG 이미지 임시본**
+
+| # | 항목 | 명령 | 결과 |
+|---|---|---|---|
+| 29 | 임시본 생성 | 일회용 `alpine:3.20` 컨테이너 (`rsvg-convert` + `font-noto-cjk` + `optipng`) | `og-image.png` **1200×630 · 30,916 B**(상한 300KB) |
+| 30 | **여백 실측**(눈이 아니라 측정) | 텍스트+로고만 렌더 → `magick text.png -trim` | 경계 **516×323 at (97,136)** → 좌 97 ≥ 96 · 우 613 ≤ 1104 → **좌우 96px 여백 안** |
+| 31 | 태그·서빙 | `curl /` · `curl -I /static/img/og-image.png` | `og:image`·`:width`·`:height`·**`og:image:alt`**·`twitter:card` **5줄 자동 부착**, 파일 **200** |
+
+**작업 11 — 폰트 폴백 메트릭 실측**
+
+| # | 항목 | 명령 | 결과 |
+|---|---|---|---|
+| 32 | 폰트 테이블 실측 | 일회용 `python:3.13-slim` + `fonttools`·`brotli` 로 `head`·`hhea`·`OS/2` 직접 읽기 | Pretendard(upm 2048 · asc 1950 · desc −494 · gap 0 · sxHeight 1086) / Malgun Gothic(upm 2048 · sxHeight 1050) → **size-adjust 103.43% · ascent 92.06% · descent 23.32% · line-gap 0%**. `static/css/fonts.css` 에 적용 |
+| 33 | 정적 압축·캐시 | 운영 이미지 `staticfiles` 검사 + 헤더 | `.br` **82개** · `.gz` 82개. `fonts.css` **113,298 B → brotli 11,258 B**. `Cache-Control: max-age=315360000, public, immutable`(2단계 #22 유지) · nginx 경유 HTML `Content-Encoding: gzip` |
+
+**작업 12 — 백업·복구·배포**
+
+| # | 항목 | 명령 | 결과 |
+|---|---|---|---|
+| 34 | 백업 정상·dry-run·라벨 | `$C exec scheduler python manage.py run_backup` / `--dry-run` / `--label pre-deploy` | `file=yogapass-local-20260913-1043.dump bytes=68389 elapsed=0.2s` · dry-run 은 여유 공간·회전 예정만 출력 · 라벨 파일 `…​.label-pre-deploy.dump` 생성 |
+| 35 | **회전(일7/주4/월3)** | 합성 덤프 23개 배치 후 `run_backup` | **`rotated=12`** → 남은 12개 = 일 7 + 주(0906·0826·0819) + 월(0729) + 라벨 1. 계산과 실제 파일 목록 일치 |
+| 36 | **락 충돌 시 라벨 백업 중단** | 다른 세션이 `pg_try_advisory_lock` 보유 상태에서 `run_backup --label pre-deploy` | **종료 코드 1** + `job.skipped … required=True` + `backup_failed` 알림 1건. **라벨 없는 실행은 `skipped` 로 종료 코드 0** — devops R2 #1 ②가 실제로 성립한다 |
+| 37 | **백업 실패 주입** | `QA_TOOLS_ENABLED=1 QA_FAIL_INJECT=backup … run_backup` | 종료 코드 1 · `core_jobrunlog status=failed` · `mailer_outbox(kind=backup_failed)` 1건 · 로그 `QA_FAIL_INJECT: backup 주입됨` |
+| 38 | **SMTP 실패 주입** | `QA_FAIL_INJECT=smtp … send_outbox` | `sent=0 failed=1` · `attempts=1` · `last_error` 기록 · **1분 뒤 재시도로 재스케줄**(`scheduled_at` +1분) |
+| 39 | 일일 운영 요약 | `report_failures --dry-run` → 실제 발송 → Mailpit | 6항목 ⓐ~ⓕ 출력, 실패 항목 있을 때 제목 **`[점검필요]`**. Mailpit 수신 확인 |
+| 40 | `/healthz` 5분 폴링 | `ping_health` | `url=http://app:8000/healthz status=200 ok=True` — **앱 직접 호출**(nginx 비경유) |
+| 41 | **복구 리허설(로컬)** | `echo yes \| COMPOSE_FILES="… compose.local.yaml" sh deploy/restore.sh /backups/…dump` | 백업(11건) → 시드로 36건 → 복구 → **11건**. **`pre-restore` 자동 덤프 생성 확인** · `migrate --check` 통과 · `/healthz` 200 |
+| 42 | 복구 **운영 가드** | `DJANGO_ENV=production` .env 로 `restore.sh` | `✗ 운영 환경입니다. … --i-know-this-is-production` 로 중단. **인라인 주석이 붙은 값에서도 가드가 걸리도록** 파서를 고쳤다(§6 #11) |
+| 43 | **배포 0단계** | `APP_VERSION=… sh deploy/deploy.sh --dry-run` | 디스크 여유·현재 이미지·IRREVERSIBLE 0개·최근 백업 확인 후 **`check_release` 실패로 배포 중단** — REQ-N-023 ①이 실제로 배포를 막는다 |
+| 44 | 롤백 가드 | `ROLLBACK_VERSION=9.9.9 sh deploy/rollback.sh` / 인자 없이 | `✗ 이미지 … 가 서버에 없습니다` / `✗ 되돌릴 이미지를 정할 수 없습니다` |
+| 45 | 점검 화면 | `$C stop app` → `curl :8080/` | **HTTP 502 + 정적 점검 화면**(앱 없이 렌더) → `start app` 후 200 복귀 |
+| 46 | 스크립트 문법 | `sh -n deploy/{deploy,rollback,restore}.sh` | 3건 모두 통과 |
+
+**작업 13 — 검증 지원 도구·안전장치**
+
+| # | 항목 | 명령 | 결과 |
+|---|---|---|---|
+| 47 | `qa_show` | `qa_show inquiry` / `--count-only` / `--since` / `--format json` | 마스킹(`T******증` · `010-****-0000`) · ISO8601+KST 병기 · 건수 1줄 · **0건도 종료 코드 0** |
+| 48 | `qa_mail_log` | `--kind backup_failed` · `--status queued` | `scheduled_at`(요청)·`sent_at`(발송) **두 시각 모두 출력** · 수신자 마스킹 |
+| 49 | `qa_purge_test_data` | `--dry-run` → `--since … --confirm` | 테이블별 건수 출력(`inquiry 11 · outbox 6 · counter 4 · joblog 0`) · 총계 · `--since` 없으면 카운터·작업 로그 **제외** |
+| 50 | `qa_pii_columns` | 실행 | `inquiry_inquiry` 6컬럼 · 목적 · **보관 기간 365일** · 마스킹 여부 — REQ-N-020 대조표로 바로 쓸 수 있다 |
+| 51 | `seed_standard` | `--count 5 --refs 1000` | 고정 시드(재실행 시 신규 0) · **표시 번호 1,000건 중복 0건 · 인접 증가 50.8%**(난수 기대치 ≈50%) → REQ-N-R-010 ④ 근거 |
+| 52 | `qa_session` | 토큰 미설정 / 불일치 / `--role member1` / 정상 | 앞의 셋 **종료 코드 2**, 정상 시 쿠키 이름·값·만료 출력(1차는 staff 만) |
+| 53 | `qa/concurrency.py` | `--count 8` / `--count 5 --same-token` | 8건 동시 → **200×4 · 429×4**(빈도 제한 5회) / 같은 토큰 5건 → 저장 1건 |
+| 54 | **항목별 독립 토글** | `QA_RATE_LIMIT_MODE=off` 로 앱 기동 | 빈도 제한만 꺼지고 다른 항목은 그대로. **이 상태에서 빈도 제한 테스트 3건이 의도대로 실패**하는 것을 보고 토글이 실제로 듣는 것을 확인했다(원복 후 53건 전건 통과) |
+| 55 | **안전장치 ①** 마스터 스위치 | `QA_TOOLS_ENABLED` 없이 `qa_show` | `이 환경에서는 사용할 수 없습니다` + **종료 코드 2** |
+| 56 | **안전장치 ②** 구조적 제외 | 운영 이미지 `ls /app/qa /app/tests /app/.env` · `find -name "qa_*.py"` | **전부 없음 · 0건** |
+| 57 | **안전장치 ③** 기동 거부 | 운영 이미지 + `QA_TOOLS_ENABLED=1` (production / staging 각각) | `QA_TOOLS_ENABLED=1 과 DJANGO_ENV=production 은 함께 쓸 수 없습니다` / **`검증 도구(qa/)가 이 이미지에 없습니다`** — 둘 다 종료 코드 1 |
+| 58 | **안전장치 ④** 명령 미등록 | 운영 이미지 `manage.py help \| grep -c "qa_\|seed_standard"` | **0** |
+| 59 | **안전장치 ⑤** HTTP 노출 0 | `grep -c qa config/urls.py` | **0** |
+| 60 | 린트·포맷·테스트 | `ruff check .` / `ruff format --check .` / `manage.py test` | `All checks passed!` / `85 files already formatted` / **Ran 53 tests … OK** |
+| 61 | 운영 설정 점검 | `check --deploy` (운영 수준 보안 env 주입) | **3건** — HSTS `W005`·`W021`(설계 §9.5 가 도메인 확인 전 금지한 옵션) + `content.W001`(처리방침 미확정, 의도) |
+
 **확인하지 않은 것(중요)**
 
 | 항목 | 사유 |
 |---|---|
-| Lighthouse 4지표 측정 | 측정 조건(M-1)을 만족할 브라우저 실행 환경이 없다. **작업 11** |
+| Lighthouse 4지표 측정 | 측정 조건(M-1)을 만족할 브라우저 실행 환경이 없다. **작업 11 잔여분 — P5 구간으로 넘긴다** |
+| ★ **실제 배포·롤백**(스테이징·운영) | 스크립트는 완성했고 **0단계 점검·가드·문법까지 로컬에서 확인**했지만, 2~5단계(빌드·마이그레이션·기동·다운타임 실측)와 롤백은 **서버가 있어야 한다**. 설계 §12.6.1 일정(10-17)의 devops 협업 항목 |
+| ★ **운영 nginx 샘플의 실제 적용** | `yogapass-prod.conf.sample`·`yogapass-stg.conf.sample` 은 **요청안**이다. 로컬 `local.conf` 로 같은 지시어 집합(`proxy_intercept_errors off`·gzip·`error_page`·`auth_basic` 더미)을 확인했을 뿐, 호스트 nginx 반영은 devops 소관 |
+| ★ **폰트 폴백 메트릭 중 macOS 분** | `Apple SD Gothic Neo` 폰트 파일이 이 작업 환경에 없어 **x-height 를 실측하지 못했다.** 지어내지 않고 size-adjust 를 보정 없음(100%)으로 두고 행 높이만 맞췄다 → **designer 1회 확인 필요**(§6 #12) |
+| ★ **오프사이트 백업·`.env` 보관 절차** | 설계 §12.5.4·§14.4 PM-3 의 PM 결정 대기 항목. 구현 범위 밖 |
 | 실제 뷰포트 렌더(360/768/1024/1280px)·가로 스크롤·요소 겹침 | 위와 동일. CSS 구간은 작성했으나 **눈으로 확인하지 않았다** |
 | 브라우저에서의 JS 동작(카운터·blur 검증·전송 중·지도 로드·주소 복사 토스트) | **코드 경로만 작성**했고 브라우저 실행 확인은 못 했다. 서버 경로(JS 없음)는 curl 로 전부 확인했다 |
 | W3C HTML 검사 · 축 기반 접근성 자동 점검 | 도구 미설치. 작업 13·P5 |
@@ -194,8 +280,8 @@ updated: 2026-09-13
 |---|---|---|
 | `tests/test_smoke.py` | 9 | URL·상태 코드·공통 레이아웃·CTA 상태(H1~H3/S1~S3)·식별자 규칙·보안 헤더 |
 | ▲ `tests/test_pages.py` | 19 | 화면 공통 규칙(h1 1개·랜드마크·canonical·OG·sitemap·robots·**템플릿 주석 누출 0**) · SCR-002 인원 경계값 · 경력 접기 · SCR-006 목차 11항목·표 라벨·`<details>` · 404·500 · 전화 확정 전후 렌더 · **배포 사전 점검** |
-| ▲ `tests/test_inquiry.py` | 20 | **응답 형태 6종 전건** + 경계값 + 아웃박스 본문 + 사용량 알림 + honeypot 화면 동일성 + 필수 표시 3중 + 동의 문구 + `<noscript>` + 지도 버튼 조건부 렌더 |
-| **합계** | **48** | `manage.py test` **전건 통과** |
+| ★ `tests/test_inquiry.py` | 25 | **응답 형태 7종 전건** + 경계값 + 아웃박스 본문 + 사용량 알림 + honeypot 화면 동일성 + 필수 표시 3중 + 동의 문구 + `<noscript>` + 지도 버튼 조건부 렌더 + ★ **만료 5건**(부재·만료·변조·재제출 성공·검증 우선) + ★ **동시 이중 제출 1건** |
+| **합계** | ★ **53** | `manage.py test` **전건 통과** |
 
 - 린트: `ruff check .` 통과(규칙 `E,F,W,I,UP,B,DJ,S`).
 - 정적 자산 크기(참고): 페이지 CSS brotli 합계 **약 12KB**, 폰트 선언 `fonts.css` brotli **10.3KB**, JS 합계 **13KB(비압축, 4파일)**. 최종 측정은 작업 11.
@@ -211,9 +297,13 @@ updated: 2026-09-13
 | 3 | ▲ 강사 경력 접기 기준을 디자인의 **"3줄 초과"** 대신 **"항목 4개 이상"** 으로 구현 | 실제 줄 수는 카드 폭·글자 길이에 따라 달라진다 | 줄 수 판정은 JS 실측이 필요해 **JS 비활성에서 동작하지 않는다**. 디자인 검토에서 designer 확인을 받는다 |
 | 4 | ▲ 앵커 칩·처리방침 목차의 **현재 위치(`aria-current`) 표시 미구현** | 디자인 명세의 선택 항목(§4.1·§5.4 "JS, 선택") | 스크롤 스파이 JS 가 필요하다. 작업 11 이후 여유가 있으면 추가 |
 | 5 | ▲ CMP-029 "맨 위로"(Could) 미구현 | 긴 문서(`/privacy`) 편의 저하 | Could 항목. 작업 11 이후 판단 |
-| 6 | ▲ **`og-image.png` 미생성** — OG 이미지 태그가 빠진 채 빌드된다 | 링크 공유 시 대표 이미지 없음 | §7 참조. Pretendard 설치 환경이 필요하다 |
-| 7 | ▲ `submit_token` 만료(24시간)는 **저장 없이 성공 화면**을 돌려준다(설계 §9.6 ⑤ 그대로) | 폼을 24시간 이상 열어 둔 이용자의 제출이 조용히 버려진다 | 설계가 정한 동작이라 그대로 구현했다. **만료 시간을 늘릴지 / ⑤를 재렌더로 바꿀지**는 설계 개정 사항으로 qa·planner 의견을 받고 싶다(§8) |
-| 8 | 폰트 폴백 메트릭 잠정값 · `requirements.lock` 미도입 · nginx 운영 샘플 미작성 | v0.1 #2·#3·#7 그대로 | 작업 11·12 |
+| 6 | ★ **(해소)** `og-image.png` 미생성 | — | **PM 결정에 따라 임시본 생성·태그 부착 완료**(§7). 정식본은 같은 경로에 덮어쓰면 코드 변경 0 |
+| 7 | ★ **(해소)** `submit_token` 만료 시 조용한 성공 | — | **PM 결정으로 ⑦(재작성 안내)로 분리**. 설계 §9.6 v0.4 · 구현 · 테스트 5건 모두 반영 |
+| 8 | ★ **(부분 해소)** 폰트 폴백 메트릭 · nginx 운영 샘플 | — | 폴백 메트릭 **Windows 실측 적용**(macOS 분은 #12) · nginx **운영·스테이징 샘플 2종 작성**. `requirements.lock` 은 **미도입**(아래 #10) |
+| ★ 10 | `requirements.lock`(해시 고정) **미도입** | 같은 태그를 다시 빌드할 때 하위 의존성 패치가 달라질 수 있다 | `requirements.txt` 는 직접 의존성 5개를 **패치까지 고정**하고 있어 1차 재현성은 확보돼 있다. 전이 의존성까지 고정하려면 `pip-compile` 도구가 필요하다 — devops 와 도입 여부를 합의한 뒤 넣는다 |
+| ★ 11 | `.env` **인라인 주석**이 파서를 깨뜨리는 문제 | `docker run --env-file` 은 `TRUSTED_PROXY_COUNT=0  # …` 을 값으로 읽어 **기동이 깨졌다**. 더 위험한 것은 **셸 파서**였다 — `restore.sh` 가 `DJANGO_ENV=production  # …` 을 `production` 과 다르게 읽어 **운영 복구 가드가 통과할 수 있었다** | `.env.example` 의 인라인 주석을 **전부 값 줄 위로 옮기고** 머리에 금지 문구를 넣었다. `restore.sh` 파서도 주석·따옴표·공백을 떼어내도록 고치고 **주석이 붙은 상태로 가드가 걸리는 것을 실행 확인**(§4 #42) |
+| ★ 12 | 폰트 폴백 메트릭 중 **macOS(Apple SD Gothic Neo) 미실측** | macOS Safari 에서 폴백 표시 시 글자 크기 보정이 없다(행 높이는 맞다) | 폰트 파일이 없어 **지어내지 않았다.** `@font-face` 를 플랫폼별 2벌로 선언해 두었으므로 designer 가 실측값을 주면 **숫자 1개(size-adjust)만 교체**하면 된다 |
+| ★ 13 | 복구 직후 `core_jobrunlog` 에 **`running` 상태로 남는 백업 기록 1건** | 복구 대상 덤프는 **자기 자신의 실행 중 상태를 담고 있다**(백업 도중 덤프를 뜬 것이므로). 복구 직후 일일 요약이 "최근 성공 기록 없음"으로 보일 수 있다 | 데이터 손상이 아니라 표시 문제이며, 다음 03:00 백업 1회로 정상화된다. **P8 운영 가이드의 "복구 직후 확인 사항"에 적는다** |
 | 9 | 지도·주소·전화·강사·처리방침 본문이 전부 `[TBD]` | **현재 화면 대부분이 "값 없음" 상태로 보인다** — 디자인 검토 시 목업과 달라 보인다 | 코드 변경 없이 `content/*.yml` 수정(+`seed_content`)으로 반영된다. 수령 일정은 pmo 추적(T-C·T-E·T-F·T-G) |
 
 ---
@@ -226,12 +316,16 @@ updated: 2026-09-13
 | `icon-192.png` | ✅ 생성 | 3.1KB |
 | `icon-512.png` | ✅ 생성 | 8.8KB |
 | `apple-touch-icon.png` (180) | ✅ 생성 | 3.0KB |
-| `og-image.png` (1200×630) | ❌ **보류** | — |
+| `og-image.png` (1200×630) | ★ ⚠ **임시본 생성**(2026-09-13 · PM 결정) | 30.9KB |
 
 - 변환은 **일회용 컨테이너**에서 했다(틀·프로젝트에 도구를 설치하지 않았다):
   `docker run --rm -v …:/in -v …:/out alpine:3.20 sh -c "apk add --no-cache rsvg-convert imagemagick && rsvg-convert -w 192 -h 192 /in/icon-master-512.svg -o /out/icon-192.png … && magick /tmp/f32.png /tmp/f48.png /out/favicon.ico"`
 - 산출물 위치: `developer/site/static/img/`. `base.html` 에 `<link rel="icon" …ico>` · `<link rel="apple-touch-icon" …>` 를 추가했다.
-- **`og-image.png` 보류 사유**: 원본 `og-image.svg` 는 `font-family: Pretendard` 로 조판돼 있고, 우리가 가진 Pretendard 는 **`unicode-range` 분할 woff2 서브셋**뿐이라 fontconfig 가 로드하지 못한다. 폴백 폰트로 구우면 글자 폭이 달라져 **좌우 96px 여백을 넘을 수 있다**(티켓이 경고한 바로 그 상황)고 판단했고, 육안 확인 수단도 없다. 티켓의 방침 ②대로 **placeholder 를 만들지 않고 `og:image` 계열 태그를 빼고 빌드**했다. 파일이 `static/img/og-image.png` 에 놓이면 **코드 변경 없이** 태그 5줄(`og:image`·width·height·alt·`twitter:card`)이 붙는다(`apps/core/context_processors._og_image`).
+- ★ **`og-image.png` 임시본 (PM 결정 2026-09-13)**: 아래 보류 사유는 그대로지만, PM 결정에 따라 **변환 환경에서 쓸 수 있는 폰트(Noto Sans CJK KR)로 렌더한 임시본**을 넣었다. **임시인 것은 폰트(자간·글자 폭)뿐이고 레이아웃·색·문구·좌표는 원본 그대로**다.
+  - 티켓이 경고한 **여백 초과는 실측으로 배제**했다 — 텍스트+로고만 렌더해 `magick -trim` 으로 잰 경계가 **516×323 at (97,136)** 이라 좌우 96px 여백 안에 들어간다(§4 #30).
+  - **임시본 표시 4곳**: 작업 사본 파일명 `og-image.TEMP-source.svg` · 그 파일 머리 주석 · `og-image.png` 의 PNG `tEXt Comment` · 인계 메모 `static/img/SOURCES.md`.
+  - **교체 시 코드 변경 0** — 같은 경로에 덮어쓰면 된다. 절차는 `static/img/SOURCES.md` 와 티켓 처리 결과 ⑤에 적었다.
+- **원래의 보류 사유(유지)**: 원본 `og-image.svg` 는 `font-family: Pretendard` 로 조판돼 있고, 우리가 가진 Pretendard 는 **`unicode-range` 분할 woff2 서브셋**뿐이라 fontconfig 가 로드하지 못한다. 폴백 폰트로 구우면 글자 폭이 달라져 **좌우 96px 여백을 넘을 수 있다**(티켓이 경고한 바로 그 상황)고 판단했고, 육안 확인 수단도 없다. 티켓의 방침 ②대로 **placeholder 를 만들지 않고 `og:image` 계열 태그를 빼고 빌드**했다. 파일이 `static/img/og-image.png` 에 놓이면 **코드 변경 없이** 태그 5줄(`og:image`·width·height·alt·`twitter:card`)이 붙는다(`apps/core/context_processors._og_image`).
 - **designer 에게 알릴 사항 1건(결함)**: `design/assets/favicon.svg` 는 **XML 로 파싱되지 않는다.** 6행 주석 안의 `--color-primary` 가 XML 주석 규칙(연속 하이픈 금지)을 어긴다. 브라우저는 `image/svg+xml` 을 XML 로 파싱하므로 **파비콘이 표시되지 않는다.** 우리 사본(`static/img/favicon.svg`)은 문구를 고쳐 해소했고 변환도 그 사본으로 했다. **원본 수정은 designer 소관**이라 티켓 처리 결과에 적었다.
 
 ---
@@ -239,11 +333,14 @@ updated: 2026-09-13
 ## 8. 검증팀 전달 사항
 
 - **실행 방법**: `developer/site/README.md` (설치 → 기동 → 자주 쓰는 명령 → 화면·콘텐츠 표 → 운영 빌드 미리보기)
-- **지금 검증할 수 있는 것**: 1차 6화면 전부 · **문의 폼 응답 형태 6종**(§3.1 이 기대값) · SEO(메타·canonical·sitemap·robots·JSON-LD) · 접근성 마크업(랜드마크·라벨·오류 요약·포커스 이동·색 외 병기) · **JS 비활성 동작**(브라우저 JS 끄기 또는 curl) · 콘텐츠 시드 반영 절차 · 빈도 제한과 복귀(`QA_CLOCK_OFFSET_SECONDS`)
-- **아직 검증할 수 없는 것**: 성능·Lighthouse(작업 11) · 백업/배포/롤백(작업 12) · **검증 지원 도구 ①~⑪ 전부**(작업 13) · 지도 실제 동작(T-E)
-- **판정용 로그 조회**: `docker compose -f compose.yaml -f compose.local.yaml logs app` — `inquiry.created` / `inquiry.invalid` / `inquiry.blocked reason=…` / `inquiry.duplicate token_state=…`
+- **지금 검증할 수 있는 것**: 1차 6화면 전부 · ★ **문의 폼 응답 형태 7종**(§3.1 이 기대값) · SEO(메타·canonical·sitemap·robots·JSON-LD·**OG 이미지**) · 접근성 마크업 · **JS 비활성 동작** · 콘텐츠 시드 반영 절차 · 빈도 제한과 복귀 · ★ **백업·복구·회전·실패 주입** · ★ **검증 지원 도구 ①~⑪ 전부** · ★ **운영 안전장치 5중**
+- **아직 검증할 수 없는 것**: 성능·Lighthouse(브라우저 필요) · **실제 배포·롤백**(서버 필요 — 설계 §12.6.1 의 10-17 항목) · Safari·iOS 실기기(체크리스트는 제공: `developer/site/qa/webkit_checklist.md`) · 지도 실제 동작(T-E)
+- ★ **검증 도구 켜는 법**: `.env` 에 `QA_TOOLS_ENABLED=1` → `docker compose … up -d app scheduler`. **끄면 모든 `qa_*` 명령이 종료 코드 2** 로 끝난다. 항목별 토글은 서로 영향을 주지 않는다(`QA_RATE_LIMIT_MODE` · `QA_RETENTION_MINUTES__INQUIRY` · `QA_FAIL_INJECT` · `QA_CLOCK_OFFSET_SECONDS`(음수 허용) · `QA_SESSION_TOKEN`).
+- ★ **증거 만들기**: `qa_show inquiry --since <ISO> --format json` · `qa_mail_log --kind … --format json` 은 **그대로 첨부 가능한 단일 JSON 배열**이다. 구간 정리는 `qa_purge_test_data --since <ISO> --confirm`(테이블별 건수 출력).
+- **판정용 로그 조회**: `docker compose -f compose.yaml -f compose.local.yaml logs app` — `inquiry.created` / `inquiry.invalid` / `inquiry.blocked reason=…` / `inquiry.duplicate token_state=used` / ★ `inquiry.expired token_state=expired|missing|invalid`
 - **빈도 제한 조정**: `.env` 의 `RATE_LIMIT_FORM_WINDOW_MAX`·`RATE_LIMIT_FORM_DAY_MAX` 로 낮춘다. 사용량 알림 임계는 `QA_TOOLS_ENABLED=1` 일 때만 `QA_RATE_LIMIT_ALERT_*` 로 낮아진다
-- **의견을 받고 싶은 것 2건**: ⓐ §6 #7(토큰 만료 시 조용한 성공) 처리 방침 ⓑ §6 #3(경력 접기 기준을 항목 수로 근사)
+- ★ **`.env` 작성 주의**: **값 줄에 인라인 주석을 쓰지 않는다.** `docker run --env-file` 과 셸 파서가 주석을 값으로 읽는다(§6 #11).
+- **의견을 받고 싶은 것 1건**: §6 #3(강사 경력 접기 기준을 "3줄 초과" 대신 **항목 4개 이상**으로 근사 — designer 확인). §6 #7(토큰 만료)은 **PM 결정으로 종결**됐다.
 
 ---
 
@@ -251,8 +348,8 @@ updated: 2026-09-13
 
 | ID | 내용 | 상태 |
 |---|---|---|
-| TKT-DSN-002 | 파비콘·OG 래스터 변환 요청 | **부분 처리** — 래스터 4종 생성, `og-image.png` 보류(사유 기재) + `favicon.svg` XML 오류 1건 회신 (§7) |
-| — | 이번 작업에서 신규 발행한 티켓 없음 | — |
+| TKT-DSN-002 | 파비콘·OG 래스터 변환 요청 | ★ **처리 완료(임시본 포함)** — 래스터 **5종 산출**(`og-image.png` 은 임시본 + 교체 절차 명시) · `favicon.svg` XML 오류 1건 회신 (§7) |
+| — | 이번 작업에서 신규 발행한 티켓 없음 | designer 확인 요청 2건(경력 접기 기준 · macOS 폰트 메트릭)은 **P4-④ 디자인 검토에서 함께 다루는 편이 빠르다고 보고** 티켓을 따로 발행하지 않았다 |
 
 ---
 
@@ -260,5 +357,6 @@ updated: 2026-09-13
 
 | 버전 | 일자 | 작성자 | 내용 | 관련 리뷰/CR |
 |---|---|---|---|---|
+| **0.3** | **2026-09-13** | developer | **PM 결정 2건 + 구현 3단계(작업 11·12·13).** ① 폼 **토큰 만료 → 재작성 안내**(⑤/⑦ 분리 · 입력값 보존 · 새 토큰 · 테스트 5건) ② **OG 이미지 임시본**(여백 실측 · 임시 표시 4곳 · 교체 시 코드 변경 0) ③ **폰트 폴백 메트릭 실측 적용**(Windows 실측 / macOS 미실측 표시) ④ **배포·롤백·복구 스크립트 + nginx 운영·스테이징 샘플 2종** ⑤ **백업 일원화(`run_backup`)·회전·실패 주입·락 충돌 중단 + 복구 리허설 1회 성공** ⑥ **일일 운영 요약·`/healthz` 폴링·파기·카운터 정리 스케줄 가동** ⑦ **검증 지원 도구 ①~⑪ + 안전장치 5중 전건 실행 확인** ⑧ **결함 1건 수정** — 동시 이중 제출 500. 실행 확인 **20건 추가**(§4.1), 자동 테스트 48 → **53건** | PM 결정 2026-09-13, TKT-DSN-002 |
 | 0.2 | 2026-09-13 | developer | **구현 2단계** — 1차 6화면 완성(SCR-002·003·006 신규, 008·009 디자인 반영) · **문의 폼과 응답 형태 6종**(§3.1) · 빈도 제한·사용량 알림 · SEO/접근성/`<noscript>` 마감 · 파비콘 래스터 4종(TKT-DSN-002) · **템플릿 주석 누출 결함 수정** · 자동 테스트 9 → 48건 | TKT-DSN-002 |
 | 0.1 | 2026-09-13 | developer | 최초 작성(초안) — 구현 1단계(작업 1~3 + SCR-001 뼈대)와 실행 명령 28건의 확인 결과 | `shared/reviews/P4a_tech-design_devops_r2.md`, `shared/reviews/P4a_tech-design_qa_r2.md` |

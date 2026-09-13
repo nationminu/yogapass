@@ -1,7 +1,8 @@
-"""문의 폼 응답 형태 6종 — 기술 설계 §9.6 표가 기대값의 원본이다 (REQ-F-040~046).
+"""문의 폼 응답 형태 7종 — 기술 설계 §9.6 표가 기대값의 원본이다 (REQ-F-040~046).
 
 표의 5열(상태 코드 · 본문 · DB 저장 · 아웃박스 INSERT · 서버 기록)을 전부 확인한다.
 ③honeypot 과 ⑤토큰 재사용은 **화면이 ①과 같으므로** 저장·발송 건수와 로그로만 구분된다.
+⑦토큰 만료는 v0.4(PM 결정 2026-09-13)에서 ⑤와 분리됐다 — 화면·로그가 모두 다르다.
 """
 
 from __future__ import annotations
@@ -41,7 +42,7 @@ class InquiryFormBase(TestCase):
 
 
 class ResponseFormTests(InquiryFormBase):
-    """§9.6 ①~⑤ (⑥은 ServerErrorTests)"""
+    """§9.6 ①~⑤ (⑥은 ServerErrorTests · ⑦은 ExpiredTokenTests)"""
 
     def test_1_accepted(self):
         with self.assertLogs("core.inquiry", level="INFO") as logs:
@@ -149,6 +150,23 @@ class ResponseFormTests(InquiryFormBase):
             self.assertEqual(self.post().status_code, 200)
         self.assertEqual(Inquiry.objects.count(), 2)
 
+    def test_5_concurrent_same_token_does_not_500(self):
+        """동시 이중 제출 — 조회를 둘 다 통과해도 UNIQUE 가 막고 화면은 ⑤가 된다.
+
+        실제 동시 요청(qa/concurrency.py --same-token)에서 **500 이 나던 경로**다.
+        여기서는 조회를 빈 결과로 만들어(경합 상태 재현) INSERT 충돌을 일으킨다.
+        """
+        token = self.token()
+        self.post(submit_token=token)  # 1회차 저장
+        with mock.patch("apps.inquiry.services.find_existing", return_value=""):
+            with self.assertLogs("core.inquiry", level="INFO") as logs:
+                response = self.post(submit_token=token)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("문의가 접수되었습니다.", response.content.decode())
+        self.assertEqual(Inquiry.objects.count(), 1)  # 저장 1건
+        self.assertEqual(Outbox.objects.filter(kind=Outbox.Kind.INQUIRY_NOTIFY).count(), 1)
+        self.assertIn("inquiry.duplicate token_state=used", "\n".join(logs.output))
+
     def test_5_token_reuse_is_silent(self):
         token = self.token()
         self.post(submit_token=token)
@@ -160,13 +178,69 @@ class ResponseFormTests(InquiryFormBase):
         self.assertEqual(Outbox.objects.count(), 1)  # 알림도 1건
         self.assertIn("inquiry.duplicate token_state=used", "\n".join(logs.output))
 
-    def test_5_missing_token_is_treated_as_expired(self):
+
+class ExpiredTokenTests(InquiryFormBase):
+    """⑦ 토큰 만료·부재·변조 — **저장하지 않고 다시 작성하도록 안내**한다 (PM 결정 2026-09-13).
+
+    ⑤(재사용)와 달리 성공 화면을 주지 않는다. 한 번도 저장된 적 없는 제출이기 때문이다.
+    """
+
+    NOTICE = "시간이 지나 문의가 접수되지 않았습니다."
+
+    def test_7_missing_token_asks_to_rewrite(self):
         with self.assertLogs("core.inquiry", level="INFO") as logs:
             response = self.post(submit_token="")
         self.assertEqual(response.status_code, 200)
-        self.assertIn("문의가 접수되었습니다.", response.content.decode())
+        body = response.content.decode()
+        self.assertIn(self.NOTICE, body)
+        self.assertNotIn("문의가 접수되었습니다.", body)  # ⑤와 구분된다
+        self.assertIn('id="contact-form"', body)  # 폼이 다시 보인다
+        self.assertIn('role="alert"', body)
         self.assertEqual(Inquiry.objects.count(), 0)
-        self.assertIn("inquiry.duplicate token_state=expired ref=none", "\n".join(logs.output))
+        self.assertEqual(Outbox.objects.count(), 0)
+        self.assertIn("inquiry.expired token_state=missing ref=none", "\n".join(logs.output))
+
+    def test_7_expired_token_preserves_input_and_issues_new_token(self):
+        with mock.patch("apps.inquiry.services.TOKEN_MAX_AGE", -1):
+            with self.assertLogs("core.inquiry", level="INFO") as logs:
+                response = self.post()
+        body = response.content.decode()
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(self.NOTICE, body)
+        # 입력값 보존 — 이름·전화·문의 내용이 폼에 그대로 있다
+        self.assertIn(f'value="{VALID["name"]}"', body)
+        self.assertIn(f'value="{VALID["phone"]}"', body)
+        self.assertIn(VALID["message"], body)
+        self.assertIn("checked", body)  # 동의 체크도 유지
+        self.assertEqual(Inquiry.objects.count(), 0)
+        self.assertEqual(Outbox.objects.count(), 0)
+        self.assertIn("inquiry.expired token_state=expired ref=none", "\n".join(logs.output))
+
+    def test_7_invalid_token_is_logged_separately(self):
+        with self.assertLogs("core.inquiry", level="INFO") as logs:
+            response = self.post(submit_token="tampered.value.here")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(self.NOTICE, response.content.decode())
+        self.assertIn("inquiry.expired token_state=invalid ref=none", "\n".join(logs.output))
+
+    def test_7_resubmit_with_the_new_token_is_accepted_once(self):
+        """재작성 안내 화면의 새 토큰으로 다시 제출하면 정상 접수된다(저장 1건)."""
+        with mock.patch("apps.inquiry.services.TOKEN_MAX_AGE", -1):
+            body = self.post().content.decode()
+        match = re.search(r'name="submit_token" value="([^"]+)"', body)
+        assert match, "재작성 안내 화면에 새 submit_token 이 없다"
+        response = self.post(submit_token=match.group(1))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("문의가 접수되었습니다.", response.content.decode())
+        self.assertEqual(Inquiry.objects.count(), 1)
+        self.assertEqual(Outbox.objects.filter(kind=Outbox.Kind.INQUIRY_NOTIFY).count(), 1)
+
+    def test_7_validation_error_takes_precedence(self):
+        """검증 실패가 먼저다 — 만료 토큰 + 빈 이름이면 ②(오류 요약)가 나온다."""
+        response = self.post(submit_token="", name="")
+        body = response.content.decode()
+        self.assertIn("입력 내용을 확인해 주세요", body)
+        self.assertNotIn(self.NOTICE, body)
 
 
 class ServerErrorTests(InquiryFormBase):

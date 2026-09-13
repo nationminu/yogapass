@@ -31,6 +31,8 @@ services:
       DJANGO_SETTINGS_MODULE: config.settings.local
     volumes:
       - .:/app
+      # 정기 백업(03:00)을 로컬에서도 그대로 재현한다 (기술 설계 §12.5)
+      - ${BACKUP_HOST_DIR:-./backups}:/backups
 
   mail:
     image: axllent/mailpit:latest
@@ -63,7 +65,7 @@ services:
     networks: [internal]
 
   backup:
-    # ⚠ 작업 12(manage.py run_backup 구현) 완료 후부터 동작한다.
+    # run_backup 을 1회 실행하는 일회용 서비스(기술 설계 §3.2.1 · §12.5). 상시 컨테이너가 아니다.
     profiles: ["backup"]
     build:
       context: .

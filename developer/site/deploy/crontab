@@ -1,13 +1,25 @@
 # supercronic crontab — scheduler 컨테이너 (기술 설계 §3.3)
-# ⚠ 여기에는 **구현이 끝난 작업만** 적는다. 남은 작업은 아래 주석으로 예약해 둔다.
-# 시각은 컨테이너 TZ(Asia/Seoul) 기준.
+# ⚠ 여기에는 **구현이 끝난 작업만** 적는다. 시각은 컨테이너 TZ(Asia/Seoul) 기준이며
+#   cron 스케줄 자체는 QA_CLOCK_OFFSET_SECONDS 의 영향을 받지 않는다(§10.3 비적용 ⓐ).
 
 # 메일 아웃박스 플러시·재시도 (1분)
 * * * * * cd /app && python manage.py send_outbox
 
-# --- 작업 12 에서 추가한다 (구현 전에는 켜지 않는다) ---
-# 0 3 * * *  cd /app && python manage.py run_backup
-# 10 3 * * * cd /app && python manage.py purge_expired
-# 0 * * * *  cd /app && python manage.py prune_rate_limit
-# 0 8 * * *  cd /app && python manage.py report_failures
-# */5 * * * * cd /app && python manage.py ping_health   # /healthz 는 항상 앱에 직접 호출한다(devops R2 #3)
+# DB 백업 + 무결성 확인 + 회전 (일 1회 03:00)
+0 3 * * * cd /app && python manage.py run_backup
+
+# 보관 기간 경과 개인정보 파기 (일 1회 03:10)
+10 3 * * * cd /app && python manage.py purge_expired
+
+# 빈도 제한 카운터 정리 (시간 1회)
+0 * * * * cd /app && python manage.py prune_rate_limit
+
+# 일일 운영 요약 메일 (일 1회 08:00) — 실패가 없어도 매일 1통 보낸다
+0 8 * * * cd /app && python manage.py report_failures
+
+# /healthz 폴링 (5분) — **앱에 직접 호출한다. nginx 를 경유하지 않는다**(devops R2 #3)
+*/5 * * * * cd /app && python manage.py ping_health
+
+# --- 2차에서 추가한다 ---
+# 0 9 * * *  cd /app && python manage.py notify_unpublished
+# 5 0 * * *  cd /app && python manage.py roll_booking_states

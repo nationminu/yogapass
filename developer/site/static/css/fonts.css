@@ -1849,25 +1849,66 @@
 
 /* ============================================================
    폴백 메트릭 오버라이드 (디자인 시스템 §1.2 / 페이지 디자인 D-7)
-   ⚠ 아래 3개 값은 **잠정값**이다. 작업 11(성능 마감)에서 360/768/1280px
-     실측 → 1% 단위 조정 → designer 1회 확인 후 확정한다.
-     측정표는 개발 보고서에 첨부한다.
+   작업 11 — **실측값 적용 (2026-09-13)**. 근거는 개발 보고서 §4 "폰트 폴백 메트릭 실측".
+
+   측정 방법: fontTools 로 폰트 테이블을 직접 읽어 계산했다(눈대중·추정값이 아니다).
+     Pretendard  upm 2048 · hhea asc 1950 / desc -494 / gap 0 · sxHeight 1086
+     Malgun Gothic(맑은 고딕, Windows) upm 2048 · sxHeight 1050
+     size-adjust      = (Pretendard x-height/upm) ÷ (폴백 x-height/upm) = 1086/1050 = 103.43%
+     ascent-override  = (1950/2048) ÷ 1.0343 = 92.06%
+     descent-override = ( 494/2048) ÷ 1.0343 = 23.32%
+     line-gap-override= 0%  (Pretendard hhea lineGap = 0)
+
+   ⚠ Apple SD Gothic Neo(macOS)는 이 작업 환경에 폰트 파일이 없어 **x-height 를 실측하지 못했다.**
+     지어내지 않고 size-adjust 를 보정 없음(100%)으로 두고 **행 높이만 Pretendard 값에 맞춘다.**
+     → **designer(macOS 환경) 1회 실측 확인 필요** (D-7 잔여 항목).
+
+   규칙 순서: 같은 family·weight 의 @font-face 는 **뒤에 선언한 것이 우선**하고,
+     src 의 local() 이 해석되지 않으면 앞 선언으로 내려간다.
+     따라서 ① Apple SD Gothic Neo(미실측) → ② Malgun Gothic(실측) 순으로 선언하면
+     Windows 는 ②, macOS 는 ① 이 적용된다.
    ============================================================ */
+
+/* ① macOS — 미실측: 행 높이만 Pretendard 에 맞춘다 (designer 확인 필요) */
 @font-face {
   font-family: 'Pretendard Fallback';
   font-style: normal;
   font-weight: 400;
-  src: local("Malgun Gothic"), local("Apple SD Gothic Neo");
-  size-adjust: 100%;       /* [잠정 — 실측 대기] */
-  ascent-override: 92%;    /* [잠정 — 실측 대기] */
-  descent-override: 24%;   /* [잠정 — 실측 대기] */
+  src: local("Apple SD Gothic Neo");
+  size-adjust: 100%;          /* [designer 확인 필요 — x-height 미실측] */
+  ascent-override: 95.21%;    /* 1950/2048 (size-adjust 100% 기준) */
+  descent-override: 24.12%;   /*  494/2048 */
+  line-gap-override: 0%;
 }
 @font-face {
   font-family: 'Pretendard Fallback';
   font-style: normal;
   font-weight: 700;
-  src: local("Malgun Gothic Bold"), local("Apple SD Gothic Neo Bold"), local("Malgun Gothic");
-  size-adjust: 100%;       /* [잠정 — 실측 대기] */
-  ascent-override: 92%;    /* [잠정 — 실측 대기] */
-  descent-override: 24%;   /* [잠정 — 실측 대기] */
+  src: local("Apple SD Gothic Neo Bold"), local("Apple SD Gothic Neo");
+  size-adjust: 100%;          /* [designer 확인 필요 — x-height 미실측] */
+  ascent-override: 95.21%;
+  descent-override: 24.12%;
+  line-gap-override: 0%;
+}
+
+/* ② Windows — 실측값 (Malgun Gothic / 맑은 고딕) */
+@font-face {
+  font-family: 'Pretendard Fallback';
+  font-style: normal;
+  font-weight: 400;
+  src: local("Malgun Gothic"), local("맑은 고딕");
+  size-adjust: 103.43%;
+  ascent-override: 92.06%;
+  descent-override: 23.32%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Pretendard Fallback';
+  font-style: normal;
+  font-weight: 700;
+  src: local("Malgun Gothic Bold"), local("맑은 고딕 Bold"), local("Malgun Gothic");
+  size-adjust: 103.43%;
+  ascent-override: 92.06%;
+  descent-override: 23.32%;
+  line-gap-override: 0%;
 }

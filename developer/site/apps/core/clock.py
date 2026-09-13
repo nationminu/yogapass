@@ -2,35 +2,32 @@
 
 애플리케이션 코드는 django.utils.timezone.now() 를 직접 부르지 않고
 반드시 이 모듈의 now() 를 쓴다. 검증 시 기준 시각을 한 곳에서 밀 수 있다.
+
+오프셋 해석은 `apps.core.qaflags` → `qa/qa_settings.py` 가 한다(§10.6 ②).
+운영 이미지에는 해석기가 없으므로 오프셋이 걸릴 수 없다.
 """
 
 from __future__ import annotations
 
 import datetime as _dt
 import logging
-import os
 
-from django.conf import settings
 from django.utils import timezone
+
+from apps.core import qaflags
 
 logger = logging.getLogger("core.clock")
 
 _LOGGED = False
 
 
-def _offset_seconds() -> int:
-    if not getattr(settings, "QA_TOOLS_ENABLED", False):
-        return 0
-    raw = os.environ.get("QA_CLOCK_OFFSET_SECONDS", "0").strip()
-    try:
-        return int(raw)
-    except ValueError:
-        logger.warning("clock.offset_invalid value=%s", raw)
-        return 0
+def offset_seconds() -> int:
+    """적용 중인 오프셋(초). 음수 허용 — 과거로 이동할 수 있다(§10.2)."""
+    return qaflags.clock_offset_seconds()
 
 
 def now() -> _dt.datetime:
-    offset = _offset_seconds()
+    offset = offset_seconds()
     value = timezone.now()
     if offset:
         global _LOGGED

@@ -1,0 +1,74 @@
+# ============================================================================
+# 운영 nginx 설정 **샘플** — 기술 설계 §12.3 의 9행 요청 항목을 그대로 담았다.
+#
+# ⚠ 이것은 요청안이다. 실제 반영은 devops·운영팀이 한다(파일 배치 권한 = I-2-b).
+# ⚠ **전역(http) 블록 변경 요청은 0건**이다 — 전부 server/location 레벨이라
+#    같은 서버의 다른 서비스에 영향을 주지 않는다(I-2-c).
+#
+# 치환할 값
+#   {DOMAIN}        운영 도메인            (미확정 — 요구사항 §8.1 T-? / 설계 §14.3 O-4)
+#   {APP_PORT}      앱 컨테이너 게시 포트  (compose.prod.yaml 의 127.0.0.1:${APP_PORT}:8000)
+#   {CERT_PATH}     TLS 인증서 경로        (devops 배포 계획서에서 확정)
+#   {STATIC_ROOT}   maintenance.html 을 둘 호스트 경로
+# ============================================================================
+
+# (7) HTTP → HTTPS 301  — REQ-N-017
+server {
+    listen 80;
+    server_name {DOMAIN};
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name {DOMAIN};
+
+    ssl_certificate     {CERT_PATH}/fullchain.pem;
+    ssl_certificate_key {CERT_PATH}/privkey.pem;
+
+    # (7) HSTS — ⚠ includeSubDomains · preload 는 도메인 구조 확인 전 **넣지 않는다**(§9.5)
+    add_header Strict-Transport-Security "max-age=86400" always;   # 1차는 1일부터 시작
+
+    # (3) 오류 가로채기 금지 — 앱의 404·500 화면을 그대로 내보낸다 (REQ-F-060 · 065)
+    #     nginx 기본값이 off 이므로, 기존 http 블록에서 on 으로 켜 두었을 때를 대비한 재정의다.
+    proxy_intercept_errors off;
+
+    # (4) 압축 — **Django 가 렌더하는 HTML 의 압축 주체는 nginx 다**(§12.3 #4)
+    #     gzip_proxied 기본값이 off 라서 프록시 응답에는 적용되지 않는다. any 로 켠다.
+    gzip on;
+    gzip_proxied any;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css application/javascript application/json image/svg+xml;
+    gzip_vary on;
+
+    # (5) 별도 로그 파일 — ⚠ 호스트 logrotate 대상에 이 2개 파일을 등록해야 한다(누락 시 디스크 증가)
+    access_log /var/log/nginx/yogapass.access.log;
+    error_log  /var/log/nginx/yogapass.error.log;
+
+    client_max_body_size 2m;   # 1차는 업로드 없음. 2차 사진 업로드 시 5m 로 요청 예정
+
+    # (1)(2) 라우팅과 헤더 전달
+    #     ⚠ X-Forwarded-For 홉 수가 앱의 TRUSTED_PROXY_COUNT 와 맞아야 한다.
+    #        앞단에 CDN 등 다른 프록시가 더 있으면 값이 달라진다 → 스테이징에서 실측(§13 #6).
+    location / {
+        proxy_pass http://127.0.0.1:{APP_PORT};
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_read_timeout 30s;
+    }
+
+    # (6) 장애·점검 화면 — **앱이 죽어 있어도 보이는 정적 파일**이다(자립형, 외부 자산 요청 0건)
+    error_page 502 503 504 /maintenance.html;
+    location = /maintenance.html {
+        root {STATIC_ROOT};
+        internal;
+    }
+
+    # (8) 접근 제어 : 운영은 공개이므로 없음 (스테이징 샘플에만 있다)
+    # (9) 색인 차단 : 운영은 색인을 허용하므로 없음 (스테이징 샘플에만 있다)
+}

@@ -3,7 +3,7 @@ doc_id: DEV-TECH
 title: 기술 설계서 — 1차(2026-11-06 오픈 범위) + 2차 스키마 선설계
 phase: P4
 owner: developer
-version: 0.3
+version: 0.4
 status: in-review
 reviewers: [devops, qa]
 inputs: [planning/02_requirements.md, planning/02_information-architecture.md, planning/02_storyboard.md, design/03_design-system.md, design/03_page-design.md, design/mockups/, interviews/2026-09-12_infra-constraints.md, interviews/2026-09-12_booking-rules.md, pm/01_project-plan.md, pm/gates/G3a_design.md, shared/reviews/CR-001_impact_developer_r2.md, shared/reviews/P3_design-docs_developer_r1.md, shared/reviews/P4a_tech-design_devops_r1.md, shared/reviews/P4a_tech-design_qa_r1.md, shared/reviews/P4a_tech-design_devops_r2.md, shared/reviews/P4a_tech-design_qa_r2.md]
@@ -49,6 +49,19 @@ updated: 2026-09-13
 > | 구현 반영 | 구현 1단계에서 확정된 사실을 표에 반영: **PyYAML 6.0.3 의존성 추가**(시드 파일 파서), 패치 버전 고정값, `deploy/nginx/htpasswd.dummy`·`config/env.py` 파일 추가 | §2.7 · §4 |
 >
 > **미반영 0건.** Should 8건·Could 4건 전건 반영. 처리 대장은 §17.4.
+
+> **v0.4 반영 요약 (PM 결정 2건 + 구현 3단계 확정 사실)**
+>
+> | 반영 | 바뀐 것 | 위치 |
+> |---|---|---|
+> | **PM 결정 ①** | **폼 토큰 만료 = 다시 작성 안내.** §9.6 표의 ⑤를 **⑤(재사용=중복 제출)와 ⑦(만료·부재·변조)으로 분리**했다. ⑦은 저장 없이 성공 화면을 주던 v0.3 동작을 버리고 **폼 재렌더 + 안내 + 입력값 보존 + 새 토큰**으로 바꿨다. 수용 기준 연결도 ⑤→REQ-F-046 ②, ⑦→REQ-F-046 ① 로 나눴다. 자동 테스트 5건 추가 | **§9.6** |
+> | **PM 결정 ②** | **OG 이미지는 임시본을 넣고 나중에 교체.** 임시본임을 **파일명(`og-image.TEMP-source.svg`)·SVG 머리 주석·PNG `tEXt Comment`·`static/img/SOURCES.md`** 네 곳에 남겼고, 정식본은 **같은 경로에 덮어쓰기만 하면 코드 변경 0** 이다 | §9.3(변경 없음) · TKT-DSN-002 |
+> | 구현 확정 ① | 일일 요약 ⓑ(재시작 횟수)를 **"응답 회복 전환 횟수"** 로 구현한다 — 컨테이너 경계를 넘어 프로세스 시작 시각을 보려면 docker 소켓이 필요해 설계가 피하려던 선택이 된다 | §3.3 |
+> | 구현 확정 ② | 검증 요건 ⑪의 선언 형식을 필드 인자 `pii=True` 대신 **모델 속성 `PII_FIELDS`** 로 한다(필드 상속은 마이그레이션 상태를 바꾼다) | §10.1 ⑪ |
+> | 구현 중 발견 | **동시 이중 제출이 500 이 되던 경로**를 찾아 닫았다(UNIQUE 충돌을 ⑤로 처리). 로컬 동시 5건으로 재현·확인 | §9.6 |
+> | 진행 상황 | §11.1 작업 **11(부분)·12·13 완료** — 배포·롤백·복구 스크립트, nginx 샘플 2종, `run_backup`·회전·실패 주입, 검증 도구 ①~⑪, 안전장치 5중 | §11.1 |
+>
+> **⚠ 이 판의 변경은 전부 "설계를 먼저 고치고 구현을 맞춘" 것이다.** 구현이 설계와 어긋난 채 남은 항목은 없다.
 
 ---
 
@@ -315,7 +328,7 @@ infra §4와 CR-001 R2 §2의 권고를 **그대로 채택**한다. 결정 근�
 | 포함 항목 | 출처 | 무엇을 알려 주는가 |
 |---|---|---|
 | ⓐ 앱 `/healthz` 폴링 결과(최근 24시간 성공/실패 횟수) | 스케줄러가 5분마다 `/healthz`를 호출해 `core_jobrunlog`에 기록. **호출 대상은 항상 앱에 직접(`http://app:8000/healthz`) — nginx 를 경유하지 않고 `SITE_BASE_URL`을 쓰지 않는다**(v0.3, devops R2 #3). 그래서 스테이징의 `auth_basic` 예외 0건 정책과 충돌하지 않는다 | **`unless-stopped`가 잡지 못하는 "살아 있지만 응답 실패" 상태**(devops R1 #15) |
-| ⓑ 컨테이너 재시작 횟수 | `docker` 소켓을 마운트하지 않기 위해 **앱 기동 시각(프로세스 시작 시간)** 을 기록해 비교 | 반복 크래시 |
+| ⓑ 컨테이너 재시작 횟수 | `docker` 소켓을 마운트하지 않기 위해 **앱 기동 시각(프로세스 시작 시간)** 을 기록해 비교.<br>**v0.4 구현 확정: "실패 → 성공 전환 횟수(응답 회복 전환)"로 계산한다.** 스케줄러 컨테이너에서 앱 프로세스의 시작 시각을 볼 수 없고(별도 컨테이너·PID 네임스페이스 분리), 그것을 보려면 docker 소켓을 마운트해야 해서 이 표가 피하려던 바로 그 선택이 된다. **ⓐ의 5분 폴링 기록만으로 같은 신호(죽었다가 살아남)를 얻을 수 있다.** | 반복 크래시 |
 | ⓒ **최근 24시간 내 `run_backup` 성공 기록의 존재 여부**·파일 크기·소요 시간 | `core_jobrunlog`의 `run_backup` | REQ-N-032 ③. **v0.3 판정 반전(devops R2 #2 ①): "성공 기록이 없으면(실패·`skipped`·기록 자체 없음 전부) `[점검필요]`".** 실패가 아니라 **실행되지 않은 경우**를 잡기 위한 것이며, 같은 규칙을 `deploy.sh` 0단계 사전 점검에도 쓴다 |
 | ⓓ 아웃박스 실패 건수·배치 실패 건수 · **`skipped` 건수(작업별 별도 집계)** | `mailer_outbox` · `core_jobrunlog` | REQ-N-037 · REQ-N-038. **`skipped` 반복은 락 경합/설계 문제의 신호**이므로 실패와 분리해 보여 준다(v0.3, devops R2 #2 ②) |
 | ⓔ 디스크 여유율(`${BACKUP_DIR}`가 있는 파일시스템) | `shutil.disk_usage` | 백업 중단의 최다 원인 |
@@ -848,8 +861,29 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 | **②** | **서버 검증 실패** (필수 누락·길이 초과·형식 오류·동의 미체크) | **200** (재렌더) | `error_summary`(CMP-019) **오류** 상태 + 항목별 `aria-invalid`·오류 메시지. **입력값 보존**, 기존 `submit_token` 유지(재제출 가능). `role="alert"` + `tabindex="-1"` 포커스 | **0건** | **0건** | `INFO inquiry.invalid fields=[name,consent]` (**필드 이름만**, 값 미기록) |
 | **③** | **honeypot 채움** (봇 판정) | **200** | `result_block` **성공** 상태 — **①과 픽셀 단위로 동일한 화면**(차단 사실을 알리지 않는다, REQ-F-044) | **0건** | **0건** | `WARNING inquiry.blocked reason=honeypot ip_hash=<hash>` — **②③④⑤의 판정은 이 로그와 DB 건수 차이로만 구분된다** |
 | **④** | **빈도 제한 초과** (10분 5회 / 1일 20회 초과, §5.3) | **429** | `result_block` **실패(일반)** 상태 + "잠시 후 다시 시도해 주세요" — **사유를 구분해 알리지 않는다**. `Retry-After` 헤더 포함 | **0건** | **0건** (단 사용량 알림 임계 초과 시 `kind=rate_limit_alert` **1건**, §5.3) | `WARNING inquiry.blocked reason=rate_limit ip_hash=<hash> scope=form` + `core_ratelimitcounter` `count` 증가·`blocked_until` 갱신 |
-| **⑤** | **`submit_token` 재사용·만료** (중복 제출) | **200** | `result_block` **성공** 상태 — **①과 동일 화면**(사용자에게는 "이미 접수됨"과 구분 없이 접수 완료로 보인다). 새 토큰 미발급 | **0건 (추가 저장 없음)** → REQ-F-046 ②의 "저장 1건" 판정 지점. `qa_show inquiry --count-only`로 확인 | **0건 (추가 발송 없음)** | `INFO inquiry.duplicate token_state=used\|expired ref=<원본 public_ref 또는 none>` |
+| **⑤** | **`submit_token` 재사용** (중복 제출 — 같은 토큰으로 두 번째 제출) | **200** | `result_block` **성공** 상태 — **①과 동일 화면**(사용자에게는 "이미 접수됨"과 구분 없이 접수 완료로 보인다). 새 토큰 미발급 | **0건 (추가 저장 없음)** → REQ-F-046 ②의 "저장 1건" 판정 지점. `qa_show inquiry --count-only`로 확인 | **0건 (추가 발송 없음)** | `INFO inquiry.duplicate token_state=used ref=<원본 public_ref>` |
 | **⑥** | **서버 오류** (DB·템플릿 예외 등 미처리 예외) | **500** | `errors/500.html`(SCR-009) — **폼 화면이 아닌 전용 오류 화면**. 입력값은 복원되지 않는다. `noindex` | **0건** (트랜잭션 롤백) | **0건** (같은 트랜잭션이므로 함께 롤백) | `ERROR` + 스택 트레이스(**개인정보 미포함**). 일일 운영 요약 메일 ⓓ에 집계 |
+| **⑦** (v0.4 신설) | **`submit_token` 만료·부재·변조** (발급 후 24시간 초과 / 토큰 없이 제출 / 서명 불일치) | **200** (재렌더) | `result_block` **실패** 상태 + **"시간이 지나 문의가 접수되지 않았습니다."** 안내 → **폼을 다시 보여 준다**. **입력값 4항목(이름·연락처·문의 내용·동의)을 보존**하고 **새 `submit_token` 을 발급**하므로 그 자리에서 다시 제출하면 정상 접수(①)된다. `role="alert"` + `tabindex="-1"` 포커스 | **0건** | **0건** | `INFO inquiry.expired token_state=expired\|missing\|invalid ref=none` |
+
+**표의 번호는 처리 순서가 아니라 판정 식별자다.** 실제 처리 순서는 아래와 같다(구현 `apps/inquiry/services.handle_submission`).
+
+```
+④ 빈도 제한 → ③ honeypot → ② 서버 검증 → ⑦ 토큰 만료·부재 → ⑤ 토큰 재사용 → ① 저장·발송
+                                                                       ↘ 저장 중 UNIQUE 충돌(동시 이중 제출)도 ⑤로 처리
+```
+
+**⑤(중복 제출)와 ⑦(만료)을 구분하는 이유 — PM 결정 2026-09-13**
+
+| | ⑤ 중복 제출 | ⑦ 만료·부재 |
+|---|---|---|
+| 무엇이 일어났나 | **이미 저장된 제출**이 다시 들어왔다(빠른 두 번 클릭·전송 직후 새로고침·뒤로가기 재전송) | **한 번도 저장된 적 없는 제출**이다(폼을 열어 둔 채 24시간 경과·캐시된 페이지·토큰 없이 POST) |
+| 사용자에게 맞는 답 | 접수 완료 화면 — 이미 접수됐으므로 사실과 같다 | **"다시 작성해 주세요"** — 접수되지 않았음을 알려야 한다 |
+| v0.3까지의 동작 | 좌동 | **성공 화면**(저장 없이) → 실제 이용자의 문의가 **조용히 버려질 수 있었다** |
+| v0.4 동작 | 변경 없음 | **폼 재렌더 + 안내 + 입력값 보존 + 새 토큰** |
+| 연결되는 수용 기준 | **REQ-F-046 ②**(저장 1건·메일 1건) | **REQ-F-046 ①**(실패 시 입력값을 잃지 않고 다시 제출할 수 있다) · REQ-N-030(JS 없이도 같은 경로) |
+| 판정 증거 | 저장 건수 + `inquiry.duplicate token_state=used` | 화면 문구 + 저장 0건 + `inquiry.expired token_state=…` |
+
+**동시 이중 제출**: 같은 토큰이 동시에 도착하면 두 요청이 ⑤의 조회를 함께 통과할 수 있다. 이때는 `inquiry_inquiry.submit_token` **UNIQUE** 가 두 번째를 막고, 구현은 그 충돌을 잡아 **⑤와 같은 화면(200)** 으로 응답한다(500이 아니다). 로컬 동시 5건 실행으로 확인했다(개발 보고서 §4).
 
 **판정 시 주의 (qa와 공유하는 해석)**
 
@@ -857,10 +891,10 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 |---|---|
 | **③ vs ①의 구분** | 화면·상태 코드가 같으므로 **`qa_show inquiry --count-only --since`(저장 0건)** + **`qa_mail_log --since`(발송 0건)** + 로그의 `reason=honeypot` 3개로 판정한다. 이것이 표에 "저장/발송/기록" 열을 둔 이유다 |
 | **④만 429인 이유** | ②는 사용자가 고칠 수 있는 입력 오류라 `200` 재렌더가 접근성·JS 비활성 양쪽에 맞고, ③⑤는 **차단 사실을 숨겨야 하므로 상태 코드로도 드러내지 않는다**. ④는 숨길 대상이 아니라 **재시도 시점을 알려야 하는 상태**이므로 표준 `429 + Retry-After`를 쓴다. 화면 문구는 여전히 사유를 구분하지 않는다 |
-| **결과 블록 6종과의 대응** | 페이지 디자인 §4.3의 6종 중 1차에서 실제로 나타나는 것은 **성공 · 오류(항목별) · 실패(일반) · 전송 중(JS 한정)** 4종이다. 나머지 2종(부분 실패·재시도 안내)은 2차 상담/예약 화면에서 쓰인다 — 1차 P5 판정 대상이 아님을 명시한다 |
-| **JS 비활성 시** | ①~⑥ 전부 동일하다. 차이는 "전송 중" 상태가 표시되지 않는 것뿐이다(REQ-N-030) |
+| **결과 블록 6종과의 대응** | 페이지 디자인 §4.3의 6종 중 1차에서 실제로 나타나는 것은 **성공 · 오류(항목별) · 실패(일반) · 전송 중(JS 한정)** 4종이다. **v0.4의 ⑦은 "실패(일반)" 블록의 문구 변형**이며(같은 CMP-020 실패 블록 · `role="alert"` · 포커스 이동) **새 컴포넌트가 아니다** — 다만 ④(실패)와 달리 **블록 아래에 폼이 남는다**. 나머지 2종(부분 실패·재시도 안내)은 2차 상담/예약 화면에서 쓰인다 — 1차 P5 판정 대상이 아니다 |
+| **JS 비활성 시** | ①~⑦ 전부 동일하다. 차이는 "전송 중" 상태가 표시되지 않는 것뿐이다(REQ-N-030). ⑦의 입력값 보존도 **서버 렌더로** 이루어지므로 JS 유무와 무관하다 |
 | **CSRF 토큰 불일치** | Django 기본 동작인 **403**이며 위 6종과 별개다. 정상 사용에서는 발생하지 않으므로 P5 판정 대상에 넣지 않는다(발생 시 결함) |
-| **판정용 로그 형식 (v0.3 — qa R2 #4)** | 위 표의 "서버 기록" 열은 **`key=value` 형식으로 고정**한다: `inquiry.created ref=…` · `inquiry.invalid fields=[…]` · `inquiry.blocked reason=honeypot|rate_limit ip_hash=… scope=…` · `inquiry.duplicate token_state=used|expired ref=…`. 로그 포맷은 `%(asctime)s %(levelname)s %(name)s %(message)s` 이며 **③(honeypot) 과 ⑤(토큰 재사용)의 유일한 구분 증거**이므로 키 이름을 바꾸지 않는다 |
+| **판정용 로그 형식 (v0.4 — qa R2 #4 · PM 결정 반영)** | 위 표의 "서버 기록" 열은 **`key=value` 형식으로 고정**한다: `inquiry.created ref=…` · `inquiry.invalid fields=[…]` · `inquiry.blocked reason=honeypot\|rate_limit ip_hash=… scope=…` · **`inquiry.duplicate token_state=used ref=…`(⑤)** · **`inquiry.expired token_state=expired\|missing\|invalid ref=none`(⑦ — v0.4 신설)**. 로그 포맷은 `%(asctime)s %(levelname)s %(name)s %(message)s` 이며 **③(honeypot) 과 ⑤(토큰 재사용)의 유일한 구분 증거**이므로 키 이름을 바꾸지 않는다. ⑦은 화면 문구가 다르므로 로그 없이도 구분되지만, **만료·부재·변조 중 어느 것인지는 `token_state` 로만 알 수 있다** |
 | **로그 조회 수단 (v0.3 — qa R2 #4)** | **로컬: `docker compose -f compose.yaml -f compose.local.yaml logs app`**(§3.4 의 json-file 드라이버·회전 설정으로 보존된다). **스테이징: qa 에게 셸 접근이 없으므로 devops 가 대행해 해당 구간 로그를 파일로 전달**한다(요청 창구는 티켓). 새 명령을 만들지 않는다 |
 
 ---
@@ -883,7 +917,7 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 | ⑧ **표준 시드 + 동시 요청 스크립트** | `manage.py seed_standard`(2차: 슬롯 400·예약 200·상담 100) + `qa/concurrency.py`(동시 N건 발사·성공/거부 집계). 1차는 문의 폼 동시 제출·빈도 제한 재현 + 번호 1,000건 생성 스크립트 골격 | 일부 | **0.5** | **1.0~1.5** |
 | ⑨ **실패 주입 수단** | `QA_FAIL_INJECT=smtp,backup,purge` — ⓐ SMTP 자격 증명 강제 오류 ⓑ **`run_backup` 강제 실패**(§12.5 — v0.2부터 **로컬 `backup` 프로필로도 재현 가능**) ⓒ 파기 배치 강제 예외. **각각 독립 토글**이며 실패 알림 경로(`core_jobrunlog` + `mailer_outbox`)까지 확인 가능. **주입이 걸리면 로그에 `QA_FAIL_INJECT: <대상> 주입됨` 1줄**(거짓 실패와 구분) | ○ (1차 REQ-N-032·037·038) | **0.5~0.75** | 0.25 |
 | ⑩ **기준 시각 고정·이동** | **`core/clock.py`의 `now()` 단일 진입점** + `QA_CLOCK_OFFSET_SECONDS`(**음수 허용**). 코드에서 현재 시각 직접 호출 금지(린트 규칙으로 차단). **적용/비적용 범위는 §10.3** | ○ (진입점만) | **0.25~0.5** | 0.25 |
-| **⑪ (신규)** **개인정보 컬럼 목록 출력** | `manage.py qa_pii_columns` — 모델 필드의 `pii=True` 선언에서 **테이블·컬럼·수집 목적·보관 기간 상수**를 표/ json으로 출력. §5.0이 이미 보관 기간을 테이블별 상수로 선언하므로 **같은 선언에서 뽑는다**. REQ-N-020(처리방침 수집 항목 ↔ 스키마 양방향 대조)과 REQ-N-038(항목별 보관) 판정 증거로 재사용 | ○ (qa R1 #11) | **0.25** | 0.1 |
+| **⑪ (신규)** **개인정보 컬럼 목록 출력** | `manage.py qa_pii_columns` — 모델의 개인정보 선언에서 **테이블·컬럼·수집 목적·보관 기간 상수**를 표/ json으로 출력.<br>**v0.4 구현 확정: 선언 형식은 필드 인자 `pii=True` 가 아니라 모델 클래스 속성 `PII_FIELDS = {필드명: (수집 목적, 마스킹 여부)}` 다.** Django 필드에 사용자 인자를 주려면 필드 클래스를 상속해야 하고 그러면 **마이그레이션 상태가 바뀐다**(1차에서 되돌릴 일을 만들지 않는다는 §5.0 원칙에 어긋난다). 출력·판정 동작은 동일하다. §5.0이 이미 보관 기간을 테이블별 상수로 선언하므로 **같은 선언에서 뽑는다**. REQ-N-020(처리방침 수집 항목 ↔ 스키마 양방향 대조)과 REQ-N-038(항목별 보관) 판정 증거로 재사용 | ○ (qa R1 #11) | **0.25** | 0.1 |
 | | **합계** | | **3.0 ~ 3.5작업일** (v0.1 2.7~3.2 + ⑤⑥⑪ 반영분 **+0.3**) | **2.9 ~ 3.7작업일** |
 
 **⑩을 1차에 넣는 이유**: 시각 진입점을 나중에 한 곳으로 모으려면 **이미 작성된 모든 코드를 고쳐야 한다.** 1차에 0.25~0.5작업일을 쓰면 2차에는 오프셋 적용만 남는다.
@@ -974,6 +1008,18 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 | 13 | **검증 지원 도구 ①~⑪ (1차분)** | qa 인계 | §10 | **3.0 ~ 3.5** (v0.1 2.7~3.2 + **+0.3**) |
 | 14 | 자체 점검(HTML·링크·`[TBD]` 검색·비밀 정보 검색·`check --deploy`) · **개발 보고서(P4-③)** | 보고 | M-4·M-5, REQ-N-023 | **0.5** |
 | | **합계** | | | **15.7 ~ 16.45** (v0.1 14.9~15.4) |
+
+**진행 상황 (v0.4 · 2026-09-13 기준)**
+
+| 작업 | 상태 | 비고 |
+|---|---|---|
+| 1 ~ 3 (스캐폴딩·모델·공통 레이아웃) | **완료** | 구현 1단계 |
+| 4 ~ 10 (전 화면 · 문의 폼 · 메일 · SEO) | **완료** | 구현 2단계 |
+| 11 (성능·폰트 폴백 메트릭·압축·캐시) | **부분 완료** | 폴백 메트릭 **실측 적용**(Windows 실측 / macOS 폰트는 미실측 — designer 확인 필요) · 압축·캐시 확인 완료. **Lighthouse 3회 측정은 브라우저가 필요해 미실행** |
+| 12 (운영 compose · 배포/롤백 · nginx 샘플 2종 · 점검 화면 · 일일 요약) | **완료** | `deploy.sh`·`rollback.sh`·`restore.sh`·`yogapass-prod.conf.sample`·`yogapass-stg.conf.sample`. **로컬에서 재현 가능한 범위까지 실행 확인**, 실제 배포·롤백은 서버 필요 |
+| 12 (백업·복구) | **완료** | `run_backup`(정상·dry-run·라벨·락 충돌·실패 주입·회전) · `restore.sh` **로컬 복구 리허설 1회 성공** |
+| 13 (검증 지원 도구 ①~⑪) | **완료** | 안전장치 5중 전건 실행 확인 |
+| 14 (자체 점검 · 개발 보고서) | 진행 중 | 브라우저 의존 항목은 P5 전까지 미확인으로 남는다 |
 
 **R1 반영으로 늘어난 공수의 내역 (+0.8 ~ 1.05작업일)**
 
@@ -1450,3 +1496,4 @@ CREATE TRIGGER adminlog_no_change BEFORE UPDATE OR DELETE ON backoffice_adminact
 | 0.1 | 2026-09-12 | developer | 최초 작성 — 스택(Django 5.2 LTS + PostgreSQL 17) 확정, 로컬·운영 compose 구성, 1차/2차 데이터 모델과 DB 제약, 검증 지원 도구 ①~⑩ 별도 산정, 배포·백업·복구 설계, 로컬/운영 차이 10건, 기술 리스크 12건. 결정 대기 항목 10건(D-5·6·7·8·9·13·28·29·33·34) 확정 | CR-001, `shared/reviews/CR-001_impact_developer_r2.md`, `shared/reviews/P3_design-docs_developer_r1.md`, `interviews/2026-09-12_infra-constraints.md` v0.5 |
 | **0.2** | **2026-09-12** | developer | **R1 교차 검토 반영 (Must 5 · Should 19 전건 반영, 미반영 0건 — §17 처리 대장).** ① 백업을 `scheduler`의 `manage.py run_backup`으로 일원화하고 실행 기록·실패 알림(`kind=backup_failed`)·실패 주입 경로를 확정(§12.5.1, `backup` 상시 컨테이너 폐지) ② 스테이징 접근 제어 신설 — nginx `auth_basic`·`QA_TOOLS_ENABLED` 마스터 스위치·검증 도구 HTTP 노출 0(§3.5.1·§10.6 5중 장치) ③ **문의 폼 응답 형태 표 6행×5열 신설**(§9.6 — REQ-F-042의 P5 판정 기준) ④ 로컬 compose에 `proxy`·`backup` **선택 프로필** 추가 + "세 환경 동일 구성" 판정 정의(§3.2.1) ⑤ REQ-N-032·033을 P5 창 안(10-17·10-20)으로 선행 배치하고 선행 조건·G7 이월 전환 규칙 명시(§12.6.2). 그 밖에 nginx 요청 9행화·HTML 압축 주체·정적 점검 화면·배포 절차 2.5단계·이미지 보존·다운타임 목표·일일 운영 요약 메일·`.env` 재발급·clock 적용 범위(§10.3)·`qa_purge_test_data` 규칙(§10.4)·Safari 검증 수단(§10.5)·도구 출력 규격(§10.2)·`qa_pii_columns`(⑪ 신설)·빈도 제한 알림 임계값·§13 #11·#12 신설과 #6 재현 절차(§13.1). 기술 리스크 12 → 15건, 1차 산정 약 15 → **약 16작업일**. **PM 결정 5건을 §14.4로 분리**(일정·SMTP 선연결·오프사이트 백업·소스 반입 수단·G5 판정 범위) | `shared/reviews/P4a_tech-design_devops_r1.md`, `shared/reviews/P4a_tech-design_qa_r1.md` |
 | **0.3** | **2026-09-13** | developer | **R2 교차 검토 반영 (신규 Must 0건 · Should 8 · Could 4 — 전건 반영, 미반영 0건 — §17.4).** ① 배포 절차의 **스케줄러 정지를 0.5단계로 앞당기고 라벨 백업의 `skipped` 를 배포 중단 사유로** 확정(§12.2·§12.5.1·§12.5.3) ② 일일 운영 요약의 백업 판정을 **"24시간 내 성공 기록 없음 = 점검 필요"로 반전**하고 `skipped` 별도 집계(§3.3) ③ **`/healthz` 호출은 항상 앱에 직접(nginx 비경유)** 을 명시해 스테이징 `auth_basic` 과의 충돌·자동 롤백 오발동을 차단(§3.3·§3.4·§3.5.1·§12.2) ④ `.env.example` 의 **`COMPOSE_PROFILES`** 로 플래그 없는 로컬 기동 = REQ-N-034 문면 충족(§3.2.1·§3.5) ⑤ **`mail` 을 프로필로 분리**해 운영·스테이징 판정 지점 확정(§3.2) ⑥ **폼 차단 지속 시간·`Retry-After` 계산식** 확정(§5.3) ⑦ **판정용 로그 `key=value` 형식·조회 수단** 명시(§9.6) ⑧ 선행 조건 **10-16 재확인 체크포인트**(§12.6.2) ⑨ 로컬 `auth_basic` 선검증(더미 자격)으로 **스테이징 단독 판정 5건 → 4건**(§13) ⑩ `${BACKUP_DIR}` 를 `scheduler` 에만 마운트(§3.5). **구현 1단계 착수에 따른 사실 반영**: PyYAML 6.0.3 의존성 추가·패치 버전 고정(§2.7), `config/env.py`·`deploy/nginx/htpasswd.dummy` 추가(§4), 환경별 `.env` 선택을 `ENV_FILE` 로 처리(§3.5) | `shared/reviews/P4a_tech-design_devops_r2.md`, `shared/reviews/P4a_tech-design_qa_r2.md` |
+| **0.4** | **2026-09-13** | developer | **PM 결정 2건 반영 + 구현 3단계(운영·배포·백업·검증 도구) 확정 사실 반영.** ① **§9.6 표를 6행 → 7행으로 분리** — ⑤ `submit_token` **재사용(중복 제출)** 과 ⑦ **만료·부재·변조** 를 다른 처리로 확정했다. ⑦은 **저장 없이 성공 화면을 주던 동작을 버리고 "시간이 지나 다시 작성해 주세요" 안내 + 폼 재렌더 + 입력값 보존 + 새 토큰 발급**으로 바꿨으며(PM 결정 2026-09-13), 수용 기준 연결을 ⑤→REQ-F-046 ② / ⑦→REQ-F-046 ①·REQ-N-030 으로 나누고 처리 순서·판정 증거·로그 키(`inquiry.expired token_state=expired\|missing\|invalid`)를 명시했다 ② **동시 이중 제출이 500 이 되던 경로**를 구현 중 발견해 닫고(UNIQUE 충돌 → ⑤ 처리) 그 규칙을 §9.6에 적었다 ③ 일일 운영 요약 **ⓑ(재시작 횟수)를 "응답 회복 전환 횟수"** 로 구현 확정(§3.3 — docker 소켓 마운트 회피) ④ 검증 요건 **⑪의 선언 형식을 모델 속성 `PII_FIELDS`** 로 확정(§10.1 — 필드 상속은 마이그레이션 상태를 바꾼다) ⑤ **§11.1 진행 상황 표 신설** — 작업 11(부분)·12·13 완료. OG 이미지는 **임시본 생성 + 교체 절차**로 처리했다(TKT-DSN-002) | PM 결정 2026-09-13, `shared/tickets/TKT-DSN-002_to-developer_favicon-og-raster.md` |

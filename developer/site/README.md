@@ -40,7 +40,7 @@ docker compose -f compose.yaml -f compose.local.yaml up
 | http://localhost:8025 | Mailpit UI (발송 메일 확인) |
 | http://localhost:8000/healthz | 헬스체크 (호출은 **항상 앱에 직접** 한다 — nginx 경유 금지) |
 
-- `COMPOSE_PROFILES` 를 비우면 `proxy` 없이 앱만 뜬다. `backup` 프로필은 **작업 12(`manage.py run_backup`) 완료 후** 값에 추가한다.
+- `COMPOSE_PROFILES` 를 비우면 `proxy` 없이 앱만 뜬다. 기본값은 **`proxy,backup`** 이다 — `backup` 은 기동 시 `run_backup` 을 1회 실행하고 끝나는 일회용 서비스다(상시 컨테이너가 아니다).
 - 스테이징·운영은 같은 `compose.yaml` 에 override 1개만 바꿔 쓴다:
   ```bash
   ENV_FILE=.env.staging docker compose -f compose.yaml -f compose.prod.yaml -p yogapass-stg up -d
@@ -63,6 +63,31 @@ $C exec -e DJANGO_SETTINGS_MODULE=config.settings.test app python manage.py test
 $C exec app ruff check .                        # 린트
 $C exec app ruff format .                       # 포맷
 $C logs -f scheduler                            # 정기 작업 로그
+
+# --- 운영 작업 (스케줄러가 자동 실행한다. 아래는 수동 실행법) ---
+$C exec scheduler python manage.py run_backup            # DB 백업 + 무결성 확인 + 회전
+$C exec scheduler python manage.py run_backup --dry-run  # 대상·여유 공간·회전 예정만
+$C exec scheduler python manage.py run_backup --label pre-deploy   # 라벨 백업(락 충돌 시 실패)
+$C exec scheduler python manage.py purge_expired --dry-run         # 보관 기간 경과 파기
+$C exec scheduler python manage.py prune_rate_limit --dry-run      # 빈도 제한 카운터 정리
+$C exec scheduler python manage.py report_failures --dry-run       # 일일 운영 요약 본문 확인
+$C exec scheduler python manage.py ping_health                     # /healthz 폴링(앱 직접)
+
+# --- 배포·롤백·복구 (서버에서 실행한다. 로컬 재현은 COMPOSE_FILES 로) ---
+APP_VERSION=0.1.0 ./deploy/deploy.sh --dry-run     # 0단계 사전 점검만
+APP_VERSION=0.1.0 ./deploy/deploy.sh               # 배포
+ROLLBACK_VERSION=0.0.9 ./deploy/rollback.sh        # 롤백
+./deploy/restore.sh /backups/<파일>.dump           # 복구(확인 입력 yes · 운영은 추가 플래그)
+COMPOSE_FILES="-f compose.yaml -f compose.local.yaml" ./deploy/restore.sh /backups/<파일>.dump  # 로컬 리허설
+
+# --- 검증 지원 도구 (QA_TOOLS_ENABLED=1 인 환경에서만 동작) ---
+$C exec app python manage.py qa_show inquiry --count-only --since 2026-10-15T09:00
+$C exec app python manage.py qa_mail_log --kind inquiry_notify --format json
+$C exec app python manage.py qa_pii_columns
+$C exec app python manage.py qa_purge_test_data --since <ISO> --confirm
+$C exec app python manage.py seed_standard --count 20 --refs 1000
+$C exec app python manage.py qa_session --role staff --token "$QA_SESSION_TOKEN"
+$C exec app python qa/concurrency.py --url http://127.0.0.1:8000/location --count 20
 ```
 
 ## 5. 운영 빌드 미리보기
@@ -129,4 +154,40 @@ curl -sS -o /tmp/pdyn.css "$B/pretendard-dynamic-subset.css"
 - 포커스 링 규칙은 `static/css/tokens.css` 맨 뒤에 있다. 이후 CSS 에서 `outline` 을 덮지 않는다.
 - **템플릿의 여러 줄 주석은 `{% comment %}` 를 쓴다.** Django 의 `{# … #}` 는 한 줄 전용이라 여러 줄로 쓰면 주석이 HTML 로 새어 나간다.
 - `static/img/*.svg` 는 브라우저가 **XML 로 파싱**한다. 주석 안에 `--`(연속 하이픈)를 넣으면 파싱 오류로 이미지가 뜨지 않는다.
-- OG 대표 이미지(`static/img/og-image.png`)는 **파일이 있을 때만** `og:image` 계열 태그가 붙는다. placeholder 를 만들지 않는다.
+- OG 대표 이미지(`static/img/og-image.png`)는 **파일이 있을 때만** `og:image` 계열 태그가 붙는다.
+  현재 파일은 **임시본**이다(PM 결정 2026-09-13). 출처·교체 절차는 `static/img/SOURCES.md`.
+- **`.env` 의 값 줄에 인라인 주석을 쓰지 않는다.** `docker run --env-file` 과 셸 파서가 주석을 값의 일부로 읽어
+  숫자 해석 실패·가드 우회가 생긴다. 설명은 값 줄 **위**에 둔다.
+
+---
+
+## 10. 백업 · 복구 · 배포 (작업 12 · 기술 설계 §12)
+
+| 항목 | 내용 |
+|---|---|
+| 정기 백업 | 스케줄러가 **매일 03:00** `run_backup` 실행 → `${BACKUP_DIR}`(로컬 기본 `./backups`)에 `yogapass-<env>-YYYYMMDD-HHMM.dump`(KST 표기) |
+| 무결성 | 파일 크기 > 0 **AND `pg_restore --list` 성공**. 실패하면 종료 코드 ≠ 0 + `mailer_outbox(kind=backup_failed)` 알림 |
+| 회전 | **일 7 · 주 4 · 월 3**. `--label` 이 붙은 파일은 회전 대상에서 제외하고 최근 3개만 유지 |
+| ⚠ 라벨 백업 | `--label` 실행은 **required** 다. 다른 백업이 돌고 있어 락을 못 잡으면 `skipped` 가 아니라 **종료 코드 ≠ 0 으로 실패**하고, `deploy.sh`·`restore.sh` 는 그것을 중단 사유로 쓴다 |
+| 복구 | `deploy/restore.sh <파일>` — ⓐ 대상 출력 + `yes` 입력 ⓑ 운영이면 `--i-know-this-is-production` ⓒ **복구 전 현재 DB 자동 덤프(`pre-restore`)**. 덤프가 실패하면 복구하지 않는다 |
+| 배포 | `deploy/deploy.sh` — 0 사전 점검 → **0.5 스케줄러 정지** → 1 라벨 백업 → 2 빌드 → 3 마이그레이션 → 4 기동 → 5 `/healthz`(**앱 직접**) 확인·다운타임 실측 → 실패 시 `rollback.sh` 자동 호출 |
+| ⚠ 이미지 정리 | **`docker image prune -a` 금지.** 롤백 경로가 사라진다. 정리는 `docker image prune --filter "label!=org.yogapass.keep=release"` 로만 한다 |
+| nginx | 호스트 nginx 요청안은 `deploy/nginx/yogapass-prod.conf.sample` · `yogapass-stg.conf.sample`. 로컬 `local.conf` 가 같은 지시어 집합을 먼저 검증한다 |
+
+## 11. 검증 지원 도구 (작업 13 · 기술 설계 §10)
+
+- 전부 **관리 명령**이다. **HTTP 경로로 노출되지 않는다.**
+- `QA_TOOLS_ENABLED=1` 이 아니면 각 명령이 **"이 환경에서는 사용할 수 없습니다" + 종료 코드 2** 로 끝난다.
+- **운영 이미지에는 `qa/` 디렉토리 자체가 없다.** 그 이미지에서 `QA_TOOLS_ENABLED=1` 을 주면 **기동이 거부**된다.
+
+| 환경 변수 | 용도 |
+|---|---|
+| `QA_TOOLS_ENABLED` | 마스터 스위치. **이 값 없이는 아래 어떤 것도 해석되지 않는다** |
+| `QA_CLOCK_OFFSET_SECONDS` | 기준 시각 이동(**음수 허용**). 적용 시 기동 로그에 `CLOCK OFFSET: <n>s` |
+| `QA_FAIL_INJECT` | `smtp,backup,purge` 콤마 목록(**독립 토글**). 주입되면 로그 1줄 |
+| `QA_RETENTION_MINUTES__INQUIRY` | 보관 기간을 **분 단위**로 단축(파기 배치 검증) |
+| `QA_RATE_LIMIT_MODE=off` | 빈도 제한만 끈다(다른 항목에 영향 없음) |
+| `QA_RATE_LIMIT_ALERT_*` | 사용량 알림 임계값 하향 |
+| `QA_SESSION_TOKEN` | `qa_session` 사용 조건 |
+
+- WebKit(Safari·iOS) 실기기 체크리스트: **`qa/webkit_checklist.md`**

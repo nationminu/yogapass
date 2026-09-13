@@ -9,6 +9,7 @@ from django.core.mail import get_connection
 from django.core.mail.message import EmailMessage
 from django.core.management.base import BaseCommand
 
+from apps.core import qaflags
 from apps.core.clock import now
 from apps.core.jobs import run_job
 from apps.mailer.models import Outbox
@@ -44,6 +45,9 @@ class Command(BaseCommand):
             for row in pending:
                 row.attempts += 1
                 try:
+                    if qaflags.fail_injected("smtp"):
+                        # 요건 ⑨ⓐ — SMTP 실패를 주입한다. 재시도·실패 기록 경로를 그대로 탄다.
+                        raise RuntimeError("QA_FAIL_INJECT=smtp 에 의한 의도된 발송 실패")
                     EmailMessage(
                         subject=row.subject,
                         body=row.body_text,

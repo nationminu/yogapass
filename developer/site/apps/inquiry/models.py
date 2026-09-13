@@ -21,6 +21,21 @@ class Inquiry(models.Model):
     #: 보관 기간 설정 키 (settings.RETENTION_DAYS) — 파기 배치가 이 값만 본다(REQ-N-038)
     RETENTION_KEY = "INQUIRY"
 
+    #: 개인정보 컬럼 선언 — `manage.py qa_pii_columns` 가 여기서 목록을 만든다(검증 요건 ⑪).
+    #: 형식: 필드명 → (수집 목적, 조회 시 마스킹 대상 여부)
+    #: ⚠ 처리방침(content/privacy.yml)의 수집 항목과 **이 선언이 곧 대조 기준**이다(REQ-N-020).
+    PII_FIELDS = {
+        "name": ("문의 답변을 위한 문의자 식별", True),
+        "phone": ("문의 답변 연락", True),
+        "phone_norm": ("표기 형식과 무관한 조회·중복 판정(생성 컬럼)", True),
+        "message": ("문의 내용 확인·답변", False),
+        "consent_at": ("수집·이용 동의 시각 증빙", False),
+        "source_ip_hash": (
+            "악용 방지 — **솔트 해시만 저장하고 원본 IP 는 저장하지 않는다**",
+            False,
+        ),
+    }
+
     public_ref = models.UUIDField("외부 식별자", default=uuid.uuid4, unique=True, editable=False)
     name = models.CharField("이름", max_length=20)
     phone = models.CharField("휴대폰 번호", max_length=20)

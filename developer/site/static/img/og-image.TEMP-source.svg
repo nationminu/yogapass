@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-labelledby="ypogt ypogd">
+  <title id="ypogt">강남 요가패스</title>
+  <desc id="ypogd">강남 요가패스 로고와 "강남 요가 스튜디오" 문구가 있는 대표 이미지</desc>
+  <!--
+    ⚠ 임시본(TEMPORARY) — og-image.png 생성용 작업 사본. 정식본이 아니다.
+    · 원본: design/assets/og-image.svg (designer 제작, 2026-09-12). 레이아웃·색·문구·좌표는 원본 그대로다.
+    · 임시인 이유: 원본은 font-family 첫 항목이 Pretendard 인데 저장소의 Pretendard 는
+      unicode-range 분할 woff2 서브셋뿐이라 래스터 변환기(fontconfig/freetype)가 로드하지 못한다.
+      PM 결정(2026-09-13)에 따라 **변환 환경에서 사용할 수 있는 폰트(Noto Sans CJK KR)로 렌더**해
+      임시 og-image.png 을 만든다. 자간·글자 폭이 Pretendard 조판과 다르다.
+    · 이 파일에서 원본과 다른 곳은 font-family 목록 1종류(Noto Sans CJK KR 추가)뿐이다.
+    · 정식본 교체 절차: design/assets/og-image.svg 를 Pretendard 가 설치된 환경 또는
+      텍스트 아웃라인 SVG 로 1200x630 PNG(≤300KB) 를 구워 static/img/og-image.png 에 덮어쓴다.
+      **코드·템플릿 변경은 필요 없다** (apps/core/context_processors._og_image 가 파일 존재만 본다).
+      교체 후 이 파일(og-image.TEMP-source.svg)과 static/img/SOURCES.md 의 임시 표기를 지운다.
+  -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0 L0 0 0 40" fill="none" stroke="#0B4F9E" stroke-opacity="0.10" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="#F0F5FB"/>
+  <rect x="740" y="0" width="460" height="630" fill="url(#grid)"/>
+  <rect x="0" y="0" width="12" height="630" fill="#0B4F9E"/>
+
+  <g transform="translate(96,120) scale(2.5)">
+    <g fill="none" stroke="#0B4F9E" stroke-width="4.5" stroke-linecap="round">
+      <path d="M7.5 33.5a16.5 16.5 0 0 1 33 0"/>
+      <path d="M6 40.5h36"/>
+    </g>
+    <circle cx="24" cy="12" r="5.5" fill="#0B4F9E"/>
+  </g>
+  <text x="244" y="204"
+        font-family="Pretendard, 'Noto Sans CJK KR', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif"
+        font-size="56" font-weight="700" letter-spacing="2" fill="#0A2540">YOGAPASS</text>
+
+  <text x="96" y="392"
+        font-family="Pretendard, 'Noto Sans CJK KR', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif"
+        font-size="92" font-weight="700" letter-spacing="-1.4" fill="#16263A">강남 요가패스</text>
+
+  <text x="96" y="456"
+        font-family="Pretendard, 'Noto Sans CJK KR', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif"
+        font-size="36" font-weight="400" fill="#5A6B7D">강남 요가 스튜디오</text>
+
+  <rect x="96" y="520" width="1008" height="1" fill="#DDE4EC"/>
+</svg>

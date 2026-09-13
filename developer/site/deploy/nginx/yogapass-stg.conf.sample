@@ -1,0 +1,70 @@
+# ============================================================================
+# 스테이징 nginx 설정 **샘플** — 운영 샘플과 다른 곳은 (8)(9) 두 행뿐이다.
+#
+# ⚠ 스테이징은 **검증 도구(QA_TOOLS_ENABLED=1)가 켜진 환경**이므로
+#    반드시 인증 뒤에 둔다. 무인증으로 열려 있으면 그 자체가 Critical 이다(설계 §3.5.1 · §10.6).
+# ⚠ **예외 경로는 0건**이다(외부 요청 기준). 내부 `/healthz` 호출은 nginx 를 거치지 않으므로
+#    auth_basic 예외를 만들 필요가 없다(devops R2 #3).
+#
+# 치환할 값: {STG_DOMAIN} {APP_PORT} {CERT_PATH} {STATIC_ROOT} {HTPASSWD} {허용 IP}
+# 계정 생성·전달은 devops 배포 계획서에서 한다. **값은 어떤 문서에도 쓰지 않는다.**
+# ============================================================================
+
+server {
+    listen 80;
+    server_name {STG_DOMAIN};
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name {STG_DOMAIN};
+
+    # 스테이징 TLS 는 도메인 확정과 무관하게 **선행**한다 — 사설 인증서도 가능하다(§12.6).
+    ssl_certificate     {CERT_PATH}/fullchain.pem;
+    ssl_certificate_key {CERT_PATH}/privkey.pem;
+
+    # (8) 접근 제어 — server 블록 전체. **예외 location 을 만들지 않는다.**
+    auth_basic           "yogapass staging";
+    auth_basic_user_file {HTPASSWD};
+    # 가능하면 출처 IP 도 함께 제한한다(순서 주의: satisfy all 이 기본)
+    # allow {허용 IP};
+    # deny all;
+
+    # (9) 색인 차단 — 앱(FORCE_NOINDEX)과 **2중**이다
+    add_header X-Robots-Tag "noindex, nofollow" always;
+
+    # 아래는 운영 샘플과 동일
+    proxy_intercept_errors off;
+
+    gzip on;
+    gzip_proxied any;
+    gzip_min_length 1024;
+    gzip_types text/plain text/css application/javascript application/json image/svg+xml;
+    gzip_vary on;
+
+    access_log /var/log/nginx/yogapass-stg.access.log;
+    error_log  /var/log/nginx/yogapass-stg.error.log;
+
+    client_max_body_size 2m;
+
+    location / {
+        proxy_pass http://127.0.0.1:{APP_PORT};
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_read_timeout 30s;
+    }
+
+    error_page 502 503 504 /maintenance.html;
+    location = /maintenance.html {
+        root {STATIC_ROOT};
+        internal;
+        # auth_basic 예외를 두지 않는다 — internal 이라 외부에서 직접 요청할 수 없고,
+        # 502 로 들어온 요청은 이미 인증을 통과한 요청이다(예외 경로 0건 유지).
+    }
+}

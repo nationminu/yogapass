@@ -41,12 +41,12 @@
   syncAll();
 
   /* G-9 WebKit 폴백 — 가상 키보드가 뜨면 고정 바가 화면 밖으로 밀린다.
-     관측 신호: <html data-vk-fallback="on"> (검증 도구 ⑥ 가 이 속성을 본다) */
+     관측 신호: <html data-vk-fallback="1"> (기술 설계 §10.5 ① 규격 — 검증 도구 ⑥ 가 이 값을 본다) */
   var vv = window.visualViewport;
   if (!vv || !bar) return;
   var isWebKit = /AppleWebKit/.test(navigator.userAgent) && !/Chrome|Chromium|Edg/.test(navigator.userAgent);
   if (!isWebKit) return;
-  root.setAttribute("data-vk-fallback", "on");
+  root.setAttribute("data-vk-fallback", "1");
   function follow() {
     if (noBarQuery.matches) { bar.style.transform = ""; return; }
     var offset = window.innerHeight - vv.height - vv.offsetTop;

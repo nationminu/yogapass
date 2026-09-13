@@ -10,3 +10,13 @@ ignore = ["S101"]
 [tool.ruff.lint.per-file-ignores]
 "config/settings/*.py" = ["F403", "F405"]
 "tests/*.py" = ["S105", "S106"]
+# 운영자·qa 가 읽는 **표 형태의 콘솔 출력·메일 본문**을 만드는 모듈이다.
+# 열 너비(%-24s)와 소수 자리(%.1f)를 한 줄에 여러 개 쓰는 곳이라 printf 표기가 더 읽기 쉽고,
+# ruff 가 이 위치들에 자동 변환을 제공하지 않아 손으로 바꾸면 오탈자 위험만 커진다.
+# **UP031 만** 면제하며 다른 규칙은 그대로 적용된다.
+"apps/core/management/commands/prune_rate_limit.py" = ["UP031"]
+"apps/core/management/commands/purge_expired.py" = ["UP031"]
+"apps/core/management/commands/report_failures.py" = ["UP031"]
+"qa/base.py" = ["UP031"]
+"qa/concurrency.py" = ["UP031"]
+"qa/management/commands/*.py" = ["UP031"]
